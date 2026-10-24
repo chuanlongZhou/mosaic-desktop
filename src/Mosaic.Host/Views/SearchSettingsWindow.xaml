@@ -1,0 +1,32 @@
+<Window x:Class="Mosaic.Host.Views.SearchSettingsWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="Mosaic · 搜索设置" Width="680" Height="710"
+        MinWidth="560" MinHeight="570" WindowStartupLocation="CenterScreen" ResizeMode="CanResize">
+  <Grid Margin="26"><Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+    <StackPanel Margin="0,0,0,18"><TextBlock Text="搜索设置" FontSize="26" FontWeight="SemiBold" /><TextBlock Text="应用自动发现；文件只在你选择的范围内建立索引。" FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="0,8,0,0" /></StackPanel>
+    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+      <StackPanel x:Name="SettingsBody" Margin="0,0,10,0">
+        <CheckBox x:Name="EnabledCheck" Content="启用全局 Command Palette" />
+        <Grid Margin="0,10,0,16"><Grid.ColumnDefinitions><ColumnDefinition Width="110" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions><TextBlock Text="全局快捷键" VerticalAlignment="Center" FontSize="12" /><ComboBox x:Name="HotkeyCombo" Grid.Column="1" Padding="8,5" MinHeight="32" DisplayMemberPath="Label" AutomationProperties.Name="搜索快捷键" /></Grid>
+        <Border Background="{StaticResource PanelBrush}" CornerRadius="10" Padding="16" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+          <StackPanel><Grid Margin="0,0,0,10"><TextBlock Text="文件搜索范围" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" /><Button Content="添加文件夹…" Click="OnAddFolderClick" Style="{StaticResource AccentButton}" FontSize="11" HorizontalAlignment="Right" /></Grid>
+            <ListBox x:Name="RootsList" MinHeight="70" MaxHeight="154" Background="#111D2B" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+              <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem"><Setter Property="HorizontalContentAlignment" Value="Stretch" /><Setter Property="Padding" Value="4" /></Style></ListBox.ItemContainerStyle>
+              <ListBox.ItemTemplate><DataTemplate><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="30" /></Grid.ColumnDefinitions><TextBlock Text="{Binding}" FontSize="11" Foreground="#C7D9EB" TextTrimming="CharacterEllipsis" ToolTip="{Binding}" VerticalAlignment="Center" /><Button Grid.Column="1" Content="×" Padding="2,0" MinHeight="26" Style="{StaticResource QuietButton}" Tag="{Binding}" Click="OnRemoveFolderClick" ToolTip="移出搜索范围（不删除文件）" AutomationProperties.Name="移出搜索范围" /></Grid></DataTemplate></ListBox.ItemTemplate>
+            </ListBox>
+            <TextBlock Text="最多 8 个本机目录。排除系统、链接、云占位文件和常见构建缓存；不读取文件正文。" TextWrapping="Wrap" FontSize="10.5" Foreground="#89A3BA" Margin="0,10,0,8" />
+            <CheckBox x:Name="IndexEnabledCheck" Content="启用本地文件索引与目录变更监听" FontSize="12" />
+          </StackPanel>
+        </Border>
+        <CheckBox x:Name="EverythingCheck" Content="优先使用已运行的 Everything（可选）" FontSize="12" Margin="0,16,0,0" />
+        <CheckBox x:Name="GlobalScopeCheck" Content="允许 Everything 搜索全部已索引磁盘" FontSize="12" Margin="0,4,0,0" />
+        <TextBlock Text="默认仍受上方目录限制。未运行、未就绪或超时时继续使用本地搜索；不会自动安装 Everything。" TextWrapping="Wrap" FontSize="10.5" Foreground="{StaticResource MutedBrush}" Margin="18,4,0,10" />
+        <CheckBox x:Name="IgnoreAccentsCheck" Content="本地匹配忽略重音符号（例如 café / cafe）" FontSize="12" />
+        <Border Height="1" Background="{StaticResource BorderBrush}" Margin="0,16" />
+        <TextBlock x:Name="IndexStatusLabel" TextWrapping="Wrap" Foreground="#9CBCD8" FontSize="11" />
+        <StackPanel Orientation="Horizontal" Margin="0,10,0,12"><Button Content="重建已保存目录的索引" FontSize="11" Click="OnRebuildClick" Margin="0,0,8,0" /><Button Content="取消扫描" FontSize="11" Click="OnCancelScanClick" Style="{StaticResource QuietButton}" /></StackPanel>
+        <TextBlock Text="热索引：最多 2 万条 / 32 MiB · 磁盘缓存：最多 100 MiB。&#x0a;更大目录流式查询，超时会标明部分结果。保存后应用目录和快捷键。" Foreground="#728FA8" TextWrapping="Wrap" FontSize="10.5" LineHeight="19" />
+      </StackPanel>
+    </ScrollViewer>
+    <StackPanel Grid.Row="2" Margin="0,12,0,0"><TextBlock x:Name="ErrorLabel" Foreground="#FFC28E" TextWrapping="Wrap" FontSize="12" Margin="0,0,0,8" /><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="100" /><ColumnDefinition Width="120" /></Grid.ColumnDefinitions><Button Grid.Column="1" Content="取消" Style="{StaticResource QuietButton}" Click="OnCancelClick" Margin="0,0,8,0" /><Button x:Name="SaveButton" Grid.Column="2" Content="保存设置" Style="{StaticResource AccentButton}" Click="OnSaveClick" HorizontalContentAlignment="Center" /></Grid></StackPanel>
+  </Grid>
+</Window>

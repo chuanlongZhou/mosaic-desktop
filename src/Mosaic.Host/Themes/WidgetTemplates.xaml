@@ -1,0 +1,66 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:controls="clr-namespace:Mosaic.Host.Controls">
+    <controls:WidgetTemplateSelector x:Key="WidgetSelector" />
+    <DataTemplate x:Key="MetricTemplate">
+      <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="72" /></Grid.ColumnDefinitions>
+        <StackPanel><TextBlock Text="{Binding Metric.Value}" FontSize="26" LineHeight="28" LineStackingStrategy="BlockLineHeight" FontWeight="SemiBold" /><TextBlock Text="{Binding Metric.Detail}" Foreground="{StaticResource MutedBrush}" FontSize="10.5" LineHeight="14" LineStackingStrategy="BlockLineHeight" Margin="0,2,0,0" TextTrimming="CharacterEllipsis" /></StackPanel>
+        <controls:Sparkline Grid.Column="1" Height="28" Margin="4,0,0,4" Values="{Binding Metric.History}" Stroke="{Binding Metric.Color}" VerticalAlignment="Bottom" />
+      </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="QuickAccessTemplate">
+      <ItemsControl ItemsSource="{Binding (controls:WidgetContext.Owner).QuickLinks, RelativeSource={RelativeSource Self}}" Margin="-5,0,-5,0">
+        <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="2" Rows="2" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate><DataTemplate>
+          <Button Margin="5,4" Padding="12,10" HorizontalContentAlignment="Stretch" Background="#1D2B3C" BorderThickness="0"
+                  Command="{Binding (controls:WidgetContext.Owner).OpenQuickLinkCommand, RelativeSource={RelativeSource Self}}" CommandParameter="{Binding}" ToolTip="{Binding Path}" AutomationProperties.Name="{Binding Title}">
+            <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="36" /><ColumnDefinition Width="*" /><ColumnDefinition Width="18" /></Grid.ColumnDefinitions>
+              <TextBlock Text="{Binding Glyph}" Style="{StaticResource Icon}" Foreground="{StaticResource AccentBrush}" HorizontalAlignment="Left" />
+              <StackPanel Grid.Column="1"><TextBlock Text="{Binding Title}" FontSize="13" /><TextBlock Text="{Binding Description}" Style="{StaticResource MutedText}" FontSize="11" Margin="0,3,0,0" /></StackPanel>
+              <TextBlock Grid.Column="2" Text="&#xE76C;" Style="{StaticResource Icon}" FontSize="10" Foreground="{StaticResource MutedBrush}" />
+            </Grid>
+          </Button>
+        </DataTemplate></ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </DataTemplate>
+    <DataTemplate x:Key="TasksTemplate">
+      <Grid DataContext="{Binding Path=(controls:WidgetContext.Owner), RelativeSource={RelativeSource Self}}">
+        <Grid.RowDefinitions><RowDefinition Height="28" /><RowDefinition Height="*" /><RowDefinition Height="42" /></Grid.RowDefinitions>
+        <TextBlock Text="{Binding TaskSummary}" Style="{StaticResource MutedText}" />
+        <Grid Grid.Row="1">
+          <StackPanel Visibility="{Binding HasNoTasks, Converter={StaticResource BoolVisibility}}" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="8,0,8,24">
+            <TextBlock Text="&#xE73E;" Style="{StaticResource Icon}" Foreground="#7399B5" FontSize="28" Margin="0,0,0,14" />
+            <TextBlock Text="给今天一个小目标" HorizontalAlignment="Center" FontSize="13" />
+            <TextBlock Text="在下方添加你的第一项待办" Style="{StaticResource MutedText}" FontSize="11" Margin="0,6,0,0" />
+          </StackPanel>
+          <ListBox ItemsSource="{Binding Tasks}" Background="Transparent" BorderThickness="0" Padding="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                   VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" ScrollViewer.CanContentScroll="True">
+            <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem"><Setter Property="HorizontalContentAlignment" Value="Stretch" /><Setter Property="Padding" Value="0" /><Setter Property="Margin" Value="0,0,0,3" /><Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListBoxItem"><ContentPresenter /></ControlTemplate></Setter.Value></Setter></Style></ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate><DataTemplate>
+              <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="28" /></Grid.ColumnDefinitions>
+                <CheckBox IsChecked="{Binding IsCompleted, Mode=TwoWay}" AutomationProperties.Name="{Binding Title}" Margin="0,2,4,2"><TextBlock Text="{Binding Title}" TextWrapping="Wrap" FontSize="12" Margin="6,0,0,0"><TextBlock.Style><Style TargetType="TextBlock"><Style.Triggers><DataTrigger Binding="{Binding IsCompleted}" Value="True"><Setter Property="TextDecorations" Value="Strikethrough" /><Setter Property="Opacity" Value="0.5" /></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock></CheckBox>
+                <Button Grid.Column="1" Content="×" Padding="3,0" MinHeight="28" Style="{StaticResource QuietButton}" Foreground="{StaticResource MutedBrush}" ToolTip="移除此任务" AutomationProperties.Name="移除此任务" Command="{Binding (controls:WidgetContext.Owner).RemoveTaskCommand, RelativeSource={RelativeSource Self}}" CommandParameter="{Binding}" />
+              </Grid>
+            </DataTemplate></ListBox.ItemTemplate>
+          </ListBox>
+        </Grid>
+        <Grid Grid.Row="2" VerticalAlignment="Bottom"><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="34" /></Grid.ColumnDefinitions>
+          <TextBox x:Name="TaskInput" Text="{Binding NewTask, UpdateSourceTrigger=PropertyChanged}" MaxLength="200" Padding="8,8" FontSize="12" ToolTip="输入待办后按 Enter 添加" AutomationProperties.Name="新任务"><TextBox.InputBindings><KeyBinding Key="Return" Command="{Binding AddTaskCommand}"/></TextBox.InputBindings></TextBox>
+          <Button Grid.Column="1" Content="+" FontSize="20" Padding="4,0" Margin="5,0,0,0" Command="{Binding AddTaskCommand}" Style="{StaticResource AccentButton}" ToolTip="添加任务" AutomationProperties.Name="添加任务" />
+        </Grid>
+      </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="NotesTemplate">
+      <Grid>
+        <TextBox Text="{Binding (controls:WidgetContext.Owner).Notes, RelativeSource={RelativeSource Self}, UpdateSourceTrigger=PropertyChanged}"
+                 AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" MaxLength="20000" FontSize="13" Padding="0,4"
+                 Background="Transparent" BorderThickness="0" AutomationProperties.Name="随手记" />
+        <TextBlock Text="记下一闪而过的想法…" Foreground="#6E839A" IsHitTestVisible="False" Margin="0,5,0,0" FontSize="13">
+          <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding (controls:WidgetContext.Owner).Notes, RelativeSource={RelativeSource Self}}" Value=""><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></TextBlock.Style>
+        </TextBlock>
+      </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="ClockTemplate">
+      <Grid DataContext="{Binding Path=(controls:WidgetContext.Owner), RelativeSource={RelativeSource Self}}">
+        <StackPanel VerticalAlignment="Center"><TextBlock Text="{Binding Time}" FontSize="42" FontWeight="Light" Foreground="#D2E8FF" /><TextBlock Text="{Binding Date}" Style="{StaticResource MutedText}" Margin="0,6,0,0" /><Border Height="1" Background="{StaticResource BorderBrush}" Margin="0,16,0,12" /><TextBlock Text="此刻，专注于重要的事。" Foreground="#91A6BC" FontSize="11" /></StackPanel>
+      </Grid>
+    </DataTemplate>
+</ResourceDictionary>

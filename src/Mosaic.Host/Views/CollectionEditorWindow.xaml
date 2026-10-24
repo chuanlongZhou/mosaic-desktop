@@ -1,0 +1,21 @@
+<Window x:Class="Mosaic.Host.Views.CollectionEditorWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Mosaic · 集合编辑" Width="540" Height="610" MinWidth="480" MinHeight="500" WindowStartupLocation="CenterOwner" ResizeMode="CanResize">
+  <Grid Margin="26"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+    <StackPanel Margin="0,0,0,16"><TextBlock x:Name="Heading" Text="新建资源集合" FontSize="25" FontWeight="SemiBold"/><TextBlock Text="集合只组织已登记资源，不移动或删除原文件。" FontSize="11" Foreground="{StaticResource MutedBrush}" Margin="0,8,0,0"/></StackPanel>
+    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"><StackPanel x:Name="EditorBody" Margin="0,0,10,0">
+      <TextBlock Text="名称" FontSize="11" Margin="0,0,0,6"/><TextBox x:Name="NameInput" MaxLength="80" AutomationProperties.Name="集合名称"/>
+      <TextBlock Text="集合类型" FontSize="11" Margin="0,14,0,6"/><ComboBox x:Name="KindInput" DisplayMemberPath="Label" SelectionChanged="OnKindChanged" AutomationProperties.Name="集合类型"/>
+      <TextBlock x:Name="RuleHelp" TextWrapping="Wrap" Foreground="{StaticResource MutedBrush}" FontSize="11" Margin="0,10,0,12"/>
+      <StackPanel x:Name="RulePanel">
+        <CheckBox x:Name="AnyRuleCheck" Content="任意条件满足即可（OR，默认同时满足 AND）" FontSize="11" Margin="0,0,0,8"/>
+        <TextBlock Text="类型条件（智能集合）" FontSize="11" Margin="0,0,0,6"/><ComboBox x:Name="TypeInput" DisplayMemberPath="Label" AutomationProperties.Name="集合资源类型"/>
+        <TextBlock Text="标签条件（精确匹配）" FontSize="11" Margin="0,12,0,6"/><TextBox x:Name="TagInput" MaxLength="40" AutomationProperties.Name="集合标签条件"/>
+        <TextBlock Text="目录范围（完整路径，可留空）" FontSize="11" Margin="0,12,0,6"/><TextBox x:Name="RootInput" MaxLength="4096" AutomationProperties.Name="集合目录条件"/>
+        <TextBlock Text="名称 / 路径关键词" FontSize="11" Margin="0,12,0,6"/><TextBox x:Name="RuleQueryInput" MaxLength="256" AutomationProperties.Name="集合关键词条件"/>
+      </StackPanel>
+      <Button Content="预览匹配数量" Click="OnPreviewClick" Style="{StaticResource QuietButton}" HorizontalAlignment="Left" Margin="0,12,0,0" FontSize="11"/>
+      <TextBlock x:Name="CountLabel" TextWrapping="Wrap" Foreground="#91BCE0" FontSize="11" Margin="0,8,0,12"/>
+    </StackPanel></ScrollViewer>
+    <StackPanel Grid.Row="2" Margin="0,12,0,0"><TextBlock x:Name="ErrorLabel" TextWrapping="Wrap" Foreground="#FFC28E" FontSize="11" Margin="0,0,0,10"/><StackPanel Orientation="Horizontal" HorizontalAlignment="Right"><Button Content="取消" Click="OnCancelClick" Style="{StaticResource QuietButton}" Margin="0,0,8,0"/><Button x:Name="SaveButton" Content="保存集合" Click="OnSaveClick" Style="{StaticResource AccentButton}" AutomationProperties.Name="保存集合"/></StackPanel></StackPanel>
+  </Grid>
+</Window>

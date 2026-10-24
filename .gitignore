@@ -1,0 +1,17 @@
+**/bin/
+**/obj/
+.tools/
+.artifacts/
+.vs/
+*.user
+artifacts/
+.idea/
+.env
+.env.*
+!.env.example
+*.pfx
+*.p12
+*.key
+*.dmp
+Thumbs.db
+.DS_Store
