@@ -13,12 +13,20 @@ public partial class LibraryView : UserControl, IDisposable
     private readonly AppServices _services;
     private readonly SearchRuntime _runtime;
     public LibraryViewModel ViewModel { get; }
-    private bool _details;
+    private bool? _details;
     private string? _pendingWorkspace;
     public LibraryView(AppServices services, SearchRuntime runtime, string? selectedId = null)
     {
         _services = services; _runtime = runtime; ViewModel = new(services, runtime);
         InitializeComponent(); DataContext = ViewModel;
+        AllowDrop = true;
+        DragOver += (_, e) => { e.Effects = e.Data.GetDataPresent(DataFormats.FileDrop) ? DragDropEffects.Link : DragDropEffects.None; e.Handled = true; };
+        Drop += async (_, e) => { if (e.Data.GetData(DataFormats.FileDrop) is string[] paths) { e.Handled = true; await ViewModel.AddPathsAsync(paths.Take(256)); } };
+        ResourcesList.PreviewKeyDown += async (_, e) =>
+        {
+            if (e.Key == Key.Enter) { e.Handled = true; await ViewModel.OpenAsync(); }
+            else if (e.Key == Key.C && Keyboard.Modifiers == ModifierKeys.Control) { OnCopyClick(this, e); e.Handled = true; }
+        };
         var initialized = false;
         Loaded += async (_, _) =>
         {
@@ -35,7 +43,7 @@ public partial class LibraryView : UserControl, IDisposable
     private async void OnSearchClick(object sender, RoutedEventArgs e) => await _services.Commands.ExecuteAsync(new("palette.toggle"));
     private void OnAddClick(object sender, RoutedEventArgs e)
     {
-        var menu = new ContextMenu { PlacementTarget = AddResourceButton };
+        var menu = new ContextMenu { PlacementTarget = sender as Button ?? AddResourceButton };
         var files = new MenuItem { Header = "添加文件…" };
         files.Click += async (_, _) => { var picker = new OpenFileDialog { Multiselect = true, CheckFileExists = true, Title = "登记资源（保留原文件）" }; if (picker.ShowDialog(Window.GetWindow(this)) == true) await ViewModel.AddPathsAsync(picker.FileNames); };
         menu.Items.Add(files);
@@ -61,7 +69,7 @@ public partial class LibraryView : UserControl, IDisposable
     private async void OnOpenClick(object sender, RoutedEventArgs e) => await ViewModel.OpenAsync();
     private async void OnRevealClick(object sender, RoutedEventArgs e) => await ViewModel.OpenAsync(true);
     private async void OnResourceDoubleClick(object sender, MouseButtonEventArgs e) => await ViewModel.OpenAsync();
-    private void OnResourceSelectionChanged(object sender, SelectionChangedEventArgs e) => ViewModel.SetSelection(ResourcesList.SelectedItems.OfType<Mosaic.Core.Search.SearchItem>());
+    private void OnResourceSelectionChanged(object sender, SelectionChangedEventArgs e) { ViewModel.SetSelection(ResourcesList.SelectedItems.OfType<Mosaic.Core.Search.SearchItem>()); UpdateDetails(); }
     private async void OnFavoriteClick(object sender, RoutedEventArgs e) => await ViewModel.SaveMetadataAsync(true);
     private async void OnSaveTagsClick(object sender, RoutedEventArgs e) => await ViewModel.SaveMetadataAsync(false);
     private async void OnPinClick(object sender, RoutedEventArgs e) => await ViewModel.PinToDockAsync();
@@ -89,12 +97,12 @@ public partial class LibraryView : UserControl, IDisposable
         if (id == "current" || id?.StartsWith("workspace:", StringComparison.Ordinal) == true) await ViewModel.RemoveFromWorkspaceAsync();
         else ViewModel.SetStatus("请先在左侧选择当前工作空间或具体工作空间。");
     }
-    private void OnDetailsClick(object sender, RoutedEventArgs e) { _details = !_details; UpdateDetails(); }
+    private void OnDetailsClick(object sender, RoutedEventArgs e) { _details = !(_details ?? ActualWidth >= 1000); UpdateDetails(); }
     private void OnSizeChanged(object sender, SizeChangedEventArgs e) => UpdateDetails();
     private void UpdateDetails()
     {
         if (DetailsColumn is null) return;
-        var visible = ActualWidth >= 1000 || _details;
+        var visible = (_details ?? ActualWidth >= 1000) && ViewModel.HasSelection;
         DetailsColumn.Width = new GridLength(visible ? Math.Min(266, ActualWidth * .33) : 0);
         DetailsPanel.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
     }

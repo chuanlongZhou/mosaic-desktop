@@ -9,11 +9,11 @@ public sealed class AppBarReservation : IDisposable
     private readonly nint _window;
     private readonly System.Drawing.Rectangle _bounds;
     private readonly uint _callback;
-    private readonly int _height;
+    private double _height;
     private readonly bool _bottom, _moveWindow;
     private bool _updating;
     private readonly HwndSource? _source;
-    public AppBarReservation(nint window, System.Drawing.Rectangle bounds, int height = ShellWorkArea.BarHeight, bool bottom = false, bool moveWindow = true)
+    public AppBarReservation(nint window, System.Drawing.Rectangle bounds, double height = ShellWorkArea.BarHeight, bool bottom = false, bool moveWindow = true)
     {
         _window = window; _bounds = bounds;
         _height = height; _bottom = bottom; _moveWindow = moveWindow;
@@ -23,6 +23,14 @@ public sealed class AppBarReservation : IDisposable
         Place();
     }
     private AppBarData Data() => new() { Size = (uint)Marshal.SizeOf<AppBarData>(), Window = _window, Edge = _bottom ? 3u : 1u };
+    public void SetHeight(double height)
+    {
+        height = Math.Clamp(height, 0, ShellWorkArea.BarHeight);
+        var scale = Math.Max(96, GetDpiForWindow(_window)) / 96.0;
+        var changed = Math.Ceiling(height * scale) != Math.Ceiling(_height * scale);
+        _height = height;
+        if (changed) Place();
+    }
     private void Place()
     {
         if (_updating) return;
@@ -47,7 +55,9 @@ public sealed class AppBarReservation : IDisposable
     public static uint TaskbarState() { var data = new AppBarData { Size = (uint)Marshal.SizeOf<AppBarData>() }; return (uint)SHAppBarMessage(4, ref data); }
     public static void SetTaskbarState(uint state)
     {
-        var data = new AppBarData { Size = (uint)Marshal.SizeOf<AppBarData>(), Window = FindWindow("Shell_TrayWnd", null), Parameter = new nint(state) };
+        nint window = 0;
+        do { window = FindWindowEx(0, window, "Shell_TrayWnd", null); } while (window != 0 && SystemTrayService.IsServiceWindow(window));
+        var data = new AppBarData { Size = (uint)Marshal.SizeOf<AppBarData>(), Window = window, Parameter = new nint(state) };
         SHAppBarMessage(10, ref data);
     }
     [StructLayout(LayoutKind.Sequential)] private struct AppBarData
@@ -55,6 +65,7 @@ public sealed class AppBarReservation : IDisposable
     [DllImport("shell32.dll")] private static extern nuint SHAppBarMessage(uint message, ref AppBarData data);
     [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern uint RegisterWindowMessage(string name);
     [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern nint FindWindow(string name, string? title);
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern nint FindWindowEx(nint parent, nint after, string name, string? title);
     [DllImport("user32.dll")] private static extern uint GetDpiForWindow(nint window);
     [DllImport("user32.dll")] private static extern bool SetWindowPos(nint window, nint after, int x, int y, int width, int height, uint flags);
 }

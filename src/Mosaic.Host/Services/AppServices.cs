@@ -18,6 +18,7 @@ public sealed class AppServices(JsonDocumentStore store)
     internal SemaphoreSlim StateGate { get; } = new(1, 1);
     public event EventHandler? SettingsChanged;
     public event EventHandler? WorkspaceActivated;
+    public Func<AppSettings, NativeShell.HotkeyReservation>? ReserveHotkeys { get; set; }
     private string ProfilePath => "profiles/" + Profile.ProfileId + "/";
 
     public async Task InitializeAsync()
@@ -26,6 +27,10 @@ public sealed class AppServices(JsonDocumentStore store)
         FirstRun = !File.Exists(Path.Combine(Store.Root, ProfilePath + "settings.json"));
         Settings = await Store.LoadAsync(ProfilePath + "settings.json", MosaicJsonContext.Configured.AppSettings,
             () => Defaults.Settings(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)));
+        // Add new built-in components without changing existing positions or enabled states.
+        foreach (var placement in DesktopPluginPlacement.Defaults())
+            if (Settings.Desktop.Widgets.All(x => x.Kind != placement.Kind))
+            { placement.Enabled = false; Settings.Desktop.Widgets.Add(placement); }
         Workspace = await Store.LoadAsync(ProfilePath + "workspaces/" + Settings.CurrentWorkspaceId + ".json", MosaicJsonContext.Configured.WorkspaceDocument,
             () => { var workspace = Defaults.Workspace(); workspace.Id = Settings.CurrentWorkspaceId; return workspace; });
         if (Workspace.Id != Settings.CurrentWorkspaceId) throw new InvalidDataException("工作空间文件 ID 与设置引用不一致，原文件已保留。");
@@ -50,7 +55,10 @@ public sealed class AppServices(JsonDocumentStore store)
         try
         {
             if (candidate.CurrentWorkspaceId != Settings.CurrentWorkspaceId) throw new InvalidOperationException("请使用工作空间切换入口修改当前工作空间。");
+            candidate.Validate();
+            using var hotkeys = ReserveHotkeys?.Invoke(candidate);
             await Store.SaveAsync(ProfilePath + "settings.json", candidate, MosaicJsonContext.Configured.AppSettings);
+            hotkeys?.Commit();
             Settings = candidate;
             SettingsChanged?.Invoke(this, EventArgs.Empty);
         }

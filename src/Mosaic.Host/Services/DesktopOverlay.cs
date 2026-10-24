@@ -10,7 +10,7 @@ public sealed class DesktopOverlay : IDisposable
 {
     private List<ShellWorkArea.Rect> _workAreas = [];
     private int _dockHeight;
-    private int _menuHeight;
+    private readonly Dictionary<System.Drawing.Rectangle, double> _menuHeights = [];
     private long _lastRefresh;
     private uint? _taskbarState;
     private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromSeconds(1) };
@@ -19,7 +19,7 @@ public sealed class DesktopOverlay : IDisposable
     private readonly Dictionary<nint, bool> _original = [];
     private StartMenuKeyGuard? _startMenuKeys;
     public bool Enabled { get; private set; }
-    public DesktopOverlay() => _timer.Tick += (_, _) => { HideShell(); ShellWorkArea.Apply(_dockHeight, false, _menuHeight); };
+    public DesktopOverlay() => _timer.Tick += (_, _) => { HideShell(); ShellWorkArea.Apply(_dockHeight, false, _menuHeights); };
 
     public void Enable()
     {
@@ -50,7 +50,7 @@ public sealed class DesktopOverlay : IDisposable
         EnumWindows((window, _) =>
         {
             var name = new StringBuilder(128); GetClassName(window, name, 128);
-            if (name.ToString() is "Shell_TrayWnd" or "Shell_SecondaryTrayWnd") result.Add(window);
+            if ((name.ToString() is "Shell_TrayWnd" or "Shell_SecondaryTrayWnd") && !SystemTrayService.IsServiceWindow(window)) result.Add(window);
             var icons = FindWindowEx(window, 0, "SHELLDLL_DefView", null);
             if (icons != 0)
             {
@@ -69,17 +69,25 @@ public sealed class DesktopOverlay : IDisposable
             if (IsWindowVisible(window)) ShowWindow(window, 0);
         }
     }
-    public void ConfigureDock(bool visible, bool autoHide, int iconSize, bool menuBarAutoHide)
+    public void ConfigureDock(bool visible, bool autoHide, int iconSize)
     {
         _dockHeight = visible && !autoHide ? (int)Math.Ceiling(60 * iconSize / 40.0 + 24) : 0;
-        _menuHeight = menuBarAutoHide ? 0 : ShellWorkArea.BarHeight;
-        if (Enabled) ShellWorkArea.Apply(_dockHeight, false, _menuHeight);
+        if (Enabled) ShellWorkArea.Apply(_dockHeight, false, _menuHeights);
+    }
+    public void SetMenuBarHeight(System.Drawing.Rectangle screen, double height)
+    {
+        height = Math.Clamp(height, 0, ShellWorkArea.BarHeight);
+        if (_menuHeights.GetValueOrDefault(screen) == height) return;
+        if (height == 0) _menuHeights.Remove(screen); else _menuHeights[screen] = height;
+        // AppBar registration may already have updated rcWork. Fit existing windows
+        // explicitly as well, including restored title bars at the top of the screen.
+        if (Enabled) ShellWorkArea.Apply(_dockHeight, true, _menuHeights);
     }
     public void RefreshLayout()
     {
         if (!Enabled || Environment.TickCount64 - _lastRefresh < 150) return;
         _lastRefresh = Environment.TickCount64;
-        ShellWorkArea.Apply(_dockHeight, true, _menuHeight);
+        ShellWorkArea.Apply(_dockHeight, true, _menuHeights);
     }
     public void Dispose()
     {
@@ -92,6 +100,7 @@ public sealed class DesktopOverlay : IDisposable
         _taskbarState = null;
         if (_workAreas.Count > 0) ShellWorkArea.Restore(_workAreas);
         _workAreas.Clear();
+        _menuHeights.Clear();
         _stop?.Set();
         if (_guard is not null) { _guard.WaitForExit(3000); _guard.Dispose(); _guard = null; }
         _stop?.Dispose(); _stop = null; Enabled = false;
@@ -107,6 +116,7 @@ public sealed class DesktopOverlay : IDisposable
         ready.Set();
         while (!stop.WaitOne(500) && !owner.HasExited)
             foreach (var window in ShellWindows()) original.TryAdd(window, IsWindowVisible(window));
+        SystemTrayService.ReannounceIcons();
         foreach (var (window, visible) in original) if (visible) ShowWindow(window, 5);
         AppBarReservation.SetTaskbarState(taskbarState);
         ShellWorkArea.Restore(workAreas);

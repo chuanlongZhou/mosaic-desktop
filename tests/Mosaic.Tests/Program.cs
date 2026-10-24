@@ -17,6 +17,10 @@ if (args.Contains("--dock-probe") || args.Contains("--window-probe-max"))
 var tests = new (string Name, Func<Task> Run)[]
 {
     ("Defaults validate and source-generated JSON round-trips", DefaultsRoundTrip),
+    ("Appearance and shortcut settings migrate, validate and persist", ExperienceTests.SettingsCompatibility),
+    ("Workspaces retain independent desktop layouts across restart", ExperienceTests.WorkspaceDesktop),
+    ("Global shortcut conflicts and cancelled changes preserve bindings", ExperienceTests.HotkeyTransactions),
+    ("Hardware monitoring validates available and unavailable sensors", ExperienceTests.HardwareAvailability),
     ("Dock imports taskbar pins, deduplicates and keeps running windows transient", DockChecks),
     ("Desktop Start-menu filter preserves Windows combinations and releases modifiers", StartMenuKeys),
     ("Overlay restores Windows taskbar on normal exit and forced termination", OverlayRecoveryChecks.RunAsync),

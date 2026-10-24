@@ -20,7 +20,7 @@ public partial class App : Application
     private System.Drawing.Icon? _trayIcon;
     private AppServices? _services;
     private DesktopOverlay? _overlay;
-    private Forms.ToolStripMenuItem? _overlayMenu;
+    private Forms.ToolStripMenuItem? _overlayMenu, _dashboardMenu;
     private DockWindow? _dock;
     private DashboardViewModel? _desktopVm;
     private DesktopSurface? _desktopSurface;
@@ -61,6 +61,7 @@ public partial class App : Application
             if (e.Args.Contains("--exit")) { Shutdown(); return; }
             _services = new(new JsonDocumentStore(_dataRoot));
             await _services.InitializeAsync();
+            ThemeManager.Initialize(_services);
             if (e.Args.Contains("--overlay"))
             {
                 var candidate = _services.CopySettings(); candidate.Desktop.OverlayEnabled = true;
@@ -75,11 +76,25 @@ public partial class App : Application
                 if (_searchMenu is not null) { _searchMenu.Enabled = _services.Settings.Search.Enabled; _searchMenu.Text = "全局搜索  " + NativeShell.DescribeHotkey(_services.Settings.Search); }
                 if (_libraryMenu is not null) _libraryMenu.Enabled = _services.Settings.Modules.Library;
                 if (_workspacesMenu is not null) _workspacesMenu.Enabled = _services.Settings.Modules.Workspaces;
+                if (_dashboardMenu is not null) _dashboardMenu.Text = "打开设置中心  " + NativeShell.DescribeHotkey(_services.Settings.Shortcuts.Dashboard);
             };
-            _native = new(_services.Settings.Search);
+            _native = new(_services.Settings.Search, _services.Settings.Shortcuts);
+            _services.ReserveHotkeys = _native.ReserveHotkeys;
+            _native.CaptureHotkey = binding =>
+            {
+                if (System.Windows.Input.Keyboard.FocusedElement is not Mosaic.Host.Controls.HotkeyInput input) return false;
+                input.Value = binding; return true;
+            };
             _native.DesktopModeRequested += async () => await ExecuteAsync(new("desktop.toggle"));
             _native.DashboardRequested += () => ShowDashboard();
             _native.PaletteRequested += ShowPalette;
+            _native.LibraryRequested += async () => await ExecuteAsync(new("library.open"));
+            _native.WorkspacesRequested += async () => await ExecuteAsync(new("workspaces.open"));
+            _native.EditLayoutRequested += async () =>
+            {
+                if (!_services.Settings.Desktop.OverlayEnabled) await ExecuteAsync(new("desktop.toggle"));
+                await ExecuteAsync(new("desktop.edit"));
+            };
             _everything = new(_native.Handle);
             _native.CopyDataReceiver = _everything.Receive;
             _search = new(_services, _everything);
@@ -155,13 +170,18 @@ public partial class App : Application
 
     private void CreateTray()
     {
-        var menu = new Forms.ContextMenuStrip();
+        var menu = new Forms.ContextMenuStrip
+        {
+            BackColor = DarkTrayMenuColors.Surface, ForeColor = DarkTrayMenuColors.Text, ShowImageMargin = false,
+            Renderer = new Forms.ToolStripProfessionalRenderer(new DarkTrayMenuColors()) { RoundedEdges = false }
+        };
         _overlayMenu = new Forms.ToolStripMenuItem("启用 Mosaic 桌面  Ctrl+Alt+M");
         _overlayMenu.Click += async (_, _) => await ExecuteAsync(new("desktop.toggle")); menu.Items.Add(_overlayMenu);
         _searchMenu = menu.Items.Add("全局搜索  " + NativeShell.DescribeHotkey(_services!.Settings.Search), null, (_, _) => ShowPalette());
         _searchMenu.Enabled = _services.Settings.Search.Enabled;
         menu.Items.Add("搜索目录与快捷键…", null, (_, _) => ShowSearchSettings());
-        menu.Items.Add("打开设置中心  Ctrl+Alt+D", null, (_, _) => ShowDashboard());
+        _dashboardMenu = new Forms.ToolStripMenuItem("打开设置中心  " + NativeShell.DescribeHotkey(_services.Settings.Shortcuts.Dashboard));
+        _dashboardMenu.Click += (_, _) => ShowDashboard(); menu.Items.Add(_dashboardMenu);
         _libraryMenu = menu.Items.Add("资源库", null, async (_, _) => await ExecuteAsync(new("library.open")));
         _libraryMenu.Enabled = _services.Settings.Modules.Library;
         _workspacesMenu = menu.Items.Add("工作空间", null, async (_, _) => await ExecuteAsync(new("workspaces.open")));
@@ -170,6 +190,7 @@ public partial class App : Application
         menu.Items.Add("打开 JSON 配置目录", null, (_, _) => ShellLauncher.OpenResource(_dataRoot));
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add("退出 Mosaic", null, async (_, _) => await ExitAsync());
+        menu.Opening += (_, _) => { menu.BackColor = DarkTrayMenuColors.Surface; menu.ForeColor = DarkTrayMenuColors.Text; };
         _trayIcon = System.Drawing.Icon.ExtractAssociatedIcon(Environment.ProcessPath!) ?? (System.Drawing.Icon)System.Drawing.SystemIcons.Application.Clone();
         _tray = new Forms.NotifyIcon { Text = "Mosaic Desktop", Icon = _trayIcon, Visible = true, ContextMenuStrip = menu };
         _tray.DoubleClick += (_, _) => ShowDashboard();
@@ -181,6 +202,7 @@ public partial class App : Application
         if (_dashboard is null)
         {
             _dashboard = new(_services, ExecuteAsync, () => _native?.HotKeyRegistered == true, _search, _desktopVm, () => _desktopSurface?.FlushLayoutAsync() ?? Task.CompletedTask);
+            _dashboard.ShortcutStatus = () => _native?.ShortcutStatus ?? "";
             _dashboard.Closed += (_, _) => _dashboard = null;
             _dashboard.Show();
         }
@@ -210,9 +232,7 @@ public partial class App : Application
         if (_searchSettings is not null) { _searchSettings.Activate(); return; }
         var window = new SearchSettingsWindow(_services, _search, async candidate =>
         {
-            using var reservation = _native.ReservePaletteHotkey(candidate.Search);
             await _services.SaveSettingsAsync(candidate);
-            reservation.Commit();
         }, _native.PaletteHotkeyError);
         _searchSettings = window;
         window.Closed += (_, _) => { _searchSettings = null; if (window.Saved && !_exiting) ShowPalette(); };
@@ -257,14 +277,15 @@ public partial class App : Application
     {
         if (_services is null) return;
         var overlay = _services.Settings.Desktop.OverlayEnabled;
+        if (!overlay) { foreach (var bar in _bars) bar.Close(); _bars.Clear(); }
         if (overlay)
         {
             _overlay ??= new DesktopOverlay();
             _overlay.Enable();
-            _overlay.ConfigureDock(_services.Settings.Modules.Dock, _services.Settings.Dock.AutoHide, _services.Settings.Dock.IconSize, _services.Settings.Desktop.MenuBarAutoHide);
+            _overlay.ConfigureDock(_services.Settings.Modules.Dock, _services.Settings.Dock.AutoHide, _services.Settings.Dock.IconSize);
         }
         else { _overlay?.Dispose(); _overlay = null; }
-        if (_overlayMenu is not null) { _overlayMenu.Checked = overlay; _overlayMenu.Text = overlay ? "切回 Windows 桌面  Ctrl+Alt+M" : "启用 Mosaic 桌面  Ctrl+Alt+M"; }
+        if (_overlayMenu is not null) { _overlayMenu.Checked = overlay; _overlayMenu.Text = (overlay ? "切回 Windows 桌面  " : "启用 Mosaic 桌面  ") + NativeShell.DescribeHotkey(_services.Settings.Shortcuts.Desktop); }
         _dashboard?.ApplyDesktopMode(overlay);
         if (overlay && _services.Settings.Modules.Dock)
         {
@@ -279,8 +300,12 @@ public partial class App : Application
         }
         else { _desktopSurface?.Dispose(); _desktopSurface = null; }
         if (overlay && _bars.Count == 0)
-            foreach (var screen in Forms.Screen.AllScreens) { var bar = new DesktopBarWindow(_services, ExecuteAsync, screen); _bars.Add(bar); bar.Show(); }
-        else if (!overlay) { foreach (var bar in _bars) bar.Close(); _bars.Clear(); }
+            foreach (var screen in Forms.Screen.AllScreens)
+            {
+                var bar = new DesktopBarWindow(_services, ExecuteAsync, screen, screen.Primary);
+                bar.WorkAreaChanged += () => _overlay?.SetMenuBarHeight(screen.Bounds, bar.ReservedHeight);
+                _bars.Add(bar); bar.Show();
+            }
         foreach (var bar in _bars) bar.RefreshConfiguration();
         _desktopScene?.SetEnabled(overlay);
         if (overlay && _desktopScene is not null) ApplyShellScene(_desktopScene.Current);

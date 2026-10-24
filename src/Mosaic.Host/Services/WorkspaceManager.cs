@@ -44,7 +44,7 @@ public sealed class WorkspaceManager(AppServices services)
     }
 
     private static WorkspaceSummary Summarize(WorkspaceDocument document) => new(document.Id, document.Name, document.ResourceIds.Count,
-        document.Dock?.Items.Count ?? 0, document.Layouts.GetValueOrDefault("12")?.Count ?? 0);
+        document.Dock?.Items.Count ?? 0, document.DesktopWidgets?.Count(x => x.Enabled) ?? 0);
     internal void Publish(WorkspaceDocument document)
     {
         Volatile.Write(ref _items, Items.Where(x => x.Id != document.Id).Append(Summarize(document)).OrderBy(x => x.Name, StringComparer.OrdinalIgnoreCase).ToArray());
@@ -62,6 +62,8 @@ public sealed class WorkspaceManager(AppServices services)
         JsonSerializer.SerializeToUtf8Bytes(value, MosaicJsonContext.Configured.WorkspaceDocument), MosaicJsonContext.Configured.WorkspaceDocument)!;
     public static DockSettings CopyDock(DockSettings dock) => JsonSerializer.Deserialize(
         JsonSerializer.SerializeToUtf8Bytes(new AppSettings { Dock = dock }, MosaicJsonContext.Configured.AppSettings), MosaicJsonContext.Configured.AppSettings)!.Dock;
+    public static List<DesktopPluginPlacement> CopyDesktop(IEnumerable<DesktopPluginPlacement> widgets) => widgets.Select(x => new DesktopPluginPlacement
+        { Kind = x.Kind, Enabled = x.Enabled, Left = x.Left, Top = x.Top, Width = x.Width, Height = x.Height }).ToList();
 
     public async Task<WorkspaceDocument> GetCopyAsync(string id)
     {
@@ -79,6 +81,11 @@ public sealed class WorkspaceManager(AppServices services)
             var candidate = preset == "clone" ? services.CopyWorkspace() : Defaults.Workspace();
             candidate.Id = Guid.NewGuid().ToString("N"); candidate.Name = name.Trim(); candidate.Revision = 0;
             candidate.Dock = CopyDock(services.Settings.Dock);
+            candidate.DesktopWidgets = CopyDesktop(services.Settings.Desktop.Widgets);
+            if (preset is "writing" or "ai")
+                foreach (var widget in candidate.DesktopWidgets)
+                    widget.Enabled = widget.Kind is WidgetKind.Clock or WidgetKind.Notes or WidgetKind.Tasks or WidgetKind.QuickAccess ||
+                        preset == "ai" && widget.Kind is WidgetKind.Cpu or WidgetKind.Memory or WidgetKind.Gpu;
             if (preset == "writing")
             {
                 candidate.Layouts = candidate.Layouts.ToDictionary(x => x.Key,
@@ -131,11 +138,19 @@ public sealed class WorkspaceManager(AppServices services)
             var target = await ReadAsync(id, token); target.Validate();
             await WriteStageAsync("Preflight", "已验证目标配置；不启动应用或恢复外部窗口。", token);
             var snapshot = services.CopyWorkspace(); snapshot.Dock = CopyDock(services.Settings.Dock);
+            snapshot.DesktopWidgets = CopyDesktop(services.Settings.Desktop.Widgets);
             await WriteStageAsync("Snapshot", "保存当前 Dock、Dashboard 和资源入口。", token);
             await services.Store.SaveAsync(_prefix + "workspaces/" + snapshot.Id + ".json", snapshot, MosaicJsonContext.Configured.WorkspaceDocument, token);
             services.SetWorkspaceSnapshot(snapshot); Publish(snapshot);
             var settings = services.CopySettings(); settings.CurrentWorkspaceId = id;
             settings.Dock = CopyDock(target.Dock ?? services.Settings.Dock);
+            if (target.DesktopWidgets is not null)
+            {
+                settings.Desktop.Widgets = CopyDesktop(target.DesktopWidgets);
+                foreach (var placement in DesktopPluginPlacement.Defaults())
+                    if (settings.Desktop.Widgets.All(x => x.Kind != placement.Kind)) { placement.Enabled = false; settings.Desktop.Widgets.Add(placement); }
+                settings.Modules.DesktopClock = settings.Desktop.Widgets.Any(x => x.Kind == WidgetKind.Clock && x.Enabled);
+            }
             await WriteStageAsync("ApplyMosaicState", "准备提交当前工作空间指针。", token);
             token.ThrowIfCancellationRequested();
             // Once pointer commit begins, finish it and publish matching in-memory state.

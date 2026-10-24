@@ -1,6 +1,6 @@
 . (Join-Path $PSScriptRoot 'common.ps1')
-$mosaicOutput = Join-Path $mosaicRoot 'artifacts\Mosaic-v0.7.0-win-x64'
-Invoke-MosaicDotnet -Arguments @('publish', (Join-Path $mosaicRoot 'src\Mosaic.Host\Mosaic.Host.csproj'), '-c', 'Release', '--self-contained', 'false', '-p:DebugType=None', '-p:DebugSymbols=false', '-o', $mosaicOutput)
+$mosaicOutput = Join-Path $mosaicRoot 'artifacts\Mosaic-v0.8.1-win-x64'
+Invoke-MosaicDotnet -Arguments @('publish', (Join-Path $mosaicRoot 'src\Mosaic.Host\Mosaic.Host.csproj'), '-c', 'Release', '--self-contained', 'false', '-m:1', '-p:DebugType=None', '-p:DebugSymbols=false', '-o', $mosaicOutput)
 Copy-Item -LiteralPath (Join-Path $mosaicRoot 'packaging\README.md') -Destination (Join-Path $mosaicOutput 'README.md')
 Compress-Archive -LiteralPath $mosaicOutput -DestinationPath ($mosaicOutput + '.zip') -Force
 Write-Output "可运行目录：$mosaicOutput"

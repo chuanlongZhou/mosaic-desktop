@@ -10,7 +10,7 @@ internal static class DesktopNativeProbe
         EnumWindows((window, _) =>
         {
             var name = Class(window); var title = Title(window);
-            if (name is not ("Progman" or "WorkerW") && !title.StartsWith("Mosaic ·")) return true;
+            if (name is not ("Progman" or "WorkerW" or "Shell_TrayWnd" or "Shell_SecondaryTrayWnd" or "NotifyIconOverflowWindow") && !title.StartsWith("Mosaic ·")) return true;
             windows.Add(Describe(window));
             EnumChildWindows(window, (child, _) => { windows.Add(Describe(child)); return true; }, 0);
             return true;

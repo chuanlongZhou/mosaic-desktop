@@ -14,6 +14,12 @@ internal static class OverlayRecoveryChecks
         var data = Path.Combine(Path.GetTempPath(), "Mosaic.Tests", Guid.NewGuid().ToString("N"));
         var originalAreas = ShellWorkArea.Capture();
         var originalTaskbarState = AppBarReservation.TaskbarState();
+        bool HasTrayService()
+        {
+            var found = false;
+            EnumWindows((window, _) => { found |= SystemTrayService.IsServiceWindow(window); return true; }, 0);
+            return found;
+        }
         Process Launch(params string[] arguments)
         {
             var start = new ProcessStartInfo(executable) { UseShellExecute = false };
@@ -31,9 +37,31 @@ internal static class OverlayRecoveryChecks
             try
             {
                 await Until(() => !IsWindowVisible(taskbar), "Overlay did not hide the Windows taskbar.");
-                await Until(() => !ShellWorkArea.Capture().SequenceEqual(originalAreas), "Overlay did not update screen work areas.");
+                // Each visible menu reserves its own monitor; a hidden menu gives
+                // the space back. The periodic shell refresh must preserve both.
+                bool MenuWorkAreasMatch()
+                {
+                    var shownBars = new List<ShellWorkArea.Rect>();
+                    EnumWindows((window, _) =>
+                    {
+                        var title = new StringBuilder(128); GetWindowText(window, title, title.Capacity);
+                        if (title.ToString() == "Mosaic · 时间与菜单栏" && IsWindowVisible(window) && GetWindowRect(window, out var bounds)) shownBars.Add(bounds);
+                        return true;
+                    }, 0);
+                    var expectedAreas = System.Windows.Forms.Screen.AllScreens.Select(screen =>
+                    {
+                        var top = screen.Bounds.Top;
+                        foreach (var bar in shownBars)
+                            if (bar.Left == screen.Bounds.Left && bar.Top == screen.Bounds.Top && bar.Right == screen.Bounds.Right) top = bar.Bottom;
+                        return new ShellWorkArea.Rect { Left = screen.Bounds.Left, Top = top, Right = screen.Bounds.Right, Bottom = screen.Bounds.Bottom };
+                    }).ToHashSet();
+                    return ShellWorkArea.Capture().ToHashSet().SetEquals(expectedAreas);
+                }
+                await Until(HasTrayService, "Notification area service did not initialize.");
                 await Until(() => { var handle = FindWindow(null, "Mosaic · Dock"); return handle != 0 && (GetWindowLongPtr(handle, -20).ToInt64() & 8) != 0; }, "Dock did not initialize as a topmost window.");
                 await Until(() => FindWindow(null, "Mosaic · 时间与菜单栏") != 0, "Top menu did not initialize.");
+                await Task.Delay(1200);
+                await Until(MenuWorkAreasMatch, "Overlay refresh did not preserve each menu's visible/hidden work area.");
                 nint DesktopCanvas()
                 {
                     nint result = 0;
@@ -77,7 +105,7 @@ internal static class OverlayRecoveryChecks
                         var hit = WindowFromPoint(new NativePoint { X = frame.Left + 150, Y = frame.Top + 180 });
                         if (GetAncestor(hit, 2) != probe.MainWindowHandle) throw new Exception("A desktop control covers the maximized application.");
                         using var managementRequest = Launch("--dashboard");
-                        await Until(() => { var handle = FindWindow(null, "Mosaic · 设置与插件"); return handle != 0 && IsWindowVisible(handle); }, "Management activation was blocked by shell layout updates.");
+                        await Until(() => { var handle = FindWindow(null, "Mosaic · 设置中心"); return handle != 0 && IsWindowVisible(handle); }, "Management activation was blocked by shell layout updates.");
                         Console.WriteLine($"  Explorer child canvas stays behind maximized app; work area {area.Top}–{area.Bottom}; Dock retains topmost style.");
                     }
                     finally { probe.CloseMainWindow(); await probe.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(5)); }
@@ -96,6 +124,7 @@ internal static class OverlayRecoveryChecks
             try
             {
                 await Until(() => !IsWindowVisible(taskbar), "Overlay did not hide the taskbar before crash verification.");
+                await Until(HasTrayService, "Notification area did not start before crash verification.");
                 crashed.Kill(); await crashed.WaitForExitAsync();
                 await Until(() => IsWindowVisible(taskbar), "Guard did not restore the taskbar after forced termination.");
                 await Until(() => ShellWorkArea.Capture().SequenceEqual(originalAreas), "Guard did not restore work areas after termination.");
@@ -109,6 +138,7 @@ internal static class OverlayRecoveryChecks
     [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern nint FindWindowEx(nint parent, nint after, string name, string? title);
     [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern int GetClassName(nint window, StringBuilder name, int count);
     private delegate bool EnumCallback(nint window, nint data);
+    [DllImport("user32.dll")] private static extern bool EnumWindows(EnumCallback callback, nint data);
     [StructLayout(LayoutKind.Sequential)] private struct NativePoint { public int X, Y; }
     [DllImport("user32.dll")] private static extern bool EnumChildWindows(nint parent, EnumCallback callback, nint data);
     [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern int GetWindowText(nint window, StringBuilder text, int count);

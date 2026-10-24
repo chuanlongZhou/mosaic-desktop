@@ -28,6 +28,9 @@ public partial class DashboardWindow : Window
     private readonly bool _ownsViewModel;
     private FrameworkElement? _dragCard;
     private double _dragX, _dragY;
+    private IInputElement? _settingsReturnFocus;
+    private bool _loadingSettings, _settingsDirty;
+    public Func<string>? ShortcutStatus { get; set; }
 
     public DashboardWindow(AppServices services, Func<CommandRequest, Task> execute, Func<bool> hasHotkey, SearchRuntime? search = null, DashboardViewModel? sharedViewModel = null, Func<Task>? saveDesktopLayout = null)
     {
@@ -39,6 +42,11 @@ public partial class DashboardWindow : Window
         _ownsViewModel = sharedViewModel is null;
         _vm = sharedViewModel ?? new(services, execute, search?.Library);
         InitializeComponent();
+        ThemeCombo.ItemsSource = new[] { new Choice("Midnight", "午夜蓝"), new Choice("Graphite", "石墨灰"), new Choice("Forest", "森林绿"), new Choice("Plum", "暮光紫"), new Choice("Light", "晨光浅色") };
+        AccentCombo.ItemsSource = new[] { new Choice("Blue", "天空蓝"), new Choice("Mint", "薄荷绿"), new Choice("Violet", "鸢尾紫"), new Choice("Rose", "玫瑰粉"), new Choice("Amber", "琥珀金") };
+        SettingsOverlay.AddHandler(TextBox.TextChangedEvent, new TextChangedEventHandler((_, _) => MarkSettingsDirty()));
+        SettingsOverlay.AddHandler(ToggleButton.CheckedEvent, new RoutedEventHandler((_, _) => MarkSettingsDirty()));
+        SettingsOverlay.AddHandler(ToggleButton.UncheckedEvent, new RoutedEventHandler((_, _) => MarkSettingsDirty()));
         DataContext = _vm;
         WidgetContext.SetOwner(this, _vm);
         SourceInitialized += (_, _) => NativeShell.StyleWindow(new WindowInteropHelper(this).Handle, false, false);
@@ -57,6 +65,9 @@ public partial class DashboardWindow : Window
     public void ApplyDesktopMode(bool enabled)
     {
         DesktopModeButton.Content = enabled ? "切回 Windows" : "启用 Mosaic 桌面";
+        EditDesktopButton.Content = enabled ? "编辑桌面布局" : "启用并编辑桌面";
+        DesktopStateLabel.Text = enabled ? "Mosaic 正在运行。选择需要的组件，进入编辑模式移动、缩放或恢复布局。" :
+            "当前使用 Windows 桌面。启用 Mosaic 后，所选组件将显示在桌面，并隐藏系统任务栏与桌面图标；可随时切回 Windows。";
         ResizeMode = ResizeMode.CanResizeWithGrip;
     }
 
@@ -67,12 +78,17 @@ public partial class DashboardWindow : Window
         if (e.NewSize.Width < 1) return;
         _vm.SetColumns(e.NewSize.Width >= 900 ? 12 : e.NewSize.Width >= 600 ? 8 : 4);
     }
+    private void OnPluginItemsSizeChanged(object sender, SizeChangedEventArgs e) => _vm.SetPluginColumns(e.NewSize.Width);
     private void OnDesktopClick(object sender, RoutedEventArgs e) => Close();
     private void OnMinimizeClick(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
     private void OnMaximizeClick(object sender, RoutedEventArgs e) { WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized; }
     private void OnCloseClick(object sender, RoutedEventArgs e) => Close();
     private void OnEditClick(object sender, RoutedEventArgs e) => _vm.BeginEdit();
-    private async void OnEditDesktopClick(object sender, RoutedEventArgs e) => await _execute(new("desktop.edit"));
+    private async void OnEditDesktopClick(object sender, RoutedEventArgs e)
+    {
+        if (!_services.Settings.Desktop.OverlayEnabled) await _execute(new("desktop.toggle"));
+        if (_services.Settings.Desktop.OverlayEnabled) await _execute(new("desktop.edit"));
+    }
     private void OnCancelClick(object sender, RoutedEventArgs e) => _vm.CancelEdit();
     private void OnUndoClick(object sender, RoutedEventArgs e) => _vm.Undo();
     private void OnRedoClick(object sender, RoutedEventArgs e) => _vm.Redo();
@@ -140,14 +156,21 @@ public partial class DashboardWindow : Window
     }
     private void OnKeyDown(object sender, KeyEventArgs e)
     {
+        if (SettingsOverlay.Visibility == Visibility.Visible)
+        {
+            if (e.Key == Key.Escape) { _ = TryDismissSettingsAsync(); e.Handled = true; }
+            return;
+        }
         if (e.Key == Key.K && Keyboard.Modifiers == ModifierKeys.Control) { _ = _execute(new("palette.toggle")); e.Handled = true; return; }
-        if (e.Key == Key.Escape && SettingsOverlay.IsVisible) { SettingsOverlay.Visibility = Visibility.Collapsed; e.Handled = true; }
         else if (e.Key == Key.Z && Keyboard.Modifiers == ModifierKeys.Control && _vm.IsEditing) { _vm.Undo(); e.Handled = true; }
         else if (e.Key == Key.Y && Keyboard.Modifiers == ModifierKeys.Control && _vm.IsEditing) { _vm.Redo(); e.Handled = true; }
     }
 
     public void ShowSettings()
     {
+        if (SettingsOverlay.Visibility == Visibility.Visible) return;
+        _loadingSettings = true;
+        _settingsReturnFocus = Keyboard.FocusedElement;
         OverlayEnabledCheck.IsChecked = _services.Settings.Desktop.OverlayEnabled;
         MenuBarAutoHideCheck.IsChecked = _services.Settings.Desktop.MenuBarAutoHide;
         SyncPinsCheck.IsChecked = _services.Settings.Dock.SyncTaskbarPins;
@@ -159,10 +182,27 @@ public partial class DashboardWindow : Window
         DockSizeLabel.Text = $"当前 {_services.Settings.Dock.IconSize} · 24–80，可拖动滑块调整后保存";
         AutoHideCheck.IsChecked = _services.Settings.Dock.AutoHide;
         StartupDashboardCheck.IsChecked = _services.Settings.OpenDashboardOnStartup;
+        SnapGridCheck.IsChecked = _services.Settings.Desktop.SnapToGrid;
+        ThemeCombo.SelectedItem = ThemeCombo.Items.Cast<Choice>().Single(x => x.Id == _services.Settings.Appearance.Theme);
+        AccentCombo.SelectedItem = AccentCombo.Items.Cast<Choice>().Single(x => x.Id == _services.Settings.Appearance.Accent);
+        TransparencyCheck.IsChecked = _services.Settings.Appearance.TransparencyEnabled;
+        AnimationsCheck.IsChecked = _services.Settings.Appearance.AnimationsEnabled;
+        SurfaceOpacitySlider.Value = _services.Settings.Appearance.SurfaceOpacity * 100;
+        SurfaceOpacitySlider.IsEnabled = TransparencyCheck.IsChecked == true;
+        SetShortcutInputs(_services.Settings.Shortcuts, new() { Enabled = _services.Settings.Search.HotkeyEnabled, Modifiers = _services.Settings.Search.HotkeyModifiers, Key = _services.Settings.Search.HotkeyVirtualKey });
         DataPathLabel.Text = _services.Store.Root;
-        HotkeyLabel.Text = _hasHotkey() ? "Ctrl + Alt + D  打开设置中心" : "Ctrl + Alt + D 已被占用，请通过 Dock 或托盘打开。";
+        HotkeyLabel.Text = ShortcutStatus?.Invoke() ?? (_hasHotkey() ? "" : "设置中心快捷键已被占用，可重新绑定。");
         SettingsErrorLabel.Text = "";
         SettingsOverlay.Visibility = Visibility.Visible;
+        SidebarChrome.IsEnabled = false; MainContent.IsEnabled = false;
+        SettingsTabs.SelectedIndex = 0;
+        _settingsDirty = false; _loadingSettings = false;
+        UiEffects.Enter(SettingsTabs);
+        Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Input, new Action(() =>
+        {
+            if (SettingsOverlay.Visibility != Visibility.Visible) return;
+            SettingsTabs.UpdateLayout(); Activate(); ThemeCombo.Focus(); Keyboard.Focus(ThemeCombo);
+        }));
     }
     private void OnSettingsClick(object sender, RoutedEventArgs e) => ShowSettings();
     private async void OnSearchClick(object sender, RoutedEventArgs e) => await _execute(new("palette.toggle"));
@@ -189,19 +229,23 @@ public partial class DashboardWindow : Window
         if (section != "library") _library?.ViewModel.SetActive(false);
         _vm.SetMonitoringFor(this, WindowState != WindowState.Minimized);
         foreach (var (button, name) in new[] { (DashboardNav, "plugins"), (LibraryNav, "library"), (WorkspacesNav, "workspaces") })
-            button.Background = new SolidColorBrush(name == section ? Color.FromRgb(34, 60, 86) : Colors.Transparent);
+            if (name == section) button.SetResourceReference(BackgroundProperty, "SelectionBrush"); else button.Background = Brushes.Transparent;
+        if (IsLoaded) UiEffects.Enter(section == "plugins" ? PluginManagementPage : section == "dashboard" ? DashboardPage : SectionContent);
         return true;
     }
     private void OnModuleSettingsChanged(object? sender, EventArgs e)
     {
-        PluginManagerItems.ItemsSource = _services.Settings.Desktop.Widgets;
+        PluginManagerItems.ItemsSource = _services.Settings.Desktop.Widgets.Select(x => new PluginCardViewModel(x, _vm)).ToArray();
+        ApplyDesktopMode(_services.Settings.Desktop.OverlayEnabled);
         LibraryNav.Visibility = _services.Settings.Modules.Library ? Visibility.Visible : Visibility.Collapsed;
         WorkspacesNav.Visibility = _services.Settings.Modules.Workspaces ? Visibility.Visible : Visibility.Collapsed;
         if (!_services.Settings.Modules.Library && SectionContent.Content is LibraryView || !_services.Settings.Modules.Workspaces && SectionContent.Content is WorkspacesView) ShowSection("plugins");
+        if (IsLoaded) _vm.SetMonitoringFor(this, WindowState != WindowState.Minimized);
     }
     private async void OnPluginToggle(object sender, RoutedEventArgs e)
     {
-        if (sender is not CheckBox check || check.DataContext is not DesktopPluginPlacement widget) return;
+        if (sender is not CheckBox check || check.DataContext is not PluginCardViewModel card) return;
+        var widget = card.Placement;
         var enabled = check.IsChecked == true;
         try
         {
@@ -211,9 +255,28 @@ public partial class DashboardWindow : Window
             if (widget.Kind == WidgetKind.Clock) candidate.Modules.DesktopClock = enabled;
             await _services.SaveSettingsAsync(candidate);
         }
-        catch (Exception ex) { _vm.SetStatus(ex.Message, true); PluginManagerItems.ItemsSource = _services.Settings.Desktop.Widgets; }
+        catch (Exception ex) { _vm.SetStatus(ex.Message, true); OnModuleSettingsChanged(this, EventArgs.Empty); }
     }
-    private void OnDismissSettingsClick(object sender, RoutedEventArgs e) => SettingsOverlay.Visibility = Visibility.Collapsed;
+    private async void OnDismissSettingsClick(object sender, RoutedEventArgs e) => await TryDismissSettingsAsync();
+    private void OnCancelSettingsClick(object sender, RoutedEventArgs e) => CloseSettings();
+    private async Task<bool> TryDismissSettingsAsync()
+    {
+        if (_settingsDirty)
+        {
+            var result = MessageBox.Show(this, "保存本次设置修改吗？选择“否”将恢复之前的设置和外观。", "尚未保存的设置", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Cancel) return false;
+            if (result == MessageBoxResult.Yes) return await SaveSettingsAsync();
+        }
+        CloseSettings(); return true;
+    }
+    private void CloseSettings()
+    {
+        SettingsOverlay.Visibility = Visibility.Collapsed;
+        SidebarChrome.IsEnabled = true; MainContent.IsEnabled = true;
+        _settingsDirty = false;
+        ThemeManager.Apply(_services.Settings.Appearance);
+        if (_settingsReturnFocus is { } focus) Keyboard.Focus(focus);
+    }
     private void OnOpenDataClick(object sender, RoutedEventArgs e)
     {
         try { ShellLauncher.OpenResource(_services.Store.Root); }
@@ -222,8 +285,10 @@ public partial class DashboardWindow : Window
     private void OnDockSizeChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
     {
         if (DockSizeLabel is not null) DockSizeLabel.Text = $"{(int)e.NewValue} · 保存后应用";
+        MarkSettingsDirty();
     }
-    private async void OnSaveSettingsClick(object sender, RoutedEventArgs e)
+    private async void OnSaveSettingsClick(object sender, RoutedEventArgs e) => await SaveSettingsAsync();
+    private async Task<bool> SaveSettingsAsync()
     {
         SaveSettingsButton.IsEnabled = false;
         try
@@ -242,13 +307,54 @@ public partial class DashboardWindow : Window
             candidate.Dock.IconSize = (int)DockSizeSlider.Value;
             candidate.Dock.AutoHide = AutoHideCheck.IsChecked == true;
             candidate.OpenDashboardOnStartup = StartupDashboardCheck.IsChecked == true;
+            candidate.Desktop.SnapToGrid = SnapGridCheck.IsChecked == true;
+            candidate.Appearance = AppearanceDraft();
+            candidate.Shortcuts = new()
+            {
+                Desktop = DesktopHotkeyInput.Value.Copy(), Dashboard = DashboardHotkeyInput.Value.Copy(),
+                Library = LibraryHotkeyInput.Value.Copy(), Workspaces = WorkspacesHotkeyInput.Value.Copy(), EditLayout = EditHotkeyInput.Value.Copy()
+            };
+            candidate.Search.HotkeyEnabled = SearchHotkeyInput.Value.Enabled;
+            candidate.Search.HotkeyModifiers = SearchHotkeyInput.Value.Modifiers;
+            candidate.Search.HotkeyVirtualKey = SearchHotkeyInput.Value.Key;
             await _services.SaveSettingsAsync(candidate);
-            SettingsOverlay.Visibility = Visibility.Collapsed;
+            CloseSettings();
             _vm.SetStatus("模块设置已保存");
+            return true;
         }
-        catch (Exception ex) { SettingsErrorLabel.Text = ex.Message; }
+        catch (Exception ex) { SettingsErrorLabel.Text = ex.Message; return false; }
         finally { SaveSettingsButton.IsEnabled = true; }
     }
+
+    private void MarkSettingsDirty() { if (!_loadingSettings && SettingsOverlay is not null && SettingsOverlay.Visibility == Visibility.Visible) _settingsDirty = true; }
+    private AppearanceSettings AppearanceDraft() => new()
+    {
+        Theme = (ThemeCombo.SelectedItem as Choice)?.Id ?? _services.Settings.Appearance.Theme,
+        Accent = (AccentCombo.SelectedItem as Choice)?.Id ?? _services.Settings.Appearance.Accent,
+        TransparencyEnabled = TransparencyCheck.IsChecked == true, AnimationsEnabled = AnimationsCheck.IsChecked == true,
+        SurfaceOpacity = SurfaceOpacitySlider.Value / 100
+    };
+    private void PreviewAppearance()
+    {
+        if (_loadingSettings || SettingsOverlay?.Visibility != Visibility.Visible) return;
+        MarkSettingsDirty(); SurfaceOpacitySlider.IsEnabled = TransparencyCheck.IsChecked == true;
+        ThemeManager.Apply(AppearanceDraft());
+    }
+    private void OnAppearanceChanged(object sender, SelectionChangedEventArgs e) => PreviewAppearance();
+    private void OnAppearanceToggle(object sender, RoutedEventArgs e) => PreviewAppearance();
+    private void OnOpacityChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (OpacityLabel is not null) OpacityLabel.Text = $"表面不透明度 · {e.NewValue:0}%";
+        PreviewAppearance();
+    }
+    private void SetShortcutInputs(ShortcutSettings shortcuts, ShortcutBinding search)
+    {
+        DesktopHotkeyInput.Value = shortcuts.Desktop.Copy(); DashboardHotkeyInput.Value = shortcuts.Dashboard.Copy();
+        LibraryHotkeyInput.Value = shortcuts.Library.Copy(); WorkspacesHotkeyInput.Value = shortcuts.Workspaces.Copy();
+        EditHotkeyInput.Value = shortcuts.EditLayout.Copy(); SearchHotkeyInput.Value = search;
+    }
+    private void OnResetHotkeysClick(object sender, RoutedEventArgs e) { SetShortcutInputs(new(), new() { Modifiers = 3, Key = 0x20 }); MarkSettingsDirty(); }
+    private sealed record Choice(string Id, string Label);
 
     public async Task FlushAsync()
     {
@@ -272,6 +378,7 @@ public partial class DashboardWindow : Window
         _closing = true;
         try
         {
+            if (SettingsOverlay.Visibility == Visibility.Visible && !await TryDismissSettingsAsync()) return;
             await FlushAsync();
             _allowClose = true;
             // Even an already-completed save must leave the original Closing callback before Close is called again.

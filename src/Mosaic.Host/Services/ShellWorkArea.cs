@@ -24,7 +24,7 @@ public static class ShellWorkArea
         }, 0);
         return areas;
     }
-    public static void Apply(int dockHeight, bool fitExisting = false, int menuHeight = BarHeight)
+    public static void Apply(int dockHeight, bool fitExisting = false, IReadOnlyDictionary<System.Drawing.Rectangle, double>? menuHeights = null)
     {
         EnumDisplayMonitors(0, 0, (nint monitor, nint dc, ref Rect rect, nint data) =>
         {
@@ -33,7 +33,8 @@ public static class ShellWorkArea
             GetDpiForMonitor(monitor, 0, out var xDpi, out _);
             var scale = (xDpi == 0 ? 96 : xDpi) / 96.0;
             var desired = info.Monitor;
-            desired.Top += (int)Math.Ceiling(menuHeight * scale);
+            var bounds = System.Drawing.Rectangle.FromLTRB(desired.Left, desired.Top, desired.Right, desired.Bottom);
+            if (menuHeights?.TryGetValue(bounds, out var menuHeight) == true) desired.Top += (int)Math.Ceiling(menuHeight * scale);
             if ((info.Flags & 1) != 0) desired.Bottom -= (int)Math.Ceiling(dockHeight * scale);
             if (!desired.Equals(info.Work))
             {

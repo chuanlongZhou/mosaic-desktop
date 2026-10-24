@@ -36,6 +36,7 @@ public partial class PaletteWindow : Window
         Show();
         NativeShell.PlacePalette(new WindowInteropHelper(this).Handle, _previousWindow, 940, 620);
         Activate();
+        UiEffects.Enter(Content as FrameworkElement);
         _vm.IsComposing = false;
         _vm.Activate();
         Dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() => { QueryInput.Focus(); Keyboard.Focus(QueryInput); QueryInput.SelectAll(); }));

@@ -22,7 +22,8 @@ public sealed class WorkspacesViewModel : ObservableObject, IDisposable
     public bool Busy { get => _busy; private set { if (Set(ref _busy, value)) Raise(nameof(IsIdle)); } }
     public bool IsIdle => !Busy && !_services.Workspaces.IsSwitching;
     public bool HasSelection => Selected is not null;
-    public string SelectionSummary => Selected is null ? "选择一个工作空间" : $"{Selected.ResourceCount} 个资源入口 · {Selected.DockCount} 个已保存 Dock 入口 · {Selected.WidgetCount} 个 Dashboard 组件";
+    public bool CanSwitch => Selected is not null && Selected.Id != _services.Workspace.Id && IsIdle;
+    public string SelectionSummary => Selected is null ? "选择一个工作空间" : $"{Selected.ResourceCount} 个资源入口 · {Selected.DockCount} 个已保存 Dock 入口 · {Selected.WidgetCount} 个已保存桌面组件";
     public string SwitchLabel => Selected?.Id == _services.Workspace.Id ? "当前工作空间" : "切换到此工作空间";
     public WorkspaceSummary? Selected
     {
@@ -32,7 +33,7 @@ public sealed class WorkspacesViewModel : ObservableObject, IDisposable
             var different = _selected?.Id != value?.Id;
             if (!Set(ref _selected, value)) return;
             if (different) Rename = value?.Name ?? "";
-            Raise(nameof(SelectionSummary)); Raise(nameof(HasSelection)); Raise(nameof(SwitchLabel));
+            Raise(nameof(SelectionSummary)); Raise(nameof(HasSelection)); Raise(nameof(SwitchLabel)); Raise(nameof(CanSwitch));
         }
     }
     public WorkspacesViewModel(AppServices services)
@@ -45,7 +46,7 @@ public sealed class WorkspacesViewModel : ObservableObject, IDisposable
         var selected = Selected?.Id ?? _services.Workspace.Id;
         Items.Clear(); foreach (var item in _services.Workspaces.Items) Items.Add(item);
         Selected = Items.FirstOrDefault(x => x.Id == selected) ?? Items.FirstOrDefault();
-        Raise(nameof(CurrentName)); Raise(nameof(IsIdle)); Raise(nameof(SwitchLabel));
+        Raise(nameof(CurrentName)); Raise(nameof(IsIdle)); Raise(nameof(SwitchLabel)); Raise(nameof(CanSwitch));
     }
     public Task CreateAsync(string preset) => RunAsync(async () =>
     {

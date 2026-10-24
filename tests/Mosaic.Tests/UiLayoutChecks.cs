@@ -25,6 +25,7 @@ internal static class UiLayoutChecks
             {
                 var app = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
                 app.Resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri("/Mosaic;component/Themes/Dark.xaml", UriKind.Relative) });
+                CheckMenuTheme();
                 var root = Path.Combine(Path.GetTempPath(), "Mosaic.Tests", Guid.NewGuid().ToString("N"));
                 var services = new AppServices(new JsonDocumentStore(root));
                 services.InitializeAsync().GetAwaiter().GetResult();
@@ -63,10 +64,12 @@ internal static class UiLayoutChecks
                 window.Closed += (_, _) => closed = true;
                 window.Close();
                 PumpUntil(() => closed);
+                CheckExperience(root + ".experience");
                 CheckDesktopPlugins(services);
                 CheckDesktopScene();
                 CheckDockAutoHide(services);
                 CheckMenuBarAutoHide(services);
+                CheckNotificationArea(services);
                 CheckPalette(services, root);
                 CheckLibraryPaging(root + ".paging");
                 CheckImagePreview(root);
@@ -79,6 +82,63 @@ internal static class UiLayoutChecks
         thread.IsBackground = true;
         thread.Start();
         return completion.Task;
+    }
+
+    private static void CheckExperience(string root)
+    {
+        var services = new AppServices(new JsonDocumentStore(root)); Complete(services.InitializeAsync());
+        var window = new DashboardWindow(services, _ => Task.CompletedTask, () => true);
+        try
+        {
+            window.ShowSection("plugins"); window.Show(); PumpUntil(() => window.IsLoaded);
+            var pluginItems = (ItemsControl)window.FindName("PluginManagerItems");
+            if (Descendants(pluginItems).OfType<TextBox>().Any()) throw new Exception("Component previews expose editable text boxes.");
+            window.Width = 720; window.Height = 560; window.UpdateLayout();
+            PumpUntil(() => ((DashboardViewModel)window.DataContext).PluginColumns == 2);
+            window.ShowSettings();
+            var theme = (ComboBox)window.FindName("ThemeCombo");
+            PumpUntil(() => theme.IsKeyboardFocusWithin);
+            if (((FrameworkElement)window.FindName("MainContent")).IsEnabled || ((FrameworkElement)window.FindName("SidebarChrome")).IsEnabled)
+                throw new Exception("Settings overlay did not isolate background keyboard input.");
+            theme.SelectedIndex = 4;
+            ((ComboBox)window.FindName("AccentCombo")).SelectedIndex = 3;
+            ((CheckBox)window.FindName("AnimationsCheck")).IsChecked = false;
+            ((CheckBox)window.FindName("TransparencyCheck")).IsChecked = true;
+            ((Slider)window.FindName("SurfaceOpacitySlider")).Value = 75;
+            if (ThemeManager.Current.Theme != "Light" || UiEffects.Enabled || ((SolidColorBrush)Application.Current.Resources["WidgetBrush"]).Color.A >= 255)
+                throw new Exception("Live appearance preview did not apply theme, opacity and motion settings.");
+            ((Button)window.FindName("SaveSettingsButton")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            PumpUntil(() => ((Grid)window.FindName("SettingsOverlay")).Visibility == Visibility.Collapsed);
+            if (services.Settings.Appearance.Theme != "Light" || services.Settings.Appearance.Accent != "Rose" || services.Settings.Appearance.AnimationsEnabled || !services.Settings.Appearance.TransparencyEnabled)
+                throw new Exception("Appearance controls did not persist the chosen combination.");
+            window.ShowSettings(); theme.SelectedIndex = 2;
+            ((Button)window.FindName("CancelSettingsButton")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            if (ThemeManager.Current.Theme != "Light" || services.Settings.Appearance.Theme != "Light") throw new Exception("Cancelling a preview did not restore the saved appearance.");
+            foreach (var name in AppearanceSettings.Themes)
+            {
+                ThemeManager.Apply(new() { Theme = name, AnimationsEnabled = false });
+                if (((SolidColorBrush)Application.Current.Resources["WidgetBrush"]).Color.A != 255) throw new Exception("Opaque mode retained transparent component surfaces.");
+            }
+            var vm = (DashboardViewModel)window.DataContext;
+            vm.NewTask = "待办编辑检查"; vm.AddTaskCommand.Execute(null);
+            var task = vm.Tasks.Last(); task.Title = "已编辑的待办";
+            vm.RemoveTaskCommand.Execute(task); vm.UndoRemoveTaskCommand.Execute(null);
+            if (!vm.Tasks.Contains(task) || task.Title != "已编辑的待办") throw new Exception("Task undo lost edited content.");
+            Complete(vm.FlushAsync());
+            var contentPath = Path.Combine(root, "profiles/default/widget-data/local-content.json");
+            var original = File.ReadAllBytes(contentPath);
+            var external = System.Text.Json.Nodes.JsonNode.Parse(original)!;
+            external["revision"] = services.Content.Revision + 10;
+            File.WriteAllText(contentPath, external.ToJsonString());
+            vm.Notes = "保存冲突检查";
+            try { Complete(vm.FlushAsync()); throw new Exception("Externally changed content unexpectedly saved."); }
+            catch (JsonConflictException) { }
+            if (!vm.ContentSaveError || !vm.ContentSaveStatus.Contains("保存失败")) throw new Exception("Desktop content did not expose a save conflict.");
+            File.WriteAllBytes(contentPath, original); Complete(vm.FlushAsync());
+            if (vm.ContentSaveError || services.Content.Notes != "保存冲突检查") throw new Exception("Content save did not recover after retry.");
+            Console.WriteLine("  experience: live theme/opacity/motion, save/cancel, isolated focus, task edit/undo and content-conflict retry verified");
+        }
+        finally { window.CloseAfterFlush(); ThemeManager.Apply(new() { AnimationsEnabled = false }); }
     }
 
     private static void CheckDesktopPlugins(AppServices services)
@@ -112,6 +172,7 @@ internal static class UiLayoutChecks
             var saved = services.Settings.Desktop.Widgets.Single(x => x.Kind == WidgetKind.Notes);
             if (Math.Abs(saved.Width - 410) > 1 || Math.Abs(saved.Height - 285) > 1 || saved.Left != 100 || saved.Top != 120 || surface.IsEditing) throw new Exception("Desktop layout did not persist or lock on completion.");
             surface.BeginEdit(); Drag(move, 30, 40); Drag(size, 20, 10); surface.CancelEdit();
+            move.RaiseEvent(new System.Windows.Controls.Primitives.DragCompletedEventArgs(30, 40, true) { RoutedEvent = System.Windows.Controls.Primitives.Thumb.DragCompletedEvent });
             if (Canvas.GetLeft(plugin) != saved.Left || plugin.Width != saved.Width || plugin.IsEditing) throw new Exception("Cancel did not restore the saved desktop layout.");
             var editor = Descendants(plugin).OfType<TextBox>().Single(x => AutomationProperties.GetName(x) == "随手记");
             if (PresentationSource.FromVisual(editor) is not HwndSource source || source.Handle != surface.Handle || !source.UsesPerPixelOpacity)
@@ -148,15 +209,33 @@ internal static class UiLayoutChecks
 
     private static void CheckMenuBarAutoHide(AppServices services)
     {
+        var originalAreas = ShellWorkArea.Capture();
+        var fixture = new Window { Title = "Mosaic menu work-area fixture", WindowState = WindowState.Maximized };
+        fixture.Show();
         var settings = services.CopySettings(); settings.Desktop.MenuBarAutoHide = true; Complete(services.SaveSettingsAsync(settings));
         var bar = new DesktopBarWindow(services, _ => Task.CompletedTask, System.Windows.Forms.Screen.PrimaryScreen!);
         bar.SetAutoHideAllowed(true);
+        void CheckWorkArea(bool reserved)
+        {
+            var handle = new WindowInteropHelper(bar).Handle;
+            var fixtureHandle = new WindowInteropHelper(fixture).Handle;
+            PumpUntil(() =>
+            {
+                GetWindowRect(handle, out var bounds);
+                var area = ShellWorkArea.Capture().First(a => a.Left == bounds.Left && a.Right == bounds.Right);
+                var original = originalAreas.First(a => a.Left == bounds.Left && a.Right == bounds.Right);
+                DwmGetWindowAttribute(fixtureHandle, 9, out var frame, Marshal.SizeOf<ShellWorkArea.Rect>());
+                return bar.ReservesWorkArea == reserved && area.Top == (reserved ? bounds.Bottom : original.Top) && Math.Abs(frame.Top - area.Top) <= 2;
+            });
+        }
         try
         {
             bar.Show(); PumpUntil(() => bar.IsLoaded && bar.IsAutoHidden);
             if (bar.IsVisible) throw new Exception("Collapsed top bar left a visible activation strip.");
+            CheckWorkArea(false);
             bar.RaiseEvent(new System.Windows.Input.MouseEventArgs(System.Windows.Input.Mouse.PrimaryDevice, Environment.TickCount) { RoutedEvent = System.Windows.Input.Mouse.MouseEnterEvent });
             if (bar.IsAutoHidden || !bar.IsVisible || bar.Height < 32) throw new Exception("Top menu bar did not expand on pointer entry.");
+            CheckWorkArea(true);
             var menuButton = (Button)bar.FindName("MenuButton");
             menuButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             bar.RaiseEvent(new System.Windows.Input.MouseEventArgs(System.Windows.Input.Mouse.PrimaryDevice, Environment.TickCount) { RoutedEvent = System.Windows.Input.Mouse.MouseLeaveEvent });
@@ -165,19 +244,132 @@ internal static class UiLayoutChecks
             menuButton.ContextMenu.IsOpen = false;
             PumpUntil(() => bar.IsAutoHidden);
             if (bar.IsVisible) throw new Exception("Top bar did not fully hide after its menu closed.");
+            CheckWorkArea(false);
             bar.SetAutoHideAllowed(false);
             bar.RaiseEvent(new System.Windows.Input.MouseEventArgs(System.Windows.Input.Mouse.PrimaryDevice, Environment.TickCount) { RoutedEvent = System.Windows.Input.Mouse.MouseLeaveEvent });
             Complete(Task.Delay(1100));
             if (bar.IsAutoHidden || !bar.IsVisible) throw new Exception("Top menu hid on the desktop or without a maximized app.");
+            CheckWorkArea(true);
             bar.SetAutoHideAllowed(true);
             PumpUntil(() => bar.IsAutoHidden);
             settings = services.CopySettings(); settings.Desktop.MenuBarAutoHide = false; Complete(services.SaveSettingsAsync(settings)); bar.RefreshConfiguration();
             if (bar.IsAutoHidden || bar.Height < 32) throw new Exception("Always-visible top menu setting did not apply.");
+            CheckWorkArea(true);
             settings = services.CopySettings(); settings.Desktop.MenuBarAutoHide = true; Complete(services.SaveSettingsAsync(settings)); bar.RefreshConfiguration();
             PumpUntil(() => bar.IsAutoHidden);
-            Console.WriteLine("  top menu: desktop/no-maximized stay visible, maximized auto-hide, edge reveal and open-menu hold verified");
+            CheckWorkArea(false);
+            Console.WriteLine("  top menu: visible/edge-revealed bar reserves work area below its bottom, existing maximized window resizes, hidden bar releases space; menu hold and setting changes verified");
+        }
+        finally { bar.Close(); fixture.Close(); ShellWorkArea.Restore(originalAreas); }
+    }
+
+    [DllImport("user32.dll")] private static extern bool GetWindowRect(nint window, out ShellWorkArea.Rect rect);
+    [DllImport("dwmapi.dll")] private static extern int DwmGetWindowAttribute(nint window, int attribute, out ShellWorkArea.Rect rect, int size);
+
+    private static void CheckNotificationArea(AppServices services)
+    {
+        using var fixture = new System.Windows.Forms.NotifyIcon { Icon = System.Drawing.SystemIcons.Information, Text = "Mosaic tray callback fixture", Visible = true };
+        var clicks = new List<System.Windows.Forms.MouseButtons>();
+        var doubleClicks = 0;
+        fixture.MouseClick += (_, e) => clicks.Add(e.Button);
+        fixture.MouseDoubleClick += (_, _) => doubleClicks++;
+        // Start after the fixture: TaskbarCreated must import an already running
+        // application, including icons that Explorer had placed in overflow.
+        var bar = new DesktopBarWindow(services, _ => Task.CompletedTask, System.Windows.Forms.Screen.PrimaryScreen!, true);
+        bar.SetAutoHideAllowed(false);
+        try
+        {
+            bar.Show(); PumpUntil(() => bar.IsLoaded);
+            var field = typeof(DesktopBarWindow).GetField("_systemTray", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
+            var tray = (SystemTrayService)field.GetValue(bar)!;
+            if (tray.Area.IsFailed) throw new Exception("Notification area failed to initialize.");
+            PumpUntil(() => tray.Area.TrayIcons.Any(i => i.Title == fixture.Text));
+            var icon = tray.Area.TrayIcons.Single(i => i.Title == fixture.Text);
+            if (icon.Icon is null || icon.HWnd == 0 || icon.CallbackMessage == 0) throw new Exception("Tray fixture lost its image or application callback.");
+            var overflow = (Button)bar.FindName("HiddenIconsButton");
+            overflow.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            var popupField = typeof(DesktopBarWindow).GetField("_statusPopup", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
+            var popup = (System.Windows.Controls.Primitives.Popup)popupField.GetValue(bar)!;
+            PumpUntil(() => popup.IsOpen && Descendants(popup.Child).OfType<Button>().Any(b => ReferenceEquals(b.DataContext, icon)));
+            var button = Descendants(popup.Child).OfType<Button>().Single(b => ReferenceEquals(b.DataContext, icon));
+            Complete(Task.Delay(System.Windows.Forms.SystemInformation.DoubleClickTime + 50));
+            void Click(System.Windows.Input.MouseButton mouseButton)
+            {
+                foreach (var routedEvent in new[] { UIElement.PreviewMouseDownEvent, UIElement.PreviewMouseUpEvent })
+                    button.RaiseEvent(new System.Windows.Input.MouseButtonEventArgs(System.Windows.Input.Mouse.PrimaryDevice, Environment.TickCount, mouseButton) { RoutedEvent = routedEvent });
+            }
+            Click(System.Windows.Input.MouseButton.Left);
+            PumpUntil(() => clicks.Contains(System.Windows.Forms.MouseButtons.Left));
+            Click(System.Windows.Input.MouseButton.Right);
+            PumpUntil(() => clicks.Contains(System.Windows.Forms.MouseButtons.Right));
+            Click(System.Windows.Input.MouseButton.Left);
+            PumpUntil(() => doubleClicks > 0);
+            Complete(Task.Delay(System.Windows.Forms.SystemInformation.DoubleClickTime + 50));
+            var clicksBeforeKeyboard = clicks.Count;
+            button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            PumpUntil(() => clicks.Count > clicksBeforeKeyboard);
+            bar.SetAutoHideAllowed(true);
+            bar.RaiseEvent(new System.Windows.Input.MouseEventArgs(System.Windows.Input.Mouse.PrimaryDevice, Environment.TickCount) { RoutedEvent = UIElement.MouseLeaveEvent });
+            Complete(Task.Delay(1100));
+            if (bar.IsAutoHidden || !popup.IsOpen) throw new Exception("Top bar hid while hidden tray applications were in use.");
+            popup.IsOpen = false;
+            var clock = (Button)bar.FindName("ClockButton");
+            clock.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            popup = (System.Windows.Controls.Primitives.Popup)popupField.GetValue(bar)!;
+            if (!popup.IsOpen || !Descendants(popup.Child).OfType<System.Windows.Controls.Calendar>().Any()) throw new Exception("Clock did not open the calendar.");
+            popup.IsOpen = false;
+            fixture.Visible = false;
+            PumpUntil(() => !tray.Area.TrayIcons.Contains(icon));
+            Console.WriteLine("  notification area: pre-existing hidden app imported, actual image, left/right callbacks, live removal, popup auto-hide hold and calendar verified");
         }
         finally { bar.Close(); }
+    }
+
+    private static void CheckMenuTheme()
+    {
+        var menu = new ContextMenu { Width = 300 };
+        foreach (var title in new[] { "桌面模式与 Dock 设置", "添加应用或文件…", "添加文件夹…", "添加工作台入口", "添加全局搜索入口" })
+            menu.Items.Add(new MenuItem { Header = title });
+        menu.Items.Add(new Separator());
+        var parent = new MenuItem { Header = "更多操作" };
+        var child = new MenuItem { Header = "显示菜单栏", IsCheckable = true, IsChecked = true, InputGestureText = "Ctrl+M" };
+        var clicked = false;
+        child.Click += (_, _) => clicked = true;
+        parent.Items.Add(child);
+        parent.Items.Add(new MenuItem { Header = "当前不可用", IsEnabled = false });
+        menu.Items.Add(parent);
+        var directory = Path.GetFullPath(".artifacts/menu-theme");
+        Directory.CreateDirectory(directory);
+        void Capture(FrameworkElement root, string name)
+        {
+            root.UpdateLayout();
+            var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap((int)Math.Ceiling(root.ActualWidth), (int)Math.Ceiling(root.ActualHeight), 96, 96, PixelFormats.Pbgra32);
+            bitmap.Render(root);
+            var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
+            encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bitmap));
+            using var output = File.Create(Path.Combine(directory, name + ".png"));
+            encoder.Save(output);
+            var pixels = new byte[bitmap.PixelWidth * bitmap.PixelHeight * 4];
+            bitmap.CopyPixels(pixels, bitmap.PixelWidth * 4, 0);
+            // Sample the former light icon gutter, away from text and icons.
+            var sample = (Math.Min(18, bitmap.PixelHeight - 1) * bitmap.PixelWidth + 6) * 4;
+            if (pixels[sample] > 160 && pixels[sample + 1] > 160 && pixels[sample + 2] > 160)
+                throw new Exception("Menu retained the default white icon gutter.");
+        }
+        try
+        {
+            menu.IsOpen = true;
+            PumpUntil(() => menu.ActualHeight > 100);
+            Capture(menu, "context-menu");
+            parent.IsSubmenuOpen = true;
+            var popup = (System.Windows.Controls.Primitives.Popup)parent.Template.FindName("PART_Popup", parent);
+            PumpUntil(() => popup.IsOpen && child.IsVisible);
+            Capture((FrameworkElement)popup.Child, "submenu");
+            child.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
+            if (!clicked) throw new Exception("The themed submenu lost its command callback.");
+            Console.WriteLine("  dark menus: popup and nested submenu rendered without light gutters; checkmarks, disabled items and callbacks verified");
+        }
+        finally { parent.IsSubmenuOpen = false; menu.IsOpen = false; }
     }
 
     private static void CheckDesktopScene()

@@ -11,12 +11,12 @@
 
 `DesktopSceneMonitor` 通过前台窗口和原生窗口枚举获取状态，忽略系统桌面、工具窗口、最小化、隐藏和 DWM cloaked 窗口。窗口事件触发及时更新，350ms 定时检查补充后台窗口状态变化。Mosaic 自己的工具菜单获得焦点时沿用此前的桌面状态，防止打开菜单改变两条栏的状态。当前按所有屏幕的应用统一判断。
 
-临时展开不注册新的 AppBar、不改变最大化工作区，避免展示栏位本身引发其他窗口缩放。原有“始终显示”的 AppBar 预留逻辑保留。
+V0.8.1 起按新的交互要求更新占位行为：顶部菜单只要展开（包括边缘临时唤出）就注册 AppBar，预留 32 DIP 工作区；最大化窗口同步适配到菜单下方，已有普通窗口的标题栏保持可达。收起和关闭时注销并释放空间。每块屏幕分别记录菜单可见状态，定时工作区维护不会覆盖这一状态。Dock 仍保留原有呼出行为。
 
 在 Mosaic 桌面覆盖模式内，专用线程安装临时 `WH_KEYBOARD_LL`：单按左/右 Win 时使用无功能菜单屏蔽键并正确释放 Win，保留 Win+D、Win+E、Win+方向键等组合；Ctrl+Esc 也被拦截，Ctrl+Shift+Esc 和普通 Esc 不受影响。切回 Windows 或退出时卸载钩子，不写系统键位注册表。主进程被结束后，系统会清理进程的钩子。
 
 验证包括桌面/有无最大化应用的策略组合、真实窗口最大化/最小化/隐藏判断、Dock/顶部栏的展开与延迟收起、取消旧隐藏计时、菜单展开保护、最大化应用场景下的原生顶部栏隐藏、Win 按键序列与组合键保留，以及钩子安装、卸载、重新安装。自动检查不发送真实 Win 按键，也不把这些检查描述为物理键盘的端到端验收。
 
-Release 构建 0 警告、0 错误；完整检查 29/29 通过。运行包为 `artifacts/Mosaic-v0.7.0-win-x64`。
+V0.7 当时的验证为 Release 构建 0 警告、0 错误，完整检查 29/29 通过；对应历史运行包为 `artifacts/Mosaic-v0.7.0-win-x64`。当前 V0.8.1 的完整验证记录为 33/33，新增功能与范围见 [V0.8／V0.8.1 指南](EXPERIENCE_V0.8.md)。
 
 参考：[Microsoft 键盘钩子回调](https://learn.microsoft.com/en-us/windows/win32/winmsg/lowlevelkeyboardproc)、[DWM cloaked 窗口](https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/ne-dwmapi-dwmwindowattribute)、[AutoHotkey 菜单屏蔽键说明](https://raw.githubusercontent.com/AutoHotkey/AutoHotkeyDocs/v2/docs/lib/A_MenuMaskKey.htm)。

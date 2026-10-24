@@ -12,6 +12,7 @@ public enum SearchFilter { All, Apps, Files, Folders, Models, Commands }
 public sealed class SearchSettings
 {
     public bool Enabled { get; set; } = true;
+    public bool HotkeyEnabled { get; set; } = true;
     public bool IndexEnabled { get; set; } = true;
     public bool UseEverything { get; set; } = true;
     public bool EverythingGlobalScope { get; set; }
@@ -26,12 +27,12 @@ public sealed class SearchSettings
     {
         if (Roots is null || Roots.Count > 8 || Roots.Any(x => string.IsNullOrWhiteSpace(x) || x.Length > 4096 || !Path.IsPathFullyQualified(x)) ||
             HotEntryLimit is < 100 or > 20000 || HotMemoryMiB is < 1 or > 32 || CacheMiB is < 5 or > 100 ||
-            HotkeyModifiers is 0 or > 7 || !(HotkeyVirtualKey == 0x20 || HotkeyVirtualKey is >= 0x41 and <= 0x5A or >= 0x70 and <= 0x7B))
+            HotkeyModifiers is 0 or > 7 || !(HotkeyVirtualKey == 0x20 || HotkeyVirtualKey is >= 0x41 and <= 0x5A or >= 0x30 and <= 0x39 or >= 0x70 and <= 0x7B))
             throw new InvalidDataException("搜索配置超出范围：最多 8 个完整目录、2 万条热索引、32 MiB 内存和 100 MiB 缓存。");
     }
     public SearchSettings Copy() => new()
     {
-        Enabled = Enabled, IndexEnabled = IndexEnabled, UseEverything = UseEverything, EverythingGlobalScope = EverythingGlobalScope,
+        Enabled = Enabled, HotkeyEnabled = HotkeyEnabled, IndexEnabled = IndexEnabled, UseEverything = UseEverything, EverythingGlobalScope = EverythingGlobalScope,
         IgnoreAccents = IgnoreAccents, HotkeyModifiers = HotkeyModifiers, HotkeyVirtualKey = HotkeyVirtualKey,
         Roots = [.. Roots], HotEntryLimit = HotEntryLimit, HotMemoryMiB = HotMemoryMiB, CacheMiB = CacheMiB
     };

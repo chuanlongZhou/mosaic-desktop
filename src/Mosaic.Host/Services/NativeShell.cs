@@ -1,38 +1,47 @@
 using System.Runtime.InteropServices;
 using System.Text;
 using Mosaic.Core.Search;
+using Mosaic.Core.Models;
 using Forms = System.Windows.Forms;
 
 namespace Mosaic.Host.Services;
 
 public sealed class NativeShell : Forms.NativeWindow, IDisposable
 {
-    private const int HotKeyId = 0x4D53;
     private readonly WinEventDelegate _callback;
     private readonly List<nint> _hooks = [];
-    private int _paletteId;
-    private uint _paletteModifiers, _paletteKey;
+    private Dictionary<string, RegisteredShortcut> _registered = [];
+    private Dictionary<int, string> _actions = [];
+    private readonly Dictionary<string, string> _hotkeyErrors = [];
+    private int _nextHotkeyId = 0x5000;
+    private ShortcutSettings _shortcuts = new();
+    private SearchSettings _searchOptions = new();
     private bool? _lastFullscreen;
     public event Action? DashboardRequested;
     public event Action? DesktopModeRequested;
-    private readonly bool _desktopHotkey;
+    public event Action? LibraryRequested;
+    public event Action? WorkspacesRequested;
+    public event Action? EditLayoutRequested;
     public event Action? PaletteRequested;
     public Func<nint, bool>? CopyDataReceiver { get; set; }
     public event Action<bool>? FullscreenChanged;
     public event Action? ShellLayoutChanged;
-    public bool HotKeyRegistered { get; }
-    public bool PaletteHotkeyRegistered => _paletteId != 0;
-    public string? PaletteHotkeyError { get; private set; }
+    public bool HotKeyRegistered => _actions.ContainsValue("dashboard");
+    public bool PaletteHotkeyRegistered => _actions.ContainsValue("palette");
+    public string? PaletteHotkeyError => _hotkeyErrors.GetValueOrDefault("palette");
+    public string ShortcutStatus => string.Join("\n", _hotkeyErrors.Values);
+    public Func<ShortcutBinding, bool>? CaptureHotkey { get; set; }
 
-    public NativeShell(SearchSettings? search = null)
+    public NativeShell(SearchSettings? search = null, ShortcutSettings? shortcuts = null)
     {
         CreateHandle(new Forms.CreateParams { Caption = "Mosaic message window", Parent = new nint(-3) });
-        _desktopHotkey = RegisterHotKey(Handle, 0x4D56, 0x4003, 0x4D);
-        HotKeyRegistered = RegisterHotKey(Handle, HotKeyId, 0x4000 | 0x0001 | 0x0002, 0x44); // Ctrl+Alt+D; no repeat.
-        if (search is not null)
+        _shortcuts = shortcuts ?? new(); _searchOptions = search ?? new() { Enabled = false };
+        foreach (var (action, label, binding) in Desired(_shortcuts, _searchOptions))
         {
-            try { using var reservation = ReservePaletteHotkey(search); reservation.Commit(); }
-            catch (InvalidOperationException ex) { PaletteHotkeyError = ex.Message; }
+            var id = _nextHotkeyId++;
+            if (RegisterHotKey(Handle, id, binding.Modifiers | 0x4000, binding.Key))
+            { _registered[binding.Identity] = new(id, binding.Copy()); _actions[id] = action; }
+            else _hotkeyErrors[action] = $"{label}：{DescribeHotkey(binding)} 已被占用，可在快捷键设置中修改。";
         }
         _callback = OnWinEvent;
         foreach (var eventId in new uint[] { 3, 0x800B })
@@ -44,28 +53,73 @@ public sealed class NativeShell : Forms.NativeWindow, IDisposable
 
     protected override void WndProc(ref Forms.Message message)
     {
-        if (message.Msg == 0x0312 && message.WParam.ToInt32() == 0x4D56) DesktopModeRequested?.Invoke();
-        if (message.Msg == 0x0312 && message.WParam.ToInt32() == HotKeyId) DashboardRequested?.Invoke();
-        if (message.Msg == 0x0312 && _paletteId != 0 && message.WParam.ToInt32() == _paletteId) PaletteRequested?.Invoke();
+        if (message.Msg == 0x0312 && _actions.TryGetValue(message.WParam.ToInt32(), out var action))
+        {
+            var messageId = message.WParam.ToInt32();
+            var binding = _registered.Values.FirstOrDefault(x => x.Id == messageId)?.Binding;
+            if (binding is not null && CaptureHotkey?.Invoke(binding.Copy()) == true) return;
+            switch (action)
+            {
+                case "desktop": DesktopModeRequested?.Invoke(); break;
+                case "dashboard": DashboardRequested?.Invoke(); break;
+                case "palette": PaletteRequested?.Invoke(); break;
+                case "library": LibraryRequested?.Invoke(); break;
+                case "workspaces": WorkspacesRequested?.Invoke(); break;
+                case "edit": EditLayoutRequested?.Invoke(); break;
+            }
+        }
         if (message.Msg == 0x4A && CopyDataReceiver?.Invoke(message.LParam) == true) { message.Result = 1; return; }
         base.WndProc(ref message);
     }
 
     public HotkeyReservation ReservePaletteHotkey(SearchSettings settings)
     {
-        if (!settings.Enabled)
-            return new(() => { if (_paletteId != 0) UnregisterHotKey(Handle, _paletteId); _paletteId = 0; PaletteHotkeyError = null; }, () => { });
-        if (_paletteId != 0 && _paletteModifiers == settings.HotkeyModifiers && _paletteKey == settings.HotkeyVirtualKey)
-            return new(() => { }, () => { });
-        var id = _paletteId == 0x4D54 ? 0x4D55 : 0x4D54;
-        if (!RegisterHotKey(Handle, id, settings.HotkeyModifiers | 0x4000, settings.HotkeyVirtualKey))
-            throw new InvalidOperationException("搜索快捷键已被其他程序占用，请选择另一组；原绑定保持可用。");
+        return ReserveHotkeys(new AppSettings { Search = settings, Shortcuts = _shortcuts });
+    }
+
+    public HotkeyReservation ReserveHotkeys(AppSettings settings)
+    {
+        settings.Shortcuts.Validate(settings.Search.HotkeyModifiers, settings.Search.HotkeyVirtualKey, settings.Search.Enabled && settings.Search.HotkeyEnabled);
+        var desired = Desired(settings.Shortcuts, settings.Search).ToArray();
+        var next = new Dictionary<string, RegisteredShortcut>();
+        var nextActions = new Dictionary<int, string>();
+        var intended = Desired(_shortcuts, _searchOptions).ToDictionary(x => x.Action, x => x.Binding.Identity);
+        var retainedErrors = new Dictionary<string, string>();
+        var acquired = new List<int>();
+        try
+        {
+            foreach (var (action, label, binding) in desired)
+            {
+                if (!_registered.TryGetValue(binding.Identity, out var registered))
+                {
+                    // An unrelated appearance save must not fail because a shortcut was already unavailable at startup.
+                    if (intended.GetValueOrDefault(action) == binding.Identity && _hotkeyErrors.TryGetValue(action, out var error))
+                    { retainedErrors[action] = error; continue; }
+                    var id = _nextHotkeyId++;
+                    if (!RegisterHotKey(Handle, id, binding.Modifiers | 0x4000, binding.Key))
+                        throw new InvalidOperationException($"“{label}”的 {DescribeHotkey(binding)} 已被其他程序占用，原快捷键保持可用。");
+                    acquired.Add(id); registered = new(id, binding.Copy());
+                }
+                next.Add(binding.Identity, registered); nextActions.Add(registered.Id, action);
+            }
+        }
+        catch { foreach (var id in acquired) UnregisterHotKey(Handle, id); throw; }
         return new(() =>
         {
-            if (_paletteId != 0) UnregisterHotKey(Handle, _paletteId);
-            _paletteId = id; _paletteModifiers = settings.HotkeyModifiers; _paletteKey = settings.HotkeyVirtualKey; PaletteHotkeyError = null;
-        }, () => UnregisterHotKey(Handle, id));
+            foreach (var (identity, registered) in _registered)
+                if (!next.ContainsKey(identity)) UnregisterHotKey(Handle, registered.Id);
+            _registered = next; _actions = nextActions; _hotkeyErrors.Clear();
+            foreach (var (action, error) in retainedErrors) _hotkeyErrors[action] = error;
+            _shortcuts = settings.Shortcuts; _searchOptions = settings.Search.Copy();
+        }, () => { foreach (var id in acquired) UnregisterHotKey(Handle, id); });
     }
+
+    private static IEnumerable<(string Action, string Label, ShortcutBinding Binding)> Desired(ShortcutSettings settings, SearchSettings search)
+    {
+        foreach (var entry in settings.Entries()) if (entry.Binding.Enabled) yield return entry;
+        if (search.Enabled && search.HotkeyEnabled) yield return ("palette", "全局搜索", new() { Modifiers = search.HotkeyModifiers, Key = search.HotkeyVirtualKey });
+    }
+    private sealed record RegisteredShortcut(int Id, ShortcutBinding Binding);
 
     public sealed class HotkeyReservation(Action commit, Action cancel) : IDisposable
     {
@@ -74,9 +128,10 @@ public sealed class NativeShell : Forms.NativeWindow, IDisposable
         public void Dispose() { if (!_finished) { cancel(); _finished = true; } }
     }
 
-    public static string DescribeHotkey(SearchSettings settings) =>
-        ((settings.HotkeyModifiers & 2) != 0 ? "Ctrl + " : "") + ((settings.HotkeyModifiers & 1) != 0 ? "Alt + " : "") +
-        ((settings.HotkeyModifiers & 4) != 0 ? "Shift + " : "") + (settings.HotkeyVirtualKey == 0x20 ? "Space" : settings.HotkeyVirtualKey is >= 0x70 and <= 0x7B ? "F" + (settings.HotkeyVirtualKey - 0x6F) : ((char)settings.HotkeyVirtualKey).ToString());
+    public static string DescribeHotkey(SearchSettings settings) => DescribeHotkey(new ShortcutBinding { Enabled = settings.HotkeyEnabled, Modifiers = settings.HotkeyModifiers, Key = settings.HotkeyVirtualKey });
+    public static string DescribeHotkey(ShortcutBinding binding) => !binding.Enabled ? "未绑定" :
+        ((binding.Modifiers & 2) != 0 ? "Ctrl + " : "") + ((binding.Modifiers & 1) != 0 ? "Alt + " : "") +
+        ((binding.Modifiers & 4) != 0 ? "Shift + " : "") + (binding.Key == 0x20 ? "Space" : binding.Key is >= 0x70 and <= 0x7B ? "F" + (binding.Key - 0x6F) : ((char)binding.Key).ToString());
     public static nint CaptureForeground() => GetForegroundWindow();
     public static void TryRestoreForeground(nint window) { if (window != 0 && IsWindow(window)) SetForegroundWindow(window); }
     public static void PlacePalette(nint window, nint previous, double width, double height)
@@ -147,9 +202,7 @@ public sealed class NativeShell : Forms.NativeWindow, IDisposable
 
     public void Dispose()
     {
-        if (_desktopHotkey) UnregisterHotKey(Handle, 0x4D56);
-        if (HotKeyRegistered) UnregisterHotKey(Handle, HotKeyId);
-        if (_paletteId != 0) UnregisterHotKey(Handle, _paletteId);
+        foreach (var shortcut in _registered.Values) UnregisterHotKey(Handle, shortcut.Id);
         foreach (var hook in _hooks) UnhookWinEvent(hook);
         DestroyHandle();
     }
