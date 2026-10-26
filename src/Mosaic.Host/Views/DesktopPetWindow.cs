@@ -24,11 +24,13 @@ public sealed class DesktopPetWindow : Window
     private Point? _pressScreen;
     private Point _pressWindow;
     private bool _dragging, _placing;
+    private string _announcement = "";
+    private long _announcementUntil;
     private bool _hoverConsumed;
     private long? _hoverSince, _outsideSince;
     public event Action<PetTrigger>? Interacted;
     public event Action<double, double>? PositionCommitted;
-    public event Action? SettingsRequested, DisableRequested;
+    public event Action? SettingsRequested, DisableRequested, ChimePreviewRequested, ClockReset;
 
     public DesktopPetWindow()
     {
@@ -43,6 +45,8 @@ public sealed class DesktopPetWindow : Window
         Sprite.Cursor = Cursors.Hand;
         AutomationProperties.SetName(Sprite, "鲸鱼娘，悬停摸头或打招呼，单击随机聊天，双击投喂，拖动移动，右键打开菜单");
         var grid = new Grid(); grid.Children.Add(Sprite); grid.Children.Add(_bubble); Content = grid;
+        Closed += (_, _) => Sprite.StopAnimation();
+        IsVisibleChanged += (_, _) => { if (!IsVisible) Sprite.StopAnimation(); };
         Sprite.MouseLeftButtonDown += OnPress; Sprite.MouseMove += OnMove; Sprite.MouseLeftButtonUp += OnRelease;
         Sprite.LostMouseCapture += (_, _) => FinishDrag();
         Sprite.ContextMenu = BuildMenu();
@@ -62,6 +66,27 @@ public sealed class DesktopPetWindow : Window
         {
             var item = new MenuItem { Header = label }; item.Click += (_, _) => Interacted?.Invoke(action); menu.Items.Add(item);
         }
+        if (PetHourlyChime.Supports(character))
+        {
+            var chime = new MenuItem { Header = "试听整点报时" };
+            chime.Click += (_, _) => ChimePreviewRequested?.Invoke(); menu.Items.Add(chime);
+        }
+        if (DesktopPetCharacters.IsAnimated(character))
+        {
+            var actions = new MenuItem { Header = "mk2 原版动作库（106）" };
+            var assigned = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var category in Mk2AnimationCatalog.Categories)
+            {
+                var group = new MenuItem { Header = category.Key };
+                foreach (var name in category.Value)
+                { var item = new MenuItem { Header = name }; item.Click += (_, _) => { Sprite.PlayAnimation(name); Announce(name); }; group.Items.Add(item); assigned.Add(name); }
+                actions.Items.Add(group);
+            }
+            var others = new MenuItem { Header = "其他动作与互动" };
+            foreach (var clip in Mk2AnimationCatalog.All.Where(c => !assigned.Contains(c.Name)))
+            { var name = clip.Name; var item = new MenuItem { Header = name }; item.Click += (_, _) => { Sprite.PlayAnimation(name); Announce(name); }; others.Items.Add(item); }
+            actions.Items.Add(others); menu.Items.Add(actions);
+        }
         menu.Items.Add(new Separator());
         var settings = new MenuItem { Header = "桌宠设置…" }; settings.Click += (_, _) => SettingsRequested?.Invoke(); menu.Items.Add(settings);
         var hide = new MenuItem { Header = "收起这位伙伴" }; hide.Click += (_, _) => DisableRequested?.Invoke(); menu.Items.Add(hide);
@@ -78,7 +103,7 @@ public sealed class DesktopPetWindow : Window
         Title = "Mosaic · " + name;
         AutomationProperties.SetName(Sprite, name + "，悬停摸头或打招呼，单击随机聊天，双击投喂，拖动移动，右键打开菜单");
         var size = settings.Size * character.SizeMultiplier;
-        Width = size + 32; Height = size + 96;
+        Width = size * DesktopPetCharacters.CanvasAspectRatio(settings.Character) + 32; Height = size + 96;
         if (initial)
         {
             Left = settings.Left ?? SystemParameters.WorkArea.Right - Width - 32;
@@ -87,13 +112,17 @@ public sealed class DesktopPetWindow : Window
         ClampToScreen();
     }
 
+    public void Announce(string text)
+    { _announcement = text; _announcementUntil = Environment.TickCount64 + 15000; }
+    public void ClearAnnouncement() { _announcementUntil = 0; }
+
     public void Render(DesktopPetBehavior behavior, long now, bool animate, bool bubbles)
     {
         var pose = !animate && behavior.IsExpression ? behavior.StillPose : !animate && behavior.IsTyping ? PetPose.TypingLeft : !animate && behavior.IsGreeting ? PetPose.GreetA : !animate && behavior.Pose == PetPose.RiceHatTilt ? PetPose.RiceHat : behavior.Pose;
         var elapsed = Math.Max(0, now - behavior.StartedAt) / 1000d;
-        Sprite.SetPose(pose);
+        if (!Sprite.RenderAnimation(behavior.ActionPose, behavior.StartedAt, now, animate, behavior.Pose)) Sprite.SetPose(pose);
         double y = 0, rotation = 0, scaleY = 1;
-        if (animate && !behavior.IsExpression)
+        if (animate && !behavior.IsExpression && !Sprite.HasNativeAnimation)
         {
             var phase = elapsed * Math.PI * 2;
             switch (behavior.Pose)
@@ -114,10 +143,12 @@ public sealed class DesktopPetWindow : Window
             }
         }
         // Apply each final transform once, rather than resetting it and setting it again.
+        var facing = Sprite.IsAnimationMirrored ? -1d : 1d; if (_scale.ScaleX != facing) _scale.ScaleX = facing;
         if (_offset.Y != y) _offset.Y = y;
         if (_rotation.Angle != rotation) _rotation.Angle = rotation;
         if (_scale.ScaleY != scaleY) _scale.ScaleY = scaleY;
         var bubble = !animate ? behavior.StillBubble : behavior.Bubble;
+        if (now < _announcementUntil) bubble = _announcement;
         if (_message.Text != bubble) _message.Text = bubble;
         var visibility = bubbles && bubble.Length > 0 && (!behavior.IsSleeping || elapsed < 5) ? Visibility.Visible : Visibility.Collapsed;
         if (_bubble.Visibility != visibility) _bubble.Visibility = visibility;
@@ -223,6 +254,8 @@ public sealed class DesktopPetWindow : Window
 
     private nint WindowMessage(nint handle, int message, nint wParam, nint lParam, ref bool handled)
     {
+        // Top-level pet windows receive power and clock broadcasts without another listener.
+        if (message == 0x1E || message == 0x218 && ((long)wParam is 4 or 7 or 18)) ClockReset?.Invoke();
         if (message == 0x21) { handled = true; return 3; } // MA_NOACTIVATE
         if (message == 0x84 && !_dragging)
         {

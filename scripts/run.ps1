@@ -1,5 +1,6 @@
 param([switch]$Dashboard, [switch]$Palette, [switch]$Library, [switch]$Workspaces, [switch]$Pet, [switch]$Exit, [string]$DataDirectory)
 . (Join-Path $PSScriptRoot 'common.ps1')
+& (Join-Path $PSScriptRoot 'setup-mk2-runtime.ps1')
 Invoke-MosaicDotnet -Arguments @('build', (Join-Path $mosaicRoot 'src\Mosaic.Host\Mosaic.Host.csproj'), '-c', 'Release', '--nologo')
 $mosaicExecutable = Join-Path $mosaicRoot 'src\Mosaic.Host\bin\Release\net10.0-windows\Mosaic.exe'
 $mosaicArguments = [System.Collections.Generic.List[string]]::new()

@@ -1,0 +1,26 @@
+{
+  "archive_url": "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-10-26-14-25/ffmpeg-n9.0.2-36-g6882969ce9-win64-lgpl-shared-9.0.zip",
+  "archive_sha256": "6be6e82a5cdc08aa173cf0a7b746682b4f16492d79473dc09d7c41be834e507b",
+  "files": [
+    {
+      "file": "avcodec-63.dll",
+      "sha256": "8a477c8d00509f10e2ec4c89e1b4016f81ba3c511f8519741eec3300dd0a212f"
+    },
+    {
+      "file": "avformat-63.dll",
+      "sha256": "f6a9fc4a9da245d9e3d86e2bad32b81cc4b62fa2f7386a9a9b709e7d8a6f30e9"
+    },
+    {
+      "file": "avutil-61.dll",
+      "sha256": "0cd8c6b444e30764478d06f4a917ce3d5d399c566a237a9c0b4be47236e63eae"
+    },
+    {
+      "file": "swresample-7.dll",
+      "sha256": "3814dc0e04d33586e020a080b1cd3820121ab34ed55ba4aaec516290abdadc26"
+    },
+    {
+      "file": "swscale-10.dll",
+      "sha256": "3e7e40672ccf35e6efd3abcb4a743e65a228033e855ec3d15be0859f24f4c5f3"
+    }
+  ]
+}

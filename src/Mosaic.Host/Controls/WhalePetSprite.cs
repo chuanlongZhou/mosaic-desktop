@@ -32,6 +32,11 @@ public sealed class WhalePetSprite : Image
         Enum.GetValues<PetCharacter>().ToDictionary(character => character, character => new Lazy<SpriteAtlas>(() => new(character)));
     private SpriteAtlas Atlas => Atlases[Character].Value;
     private PetPose _pose;
+    private Mk2AnimationPlayer? _mk2;
+    public bool HasNativeAnimation => _mk2 is not null;
+    public string? CurrentAnimationName => _mk2?.Name;
+    public bool IsAnimationMirrored => _mk2?.Mirrored == true;
+    public int AnimationFramesDecoded => _mk2?.FramesDecoded ?? 0;
     public PetCharacter Character { get; private set; }
     public WhalePetSprite()
     {
@@ -41,11 +46,21 @@ public sealed class WhalePetSprite : Image
     public void SetCharacter(PetCharacter character)
     {
         if (Character == character) return;
+        if (DesktopPetCharacters.IsAnimated(character))
+        {
+            var poster = Mk2AnimationCatalog.Poster("待机呼吸休闲");
+            _mk2?.Stop(); _mk2 = new(); Character = character; _pose = PetPose.Idle; Source = poster; return;
+        }
+        _mk2?.Stop(); _mk2 = null;
         // Load before committing so a broken resource cannot leave a half-switched sprite.
         var atlas = Atlases[character].Value;
         Character = character; Source = atlas.Frames[(int)_pose];
     }
-    public void SetPose(PetPose pose) { if (_pose == pose && Source is not null) return; _pose = pose; Source = Atlas.Frames[(int)pose]; }
+    public void SetPose(PetPose pose) { if (_mk2 is not null) { _pose = pose; Source = Mk2AnimationCatalog.Poster(Mk2AnimationCatalog.ForPose(pose)); return; } if (_pose == pose && Source is not null) return; _pose = pose; Source = Atlas.Frames[(int)pose]; }
+    public bool RenderAnimation(PetPose action, long startedAt, long now, bool animate, PetPose gaze = PetPose.Idle)
+    { if (_mk2 is null) return false; Source = _mk2.Render(action, startedAt, now, animate, gaze); return true; }
+    public void PlayAnimation(string name, long? now = null) => _mk2?.Play(name, now ?? Environment.TickCount64);
+    public void StopAnimation() => _mk2?.Stop();
     public bool IsOpaqueAt(Point point)
     {
         if (ActualWidth <= 0 || ActualHeight <= 0 || point.X < 0 || point.Y < 0 || point.X >= ActualWidth || point.Y >= ActualHeight) return false;
@@ -54,6 +69,13 @@ public sealed class WhalePetSprite : Image
         var x = (point.X - (ActualWidth - frame.PixelWidth * scale) / 2) / scale;
         var y = (point.Y - (ActualHeight - frame.PixelHeight * scale) / 2) / scale;
         if (x < 0 || y < 0 || x >= frame.PixelWidth || y >= frame.PixelHeight) return false;
+        if (_mk2 is not null)
+        {
+            var offset = ((int)y * frame.PixelWidth + (int)x) * 4 + 3;
+            if (ReferenceEquals(Source, _mk2.CurrentBitmap) && _mk2.Pixels is { } pixels) return pixels[offset] > 24;
+            var data = new byte[frame.PixelWidth * frame.PixelHeight * 4];
+            frame.CopyPixels(data, frame.PixelWidth * 4, 0); return data[offset] > 24;
+        }
         return Atlas.Alpha(_pose)[(int)y * frame.PixelWidth + (int)x] > 24;
     }
     private static BitmapSource[] Load(PetCharacter character)

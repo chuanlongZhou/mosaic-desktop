@@ -14,7 +14,7 @@
   <TextBlock Text="最多 5 位，可重复选择同一角色；各自保存位置、大小和反应。主位可收起，其他伙伴可移除。保存后一起应用。" Foreground="{DynamicResource MutedBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,4,0,16"/>
   <TextBlock Text="选择桌宠" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8"/>
   <ComboBox x:Name="CharacterPicker" DisplayMemberPath="Name" SelectedValuePath="Id" SelectionChanged="OnCharacterChanged" AutomationProperties.Name="桌宠角色" Margin="0,0,0,8"/>
-  <TextBlock Text="共 11 款：原版鲸鱼娘，以及 DeepSeek、GPT、Gemini、Claude、Qwen 的 Q 版与正常比例版。正常比例显示高度加倍。先选择伙伴，再选择她的角色。" Foreground="{DynamicResource MutedBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,16"/>
+  <TextBlock Text="共 12 款，新增 Deepseek Q版 mk2：原版鲸鱼娘，以及 DeepSeek、GPT、Gemini、Claude、Qwen 的 Q 版与正常比例版。正常比例显示高度加倍。先选择伙伴，再选择她的角色。" Foreground="{DynamicResource MutedBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,16"/>
   <Border Background="{DynamicResource HeroBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="14" Padding="12" Margin="0,0,0,18">
    <Grid x:Name="PreviewStage" ClipToBounds="True"><Grid.ColumnDefinitions><ColumnDefinition Width="160"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
     <local:WhalePetSprite x:Name="PreviewSprite" Width="152" Height="170" RenderTransformOrigin=".5,.85" AutomationProperties.Name="鲸鱼娘动作预览"/>
@@ -26,6 +26,12 @@
     </StackPanel>
    </Grid>
   </Border>
+  <StackPanel x:Name="Mk2AnimationPanel" Visibility="Collapsed" Margin="0,0,0,18">
+   <TextBlock Text="mk2 原版动作库 · 106 段" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8"/>
+   <ComboBox x:Name="Mk2AnimationPicker" AutomationProperties.Name="mk2 原版动画"/>
+   <Button Content="播放选中的动作" Click="OnMk2Preview" HorizontalAlignment="Left" Margin="0,8,0,8"/>
+   <TextBlock Text="素材来源：SchneeHertz/pi-deepseek-pet，原始素材来自 PC2005-cloud/dsh-pet。素材仅限非商业使用，详情见运行包 licenses/Pi-DeepSeek-Pet-ASSET_LICENSE.md。" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" FontSize="12"/>
+  </StackPanel>
   <TextBlock Text="试试她的动作" FontSize="16" FontWeight="SemiBold"/>
   <WrapPanel Margin="0,10,0,0">
    <Button Content="随机聊一句" Tag="Click" Click="OnPreview" Margin="0,0,8,8"/>
@@ -43,6 +49,15 @@
   </WrapPanel>
   <TextBlock x:Name="PreviewCaption" Text="动作预览，不会改变桌宠开关。" Foreground="{DynamicResource MutedBrush}" FontSize="12" TextWrapping="Wrap" MinHeight="36" Margin="0,0,0,12"/>
   <Separator Margin="0,0,0,16"/>
+  <StackPanel x:Name="HourlyChimePanel" Visibility="Collapsed" Margin="0,0,0,20">
+   <TextBlock Text="DeepSeek Q 版系列 · 整点报时" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,12"/>
+   <CheckBox x:Name="HourlyChimeCheck" Content="每到整点，用语音提醒我" Checked="OnChimeChanged" Unchecked="OnChimeChanged" AutomationProperties.Name="DeepSeek Q 版整点语音报时"/>
+   <TextBlock Text="中文女声测试配音，离线播放。按电脑本地时间报时；显示中的 DeepSeek Q 版或 mk2 生效，多开只播一次。跟随全屏隐藏设置，启动或唤醒后不补报。保存后生效。" Foreground="{DynamicResource MutedBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,4,0,12"/>
+   <TextBlock x:Name="ChimeVolumeLabel" Text="报时音量 · 70%" Margin="0,0,0,8"/>
+   <Slider x:Name="ChimeVolumeSlider" Minimum="0" Maximum="100" Value="70" TickFrequency="5" IsSnapToTickEnabled="True" ValueChanged="OnChimeVolumeChanged" AutomationProperties.Name="报时音量"/>
+   <Button Content="立即试听当前整点" Click="OnChimePreview" HorizontalAlignment="Left" Margin="0,12,0,8" AutomationProperties.Name="试听 DeepSeek Q 版整点报时"/>
+   <TextBlock x:Name="ChimeStatus" Text="试听无需开启报时，也不会修改已保存设置。音量为 0 时静音。" Foreground="{DynamicResource MutedBrush}" FontSize="12" TextWrapping="Wrap"/>
+  </StackPanel>
   <TextBlock Text="她会回应这些时刻" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,12"/>
   <CheckBox x:Name="CursorCheck" Content="鼠标移动 → 看向鼠标所在方向"/>
   <CheckBox x:Name="EnterCheck" Content="按回车 → 开心蹦跳，给你加油"/>

@@ -178,7 +178,7 @@ internal static class DesktopPetTests
 
     private static void CheckStandardCharacters()
     {
-        Assert(DesktopPetCharacters.All.Count == 11 && DesktopPetCharacters.All.Select(character => character.Id).Distinct().Count() == 11, "Standard variants replaced an existing character.");
+        Assert(DesktopPetCharacters.All.Count == 12 && DesktopPetCharacters.All.Select(character => character.Id).Distinct().Count() == 12, "Standard variants replaced an existing character.");
         Assert((int)PetCharacter.WhaleGirl == 0 && (int)PetCharacter.DeepSeekStandard == 2 && (int)PetCharacter.Gpt == 3 && (int)PetCharacter.Qwen == 6, "Existing persisted character IDs changed.");
         foreach (var (chibi, standard) in new[]
         {
