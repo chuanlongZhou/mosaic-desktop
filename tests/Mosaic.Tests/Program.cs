@@ -4,6 +4,8 @@ using Mosaic.Core.Commands;
 using Mosaic.Core.Models;
 using Mosaic.Storage.Json;
 
+if (args.Contains("--mk2-check")) { await Mk2Checks.RunAsync(args.Length > 1 ? args[1] : ".artifacts/mk2-check"); return 0; }
+if (args.Contains("--hourly-chime-check")) { await HourlyChimeChecks.RunAsync(args.Length > 1 ? args[1] : ".artifacts/hourly-chime-check"); return 0; }
 if (args.Contains("--desktop-native-status")) { DesktopNativeProbe.Print(); return 0; }
 if (args.Contains("--ui-check")) { await UiLayoutChecks.RunAsync(); return 0; }
 if (args.Contains("--menu-check")) { await UiLayoutChecks.RunAsync(menuOnly: true); return 0; }

@@ -68,7 +68,7 @@ internal static class DesktopPetChecks
         CheckExpressionMenu(pet, window);
         CheckEmotionKeyframes();
         var characterIdles = new List<BitmapSource>();
-        foreach (var character in Enum.GetValues<PetCharacter>())
+        foreach (var character in Enum.GetValues<PetCharacter>().Where(c => !DesktopPetCharacters.IsAnimated(c)))
         {
             Complete(services.UpdatePetAsync(p => p.Character = character));
             window.UpdateLayout();
@@ -86,7 +86,7 @@ internal static class DesktopPetChecks
             SavePoseSheet(window.Sprite, character);
             window.Sprite.SetPose(PetPose.Idle); characterIdles.Add((BitmapSource)window.Sprite.Source);
         }
-        Assert(characterIdles.Distinct().Count() == Enum.GetValues<PetCharacter>().Length, "A character silently reused another character's artwork.");
+        Assert(characterIdles.Distinct().Count() == Enum.GetValues<PetCharacter>().Count(c => !DesktopPetCharacters.IsAnimated(c)), "A character silently reused another character's artwork.");
         Complete(services.UpdatePetAsync(p => p.Character = PetCharacter.WhaleGirl));
         window.Sprite.SetPose(PetPose.Idle);
         // Returning to the original must reuse its own cached frame and alpha mask.
@@ -241,7 +241,7 @@ internal static class DesktopPetChecks
         var sprite = (WhalePetSprite)panel.FindName("PreviewSprite");
         var probe = new WhalePetSprite();
         var picker = (ComboBox)panel.FindName("CharacterPicker");
-        foreach (var character in Enum.GetValues<PetCharacter>())
+        foreach (var character in Enum.GetValues<PetCharacter>().Where(c => !DesktopPetCharacters.IsAnimated(c)))
         {
             picker.SelectedValue = character; probe.SetCharacter(character);
             var chat = FindVisual<Button>(panel, item => Equals(item.Tag, "Click"));
@@ -312,7 +312,7 @@ internal static class DesktopPetChecks
         var window = new DesktopPetWindow();
         try
         {
-            foreach (var character in Enum.GetValues<PetCharacter>())
+            foreach (var character in Enum.GetValues<PetCharacter>().Where(c => !DesktopPetCharacters.IsAnimated(c)))
             {
                 sprite.SetCharacter(character); window.Configure(new DesktopPetSettings { Character = character }, true);
                 var sequences = new[]

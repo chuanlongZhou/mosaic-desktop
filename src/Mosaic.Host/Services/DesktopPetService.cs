@@ -18,6 +18,8 @@ public sealed class DesktopPetService : IDisposable
     private readonly AppServices _services;
     private readonly Action _openSettings;
     private readonly DispatcherTimer _timer = new(DispatcherPriority.Background) { Interval = TimeSpan.FromMilliseconds(100) };
+    private readonly PetHourlyChimeSchedule _chimeSchedule = new();
+    private string? _announcingPetId;
     private readonly PetInputBuffer _input = new();
     private readonly Dictionary<string, Resident> _residents = new(StringComparer.Ordinal);
     private readonly DesktopPetBehavior _inactive = new();
@@ -55,6 +57,8 @@ public sealed class DesktopPetService : IDisposable
             {
                 var window = new DesktopPetWindow();
                 resident = new(id, options, window, new(character: options.Character)); _residents.Add(id, resident);
+                window.ClockReset += ResetHourlyChime;
+                window.ChimePreviewRequested += () => PreviewChime(id);
                 window.Interacted += action => TriggerFor(id, action);
                 window.PositionCommitted += async (left, top) => await SaveAsync(() => _services.UpdatePetAsync(pet =>
                 { var own = pet.GetPet(id); own.Left = left; own.Top = top; }));
@@ -121,9 +125,46 @@ public sealed class DesktopPetService : IDisposable
             pet.Behavior.Tick(now, 0, options.SleepWhenIdle, options.IdleSeconds, false, 0, 0);
         pet.Behavior.Trigger(trigger, now);
     }
+    private void ResetHourlyChime()
+    {
+        _chimeSchedule.ResetObservation(); PetChimeAudio.Shared.StopAutomatic(); _announcingPetId = null;
+        foreach (var pet in _residents.Values) pet.Window.ClearAnnouncement();
+    }
+    private bool CanChime(Resident pet) => PetHourlyChime.CanAnnounce(pet.Options, true, _fullscreen) && !pet.Behavior.IsDragging;
+    private void PreviewChime(string id)
+    {
+        if (_residents.TryGetValue(id, out var pet) && PetHourlyChime.Supports(pet.Options.Character) && !(_fullscreen && pet.Options.HideInFullscreen))
+            PlayChime(pet, DateTimeOffset.Now.Hour, true);
+    }
+    private void PlayChime(Resident pet, int hour, bool preview)
+    {
+        var audio = PetChimeAudio.Shared;
+        if (audio.Play(hour, pet.Options.HourlyChimeVolume, preview, error =>
+            { if (error is not null) pet.Window.Announce(error); }))
+        {
+            if (!preview) _announcingPetId = pet.Id;
+            pet.Behavior.Trigger(PetTrigger.Wave, Environment.TickCount64);
+            pet.Window.Announce(PetHourlyChime.GetLine(hour));
+        }
+        else pet.Window.Announce(audio.LastError ?? "语音暂不可用。");
+    }
+    private void CheckHourlyChime()
+    {
+        var audio = PetChimeAudio.Shared;
+        if (_announcingPetId is { } id && (!_residents.TryGetValue(id, out var speaking) || !CanChime(speaking)))
+        {
+            audio.StopAutomatic();
+            if (_residents.TryGetValue(id, out speaking)) speaking.Window.ClearAnnouncement();
+            _announcingPetId = null;
+        }
+        var now = DateTimeOffset.Now;
+        var pet = _residents.Values.FirstOrDefault(CanChime);
+        if (_chimeSchedule.TryTake(now, pet is not null && !audio.IsPlaying)) PlayChime(pet!, now.Hour, false);
+    }
     private void Tick()
     {
         if (_residents.Count == 0) return;
+        CheckHourlyChime();
         var pending = _input.Take(); var now = Environment.TickCount64;
         var sample = now - _lastSample >= 500;
         if (sample) { _idle = DesktopPetMonitor.IdleSeconds(); _lastSample = now; }
@@ -144,7 +185,7 @@ public sealed class DesktopPetService : IDisposable
             if (window.PollHover(hasCursor ? cursor : null, now)) ApplyTrigger(pet, PetTrigger.Hover, now);
             behavior.Tick(now, _idle, options.SleepWhenIdle, options.IdleSeconds, options.FollowCursor, direction.X, direction.Y, options.ReactToTyping);
             window.Render(behavior, now, animate, options.ShowBubbles);
-            var ownInterval = !animate || behavior.IsSleeping ? 200 : behavior.IsTyping ? 130 : behavior.Pose is PetPose.Idle or PetPose.Blink or PetPose.LookLeft or PetPose.LookRight or PetPose.LookUp or PetPose.LookDown ? 100 : 40;
+            var ownInterval = animate && window.Sprite.HasNativeAnimation ? 40 : !animate || behavior.IsSleeping ? 200 : behavior.IsTyping ? 130 : behavior.Pose is PetPose.Idle or PetPose.Blink or PetPose.LookLeft or PetPose.LookRight or PetPose.LookUp or PetPose.LookDown ? 100 : 40;
             interval = Math.Min(interval, ownInterval);
         }
         var next = TimeSpan.FromMilliseconds(interval); if (_timer.Interval != next) _timer.Interval = next;
@@ -155,6 +196,7 @@ public sealed class DesktopPetService : IDisposable
     }
     private void Stop()
     {
+        _chimeSchedule.ResetObservation(); PetChimeAudio.Shared.StopAutomatic(); _announcingPetId = null;
         _timer.Stop(); _monitor?.Dispose(); _monitor = null; _input.Take();
         foreach (var pet in _residents.Values) pet.Window.Close(); _residents.Clear();
     }

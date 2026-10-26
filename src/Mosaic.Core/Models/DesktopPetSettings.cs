@@ -12,6 +12,8 @@ public class DesktopPetOptions
     public bool SleepWhenIdle { get; set; } = true;
     public bool ShowBubbles { get; set; } = true;
     public bool HideInFullscreen { get; set; } = true;
+    public bool HourlyChimeEnabled { get; set; }
+    public int HourlyChimeVolume { get; set; } = 70;
     public int IdleSeconds { get; set; } = 90;
     public int Size { get; set; } = 220;
     public double? Left { get; set; }
@@ -20,6 +22,7 @@ public class DesktopPetOptions
     public virtual void Validate()
     {
         if (!Enum.IsDefined(Character)) throw new InvalidDataException("请选择有效的桌宠角色。");
+        if (HourlyChimeVolume is < 0 or > 100) throw new InvalidDataException("报时音量须为 0–100。");
         if (IdleSeconds is < 30 or > 1800 || Size is < 128 or > 320 ||
             Left is { } left && !double.IsFinite(left) || Top is { } top && !double.IsFinite(top))
             throw new InvalidDataException("桌宠设置无效：大小须为 128–320，入睡时间须为 30–1800 秒，位置须为有效坐标。");
@@ -30,6 +33,7 @@ public class DesktopPetOptions
         other.Character = Character; other.Enabled = Enabled; other.FollowCursor = FollowCursor;
         other.ReactToEnter = ReactToEnter; other.ReactToTyping = ReactToTyping; other.ReactToDesktop = ReactToDesktop;
         other.ReactToAppClose = ReactToAppClose; other.SleepWhenIdle = SleepWhenIdle; other.ShowBubbles = ShowBubbles;
+        other.HourlyChimeEnabled = HourlyChimeEnabled; other.HourlyChimeVolume = HourlyChimeVolume;
         other.HideInFullscreen = HideInFullscreen; other.IdleSeconds = IdleSeconds; other.Size = Size; other.Left = Left; other.Top = Top;
     }
 }

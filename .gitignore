@@ -19,3 +19,6 @@ Thumbs.db
 
 # Local demo programs and generated verification reports
 output/
+
+# Downloaded, hash-verified native video runtime
+src/Mosaic.Host/Native/FFmpeg/*.dll

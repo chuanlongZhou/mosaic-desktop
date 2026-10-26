@@ -1,4 +1,5 @@
 . (Join-Path $PSScriptRoot 'common.ps1')
+& (Join-Path $PSScriptRoot 'setup-mk2-runtime.ps1')
 [xml]$mosaicProject = Get-Content -LiteralPath (Join-Path $mosaicRoot 'src\Mosaic.Host\Mosaic.Host.csproj')
 $mosaicVersion = [string]$mosaicProject.Project.PropertyGroup.Version
 if ($mosaicVersion -notmatch '^\d+\.\d+\.\d+$') { throw '项目版本号无效。' }

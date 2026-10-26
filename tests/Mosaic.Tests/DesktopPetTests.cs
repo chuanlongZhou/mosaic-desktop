@@ -179,7 +179,7 @@ internal static class DesktopPetTests
 
     private static void CheckStandardCharacters()
     {
-        Assert(DesktopPetCharacters.All.Count == 20 && DesktopPetCharacters.All.Select(character => character.Id).Distinct().Count() == 20, "Community variants replaced or duplicated an existing character.");
+        Assert(DesktopPetCharacters.All.Count == 21 && DesktopPetCharacters.All.Select(character => character.Id).Distinct().Count() == 21, "Community variants replaced or duplicated an existing character.");
         Assert(DesktopPetCharacters.All.Take(11).Select(item => item.Id).SequenceEqual(Enum.GetValues<PetCharacter>().Take(11)), "The original character roster changed order.");
         Assert((int)PetCharacter.WhaleGirl == 0 && (int)PetCharacter.DeepSeekStandard == 2 && (int)PetCharacter.Gpt == 3 && (int)PetCharacter.Qwen == 6, "Existing persisted character IDs changed.");
         foreach (var (chibi, standard) in new[]
@@ -207,7 +207,7 @@ internal static class DesktopPetTests
 
     private static void CheckCommunityCharacters()
     {
-        Assert((int)PetCharacter.GrokCommunity == 11 && (int)PetCharacter.CrossPetGlm == 19, "Community characters changed persisted IDs.");
+        Assert((int)PetCharacter.DeepSeekChibiMk2 == 11 && (int)PetCharacter.GrokCommunity == 12 && (int)PetCharacter.CrossPetGlm == 20, "Community characters changed persisted IDs.");
         foreach (var (variant, original) in new[]
         {
             (PetCharacter.CrossPetGpt, PetCharacter.Gpt), (PetCharacter.CrossPetClaude, PetCharacter.Claude),

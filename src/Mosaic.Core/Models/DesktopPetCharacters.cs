@@ -1,7 +1,7 @@
 namespace Mosaic.Core.Models;
 
 public enum PetCharacter { WhaleGirl, DeepSeekChibi, DeepSeekStandard, Gpt, Gemini, Claude, Qwen, GptStandard, GeminiStandard, ClaudeStandard, QwenStandard,
-    GrokCommunity, KimiCommunity, ZhipuCommunity, CrossPetGpt, CrossPetClaude, CrossPetDeepSeek, CrossPetGemini, CrossPetQwen, CrossPetGlm }
+    DeepSeekChibiMk2, GrokCommunity, KimiCommunity, ZhipuCommunity, CrossPetGpt, CrossPetClaude, CrossPetDeepSeek, CrossPetGemini, CrossPetQwen, CrossPetGlm }
 
 public sealed record DesktopPetCharacter(PetCharacter Id, string Name, string Description, double SizeMultiplier = 1,
     string FeedLabel = "喂白米饭", string SignatureLabel = "头顶饭盆", string TeaseLabel = "叫她大肥鱼", string Tagline = "今天也要一起摸鱼呀～");
@@ -20,6 +20,7 @@ public static class DesktopPetCharacters
         new(PetCharacter.GeminiStandard, "Gemini · 星猫娘（正常比例）", "正常比例的星空猫娘。蓝紫渐变发、异色瞳、猫耳与猫尾，俏皮好奇；桌面显示高度加倍。", SizeMultiplier: 2, FeedLabel: "投喂小鱼饼", SignatureLabel: "猫爪比心", TeaseLabel: "逗逗猫娘", Tagline: "喵～今天会发现什么新点子？"),
         new(PetCharacter.ClaudeStandard, "Claude · 书卷娘（正常比例）", "正常比例的学者伙伴。橙色长发、日芒花饰、象牙白长裙与书本，温柔安静；桌面显示高度加倍。", SizeMultiplier: 2, FeedLabel: "递一杯热茶", SignatureLabel: "翻一页书", TeaseLabel: "打断阅读", Tagline: "这一页，让我慢慢陪你读。"),
         new(PetCharacter.QwenStandard, "Qwen · 折扇娘（正常比例）", "正常比例的国风伙伴。蓝紫长发与侧辫、中式头饰、长披袖与折扇，明朗自信；桌面显示高度加倍。", SizeMultiplier: 2, FeedLabel: "投喂桂花糕", SignatureLabel: "开合折扇", TeaseLabel: "逗逗扇娘", Tagline: "有问便来，一起把思路展开。"),
+        new(PetCharacter.DeepSeekChibiMk2, "Deepseek Q版 mk2", "来自 pi-deepseek-pet 的 106 段原版透明动画，共享 DeepSeek Q 版的肥鱼配音与整点报时。素材仅限非商业使用。", SignatureLabel: "今天吃什么"),
         new(PetCharacter.GrokCommunity, "Grok · 暗金哥特娘（社区图集）", "来自 chatgpt-chibi-pets 的非官方同人图集，金发双马尾与暗金哥特服饰。", FeedLabel: "投喂点心", SignatureLabel: "检查任务", TeaseLabel: "逗逗她", Tagline: "直说吧，今天要挑战什么？"),
         new(PetCharacter.KimiCommunity, "Kimi · 月影娘（社区图集）", "来自 chatgpt-chibi-pets 的非官方同人图集，月影主题的温柔伙伴。", FeedLabel: "投喂月饼", SignatureLabel: "检查任务", TeaseLabel: "逗逗她", Tagline: "慢慢说，我会陪你看完。"),
         new(PetCharacter.ZhipuCommunity, "智谱 · 珊瑚技术娘（社区图集）", "来自 chatgpt-chibi-pets 的非官方同人图集，珊瑚色科技主题。", FeedLabel: "投喂点心", SignatureLabel: "检查任务", TeaseLabel: "逗逗她", Tagline: "交给我，先理清线索。"),
@@ -31,10 +32,14 @@ public static class DesktopPetCharacters
         new(PetCharacter.CrossPetGlm, "GLM · 狐狸娘（CrossPet）", "CrossPet 社区画风的黑狐狸女仆，包含思考、阅读、搜索、绘画等动作。", FeedLabel: "投喂点心", SignatureLabel: "打开小账本", TeaseLabel: "逗逗狐狸", Tagline: "今天的任务，交给我吧。")
     ]);
 
+    public static bool IsAnimated(PetCharacter character) => character == PetCharacter.DeepSeekChibiMk2;
+    public static double CanvasAspectRatio(PetCharacter character) => IsAnimated(character) ? 16d / 9 : 1;
+
     public static DesktopPetCharacter Get(PetCharacter character) => All.Single(item => item.Id == character);
 
     public static PetCharacter Personality(PetCharacter character) => character switch
     {
+        PetCharacter.DeepSeekChibiMk2 => PetCharacter.DeepSeekChibi,
         PetCharacter.GptStandard => PetCharacter.Gpt,
         PetCharacter.GeminiStandard => PetCharacter.Gemini,
         PetCharacter.ClaudeStandard => PetCharacter.Claude,

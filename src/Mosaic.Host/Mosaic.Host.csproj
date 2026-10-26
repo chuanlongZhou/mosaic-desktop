@@ -3,6 +3,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets/Mosaic.ico</ApplicationIcon>
@@ -53,11 +54,17 @@
     <Resource Include="Assets/Pet/*Community/frames.json" />
     <Resource Include="Assets/Pet/CrossPet*/atlas.png" />
     <Resource Include="Assets/Pet/CrossPet*/frames.json" />
+    <Content Include="Assets/Voice/DeepSeekChibi/*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <PackageReference Include="FFmpeg.AutoGen" Version="9.0.1.1" />
+    <Content Include="Assets/Pet/DeepSeekChibiMk2/*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="Native/FFmpeg/*.dll" Link="%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <PackageReference Include="ManagedShell" Version="0.0.374" />
     <Content Include="../../packaging/licenses/ManagedShell-LICENSE.txt" Link="licenses/ManagedShell-LICENSE.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="../../packaging/licenses/DeepSeek-Pets-NOTICE.md" Link="licenses/DeepSeek-Pets-NOTICE.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="../../packaging/licenses/AI-Companions-NOTICE.md" Link="licenses/AI-Companions-NOTICE.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="../../packaging/licenses/Community-Pets-NOTICE.md" Link="licenses/Community-Pets-NOTICE.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="../../packaging/licenses/Pi-DeepSeek-Pet-*" Link="licenses/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="../../packaging/licenses/FFmpeg-*" Link="licenses/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Using Remove="System.Windows.Forms" />
     <Using Remove="System.Drawing" />
     <ProjectReference Include="../Mosaic.Core/Mosaic.Core.csproj" />

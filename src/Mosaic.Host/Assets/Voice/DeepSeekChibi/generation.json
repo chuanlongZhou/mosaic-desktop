@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "clips": 24,
+  "style": "cute",
+  "torch": "2.11.0+cu128",
+  "gpu": "NVIDIA GeForce RTX 4070 Laptop GPU",
+  "precision": "float32",
+  "cosyvoice_commit": "074ca6dc9e80a2f424f1f74b48bdd7d3fea531cc",
+  "matcha_commit": "dd9105b34bf2be2230f4aa1e4769fb586a3c824e",
+  "model_manifest_sha256": "9f39074aba4d6a422a98b7a5e0bfc0a7463666669da226be55c85b67ccbc0edd",
+  "onnx_sessions": [
+    {
+      "providers": [
+        "CPUExecutionProvider"
+      ]
+    },
+    {
+      "providers": [
+        "CPUExecutionProvider"
+      ]
+    }
+  ],
+  "text_frontend": "",
+  "wav_decoder": "SoundFile (torchaudio load adapter for Windows)",
+  "elapsed_seconds": 143.1326059999992
+}
