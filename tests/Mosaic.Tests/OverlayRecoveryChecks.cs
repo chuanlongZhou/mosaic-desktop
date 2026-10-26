@@ -81,6 +81,30 @@ internal static class OverlayRecoveryChecks
                 await Until(() => FindWindow(null, "Mosaic · 时间与菜单栏") != 0, "Top menu did not initialize.");
                 await Task.Delay(1200);
                 await Until(MenuWorkAreasMatch, "Overlay refresh did not preserve each menu's visible/hidden work area.");
+                var secondary = System.Windows.Forms.Screen.AllScreens.FirstOrDefault(screen => !screen.Primary);
+                if (secondary is not null)
+                {
+                    var secondaryProbe = new ProcessStartInfo(Environment.ProcessPath!) { UseShellExecute = false };
+                    secondaryProbe.ArgumentList.Add("--window-probe-secondary");
+                    using var probe = Process.Start(secondaryProbe)!;
+                    try
+                    {
+                        await Until(() => { probe.Refresh(); return probe.MainWindowHandle != 0 && IsZoomed(probe.MainWindowHandle); },
+                            "Secondary-screen probe did not maximize.");
+                        await Task.Delay(1200); // Include shell scene and layout refresh after maximize.
+                        var handle = probe.MainWindowHandle;
+                        if (System.Windows.Forms.Screen.FromHandle(handle).DeviceName != secondary.DeviceName)
+                            throw new Exception("Maximizing an ordinary application on the secondary screen moved it to the primary screen.");
+                        if (DwmGetWindowAttribute(handle, 9, out var frame, Marshal.SizeOf<ShellWorkArea.Rect>()) < 0)
+                            throw new Exception("Could not read the secondary-screen maximized frame.");
+                        var area = ShellWorkArea.Capture().First(a => a.Left == secondary.Bounds.Left && a.Right == secondary.Bounds.Right);
+                        if (Math.Abs(frame.Left - area.Left) > 2 || Math.Abs(frame.Top - area.Top) > 2 ||
+                            Math.Abs(frame.Right - area.Right) > 2 || Math.Abs(frame.Bottom - area.Bottom) > 2)
+                            throw new Exception("Secondary-screen maximized application does not fit its own work area.");
+                        Console.WriteLine("  secondary-screen application maximizes and stays within its own work area after shell refresh.");
+                    }
+                    finally { probe.CloseMainWindow(); await probe.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(5)); }
+                }
                 nint DesktopCanvas()
                 {
                     nint result = 0;

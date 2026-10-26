@@ -34,9 +34,9 @@ public partial class DockWindow : Window
         _windowsKeyPinned = pinned;
         _hideTimer.Stop();
         if (pinned) { if (!IsVisible) Show(); ExpandDock(); EnsureTopmost(); }
-        else if (CanAutoHide) CollapseDock();
+        else if (CanAutoHide && !IsMouseOver && !HasOpenMenu()) CollapseDock();
     }
-    private bool CanAutoHide => _windowsKeyPinned is bool pinned ? !pinned : _services.Settings.Dock.AutoHide && _autoHideAllowed;
+    private bool CanAutoHide => _services.Settings.Dock.AutoHide && _autoHideAllowed && _windowsKeyPinned != true;
     public bool IsAutoHidden => _collapsed;
 
     public void SetAutoHideAllowed(bool allowed)
@@ -74,7 +74,7 @@ public partial class DockWindow : Window
         };
         _edgeTimer.Start();
         _hideTimer.Tick += (_, _) => { _hideTimer.Stop(); if (!IsMouseOver && !_dragging && !HasOpenMenu() && CanAutoHide) CollapseDock(); };
-        SourceInitialized += (_, _) => NativeShell.StyleWindow(new WindowInteropHelper(this).Handle, true, true);
+        SourceInitialized += (_, _) => NativeShell.StyleWindow(new WindowInteropHelper(this).Handle, true, true, transparent: true);
         SystemParameters.StaticPropertyChanged += OnSystemParametersChanged;
         Closed += (_, _) => { _closed = true; _refreshTimer.Stop(); _hideTimer.Stop(); _edgeTimer.Stop(); _reservation?.Dispose(); SystemParameters.StaticPropertyChanged -= OnSystemParametersChanged; };
     }
@@ -87,7 +87,8 @@ public partial class DockWindow : Window
         {
             var entries = await _applications.ReadAsync(_services.Settings.Dock.Items, _services.Settings.Dock.SyncTaskbarPins);
             if (_closed) return;
-            var signature = string.Join("|", entries.Select(x => x.Identity + ":" + x.Title + ":" + string.Join(",", x.Windows)));
+            var signature = string.Join("|", entries.Select(x => x.Identity + ":" + x.Title + ":" +
+                string.Join(",", x.Windows.Zip(x.WindowTitles, (handle, title) => handle.ToString() + "=" + title))));
             DockItems.LayoutTransform = new ScaleTransform(_services.Settings.Dock.IconSize / 40.0, _services.Settings.Dock.IconSize / 40.0);
             Height = DockHeight;
             DockTimeLabel.Text = DateTime.Now.ToString("HH:mm");
@@ -111,10 +112,10 @@ public partial class DockWindow : Window
     }
     public double DockHeight => Math.Ceiling(60 * _services.Settings.Dock.IconSize / 40.0 + 24);
     public void EnsureTopmost() { if (IsVisible && !HasOpenMenu()) NativeShell.KeepAbove(new WindowInteropHelper(this).Handle); }
-    private bool HasOpenMenu() => _addMenu?.IsOpen == true || DockItems.Items.Cast<object>().Any(x =>
+    private bool HasOpenMenu() => _addMenu?.IsOpen == true || _windowMenu?.IsOpen == true || DockItems.Items.Cast<object>().Any(x =>
         (DockItems.ItemContainerGenerator.ContainerFromItem(x) is ContentPresenter presenter &&
         VisualTreeHelper.GetChildrenCount(presenter) > 0 && VisualTreeHelper.GetChild(presenter, 0) is Button button && button.ContextMenu?.IsOpen == true));
-    private ContextMenu? _addMenu;
+    private ContextMenu? _addMenu, _windowMenu;
     private static DockItem? ItemOf(object sender) => ((sender as FrameworkElement)?.DataContext as DockApplication)?.Item;
 
     private void OnDockWheel(object sender, MouseWheelEventArgs e) { DockScroll.ScrollToHorizontalOffset(DockScroll.HorizontalOffset - e.Delta); e.Handled = true; }
@@ -151,8 +152,34 @@ public partial class DockWindow : Window
     private async void OnItemClick(object sender, RoutedEventArgs e)
     {
         if (_dragging || _busy || (sender as FrameworkElement)?.DataContext is not DockApplication entry) return;
-        if (entry.IsRunning) DockApplications.Activate(entry.Windows[0]);
+        if (entry.HasMultipleWindows) ShowRunningWindowMenu((Button)sender, entry);
+        else if (entry.IsRunning) DockApplications.Activate(entry.Windows[0]);
         else await _execute(new(entry.Item.Command, entry.Item.Target));
+    }
+    private static string WindowLabel(DockApplication entry, int index)
+    {
+        var title = entry.WindowTitles[index];
+        return title.Length > 72 ? title[..69] + "…" : title;
+    }
+    private void ShowRunningWindowMenu(Button button, DockApplication entry)
+    {
+        _hideTimer.Stop();
+        if (_windowMenu is not null) _windowMenu.IsOpen = false;
+        var menu = new ContextMenu { PlacementTarget = button, Placement = System.Windows.Controls.Primitives.PlacementMode.Top };
+        for (var index = 0; index < entry.Windows.Length; index++)
+        {
+            var handle = entry.Windows[index];
+            var item = new MenuItem { Header = $"{index + 1}. {WindowLabel(entry, index)}", ToolTip = entry.WindowTitles[index] };
+            item.Click += (_, _) => DockApplications.Activate(handle);
+            menu.Items.Add(item);
+        }
+        menu.Closed += (_, _) =>
+        {
+            if (ReferenceEquals(_windowMenu, menu)) _windowMenu = null;
+            if (CanAutoHide) _hideTimer.Start();
+        };
+        _windowMenu = menu;
+        menu.IsOpen = true;
     }
     private void OnItemMouseDown(object sender, MouseButtonEventArgs e) => _mouseDown = e.GetPosition(this);
     private void OnItemMouseMove(object sender, MouseEventArgs e)
@@ -186,9 +213,10 @@ public partial class DockWindow : Window
         var open = new MenuItem { Header = "打开" };
         open.Click += async (_, _) => await _execute(new(item.Command, item.Target));
         menu.Items.Add(open);
-        foreach (var handle in entry.Windows)
+        for (var windowIndex = 0; windowIndex < entry.Windows.Length; windowIndex++)
         {
-            var switchTo = new MenuItem { Header = "切换到运行窗口" };
+            var handle = entry.Windows[windowIndex];
+            var switchTo = new MenuItem { Header = "切换到 · " + WindowLabel(entry, windowIndex), ToolTip = entry.WindowTitles[windowIndex] };
             switchTo.Click += (_, _) => DockApplications.Activate(handle); menu.Items.Add(switchTo);
         }
         if (!_services.Settings.Dock.Items.Any(x => x.Id == item.Id))

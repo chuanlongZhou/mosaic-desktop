@@ -67,6 +67,7 @@ public sealed class WhalePetSprite : Image
         };
         var images = new Dictionary<string, BitmapImage>();
         var frames = new Dictionary<PetPose, BitmapSource>();
+        var normalized = new Dictionary<(string File, int X, int Y, int Width, int Height), BitmapSource>();
         var manifestPaths = new[] { manifestPath, character switch
         {
             PetCharacter.DeepSeekChibi => "DeepSeekChibi/motion-frames.json",
@@ -83,7 +84,8 @@ public sealed class WhalePetSprite : Image
             PetCharacter.DeepSeekStandard => "DeepSeekStandard/keyframes.json",
             _ => "whale-keyframes.json"
         } };
-        if (DesktopPetCharacters.Personality(character) is PetCharacter.Gpt or PetCharacter.Gemini or PetCharacter.Claude or PetCharacter.Qwen) manifestPaths = [character + "/frames.json"];
+        if (character is not (PetCharacter.WhaleGirl or PetCharacter.DeepSeekChibi or PetCharacter.DeepSeekStandard))
+            manifestPaths = [character + "/frames.json"];
         foreach (var path in manifestPaths)
         {
           using var stream = Application.GetResourceStream(new Uri(root + path)).Stream;
@@ -96,6 +98,8 @@ public sealed class WhalePetSprite : Image
             if (!images.TryGetValue(file, out var bitmap))
             { bitmap = new BitmapImage(new Uri(root + file)); bitmap.Freeze(); images.Add(file, bitmap); }
             var box = item.GetProperty("rect").EnumerateArray().Select(x => x.GetInt32()).ToArray();
+            var key = (file, box[0], box[1], box[2], box[3]);
+            if (normalized.TryGetValue(key, out var reused)) { frames.Add(pose, reused); continue; }
             var crop = new CroppedBitmap(bitmap, new Int32Rect(box[0], box[1], box[2], box[3])); crop.Freeze();
             // Explicit per-pose bounds avoid assuming that generated art is a perfect grid.
             // Render into a common transparent canvas with a fixed foot baseline and safe gutters.
@@ -106,7 +110,7 @@ public sealed class WhalePetSprite : Image
             using (var context = drawing.RenderOpen()) context.DrawImage(crop, new Rect(left, top, width, height));
             var frame = new RenderTargetBitmap(512, 512, 96, 96, PixelFormats.Pbgra32);
             frame.Render(drawing); frame.Freeze();
-            frames.Add(pose, frame);
+            frames.Add(pose, frame); normalized.Add(key, frame);
           }
         }
         // Falling-token keyframes reuse the exact existing idle painting. Only
@@ -125,6 +129,15 @@ public sealed class WhalePetSprite : Image
             }
             var frame = new RenderTargetBitmap(512, 512, 96, 96, PixelFormats.Pbgra32); frame.Render(drawing); frame.Freeze(); frames.Add(pose, frame);
         }
+        // Existing Mosaic artwork keeps its own poses. New manual actions use
+        // the closest original pose when that artwork has no dedicated frame.
+        foreach (var (pose, fallback) in new[]
+        {
+            (PetPose.Think, PetPose.LookDown), (PetPose.Read, PetPose.TypingLeft),
+            (PetPose.Search, PetPose.LookRight), (PetPose.Draw, PetPose.TypingRight),
+            (PetPose.Stretch, PetPose.Wake), (PetPose.Run, PetPose.Cheer),
+            (PetPose.Hum, PetPose.Wave)
+        }) frames.TryAdd(pose, frames[fallback]);
         return Enum.GetValues<PetPose>().Select(pose => frames[pose]).ToArray();
     }
 }

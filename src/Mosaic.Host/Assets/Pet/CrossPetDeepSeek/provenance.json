@@ -1,0 +1,29 @@
+{
+  "source": "https://github.com/lokicorvus/crosspet",
+  "directory": "characters/deepseek",
+  "files": {
+    "idle.webp": "4d827db8f758afd35dbbbbedba1924721bf8a29090554ede1e1607acfaa80378",
+    "idle-blink.webp": "4e9a9d98c17b181ce7e8441abfc9d7946537fb4e67300b85af45df61c923aefd",
+    "listening.webp": "046e8ed018dd595d41a7c8618d4a0967bb40cdedce2ed420f57837dc7f942d42",
+    "thinking.webp": "7502277b98453ae1b6d1d6d47da5a77901ac452011767a4574e044444ee6ecb5",
+    "reading.webp": "4cfb1878aebe06ff731a5b53c1551ff9c36fe70b3a04fadc55b698d7e4dc4a4a",
+    "writing.webp": "a5f8da6ccef445b3f12aa1335a6b4db445c4d79b16f031aafb0ce6e4ce108694",
+    "running.webp": "382794ed68007dd753903bff1a135fb5731384e463e3672c298c70edf02613a2",
+    "searching.webp": "adb9f8b2103415fd646961a09e860c3d80303380b8a7fec80007d80cc3b8dbb8",
+    "drawing.webp": "56ca64799b5627f1f22109b25d77dbfef01ab2eecd1d43bfc3ad396a42132d63",
+    "happy.webp": "e85fcf3e9cc047bf6645707f32fefe1cfc4acefeb161a7bd7743e8481855bf9d",
+    "proud.webp": "de0346c6ecc12050f73cc25fcb163f1279ef954af2fe942a1d2d58691f636c12",
+    "oops.webp": "a7f7e5b023cda4a3aaca5a073ec9a4a86becfa5caee0093e438cc4f00f5d6128",
+    "surprised.webp": "fe134e6bdd86231648fd901e0acdef08825e79b295054112f44451b01665b000",
+    "pat.webp": "1282964a09221eb6f500951cd58daad704ff15e4b8794ec8cfb5aba4e42ac29b",
+    "sleeping.webp": "8788a39c89eba44635f80c3dff66f932342fe242aa75366452874efae324bb10",
+    "tired.webp": "1fa2b6b1124525b2b1180606a0f1b664b73cee3c7cd5da4d2162c7a4457f95d0",
+    "yawn.webp": "ce317599a32a814a6a85ffcea18a6a525e7d341e6a728876e5e498f6cf3b5248",
+    "stretch.webp": "d90fd428a1567bb75580fa44c25a68cea8e998fc7a91fa860fce2940cc6ee352",
+    "hum.webp": "50ce88ebec588f373a196fd816e2698849cbfd9c3707d14edc2c8c66db0f96cc",
+    "bye.webp": "ce2f9bc04966e411ddae06da74d8af32932863622d3bab73a69a7301a2177548",
+    "asking.webp": "27a37944738f5a4b801183577d503ee7b0102bb1116dd19ab9f29fe7410008a1"
+  },
+  "license": "CC BY-NC-SA 4.0",
+  "change": "Resized source poses to half size and repacked them as a PNG atlas; pose mapping in this script."
+}

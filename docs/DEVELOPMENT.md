@@ -2,7 +2,7 @@
 
 ## 当前交付 · V0.8.3
 
-2026-10-26。当前版本以 `src/Mosaic.Host/Mosaic.Host.csproj` 的 `0.8.15` 为准；运行包输出到 `artifacts/Mosaic-v0.8.15-win-x64`。下面的 V0.1／V0.2 记录保留当时的范围与数据，不能作为当前依赖、功能或验收状态。
+2026-10-26。当前版本以 `src/Mosaic.Host/Mosaic.Host.csproj` 的 `0.8.17` 为准；运行包输出到 `artifacts/Mosaic-v0.8.17-win-x64`。下面的 V0.1／V0.2 记录保留当时的范围与数据，不能作为当前依赖、功能或验收状态。
 
 | 更新 | 当前实现 |
 | --- | --- |

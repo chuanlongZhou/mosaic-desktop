@@ -44,10 +44,10 @@ public partial class DesktopBarWindow : Window
     {
         _windowsKeyPinned = pinned;
         _hideTimer.Stop();
-        SetCollapsed(!pinned && CanAutoHide);
+        SetCollapsed(CanAutoHide && !IsMouseOver && !HasOpenMenu);
         if (pinned) EnsureTopmost();
     }
-    private bool CanAutoHide => _windowsKeyPinned is bool pinned ? !pinned : _autoHide == true && _autoHideAllowed;
+    private bool CanAutoHide => _autoHide == true && _autoHideAllowed && _windowsKeyPinned != true;
     public bool IsAutoHidden { get; private set; }
     public bool IsTransitioning { get; private set; }
     public double ReservedHeight { get; private set; }
@@ -65,6 +65,7 @@ public partial class DesktopBarWindow : Window
     {
         _services = services; _execute = execute; _screen = screen; InitializeComponent();
         BarContent.RenderTransform = _slide;
+        BarShadow.RenderTransform = _slide;
         UiEffects.MotionPreferenceChanged += OnMotionPreferenceChanged;
         Loaded += (_, _) =>
         {
@@ -77,7 +78,7 @@ public partial class DesktopBarWindow : Window
                 UpdateTime();
             }
         };
-        SourceInitialized += (_, _) => NativeShell.StyleWindow(new WindowInteropHelper(this).Handle, true, true);
+        SourceInitialized += (_, _) => NativeShell.StyleWindow(new WindowInteropHelper(this).Handle, true, true, transparent: true);
         _timer.Tick += (_, _) => UpdateTime(); _timer.Start();
         _hideTimer.Tick += (_, _) =>
         {
@@ -182,7 +183,7 @@ public partial class DesktopBarWindow : Window
             Height = 1 / scale;
             _slide.Y = -ShellWorkArea.BarHeight;
             SetWindowPos(handle, new nint(-1), bounds.Left, bounds.Top, bounds.Width, 1, 0x10);
-            BarContent.Visibility = Visibility.Collapsed;
+            BarContent.Visibility = BarShadow.Visibility = Visibility.Collapsed;
             ReleaseWorkArea();
             return;
         }
@@ -190,7 +191,7 @@ public partial class DesktopBarWindow : Window
         // visible bottom and the real Windows work-area boundary move together.
         Height = Math.Max(1 / scale, height);
         _slide.Y = height - ShellWorkArea.BarHeight;
-        BarContent.Visibility = Visibility.Visible;
+        BarContent.Visibility = BarShadow.Visibility = Visibility.Visible;
         if (_reservation is null) _reservation = new AppBarReservation(handle, bounds, height, moveWindow: false);
         else _reservation.SetHeight(height);
         if (ReservedHeight != height)

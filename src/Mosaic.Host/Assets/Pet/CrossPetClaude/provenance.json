@@ -1,0 +1,24 @@
+{
+  "source": "https://github.com/lokicorvus/crosspet",
+  "directory": "characters/claude",
+  "files": {
+    "idle.webp": "cb4540df9325fd246de61c673e29027de0821ea70eeeafb3220a97546f440653",
+    "idle-blink.webp": "726fc8f09433fb9331b5c7e19a7af93e07131d0bbb81ce58945e733171a482e8",
+    "listening.webp": "48e388fb2f8047f2a6bfec253d44d5f57651422af3a4969cb4b5a917c9b79b2d",
+    "thinking.webp": "48cc8fb2a0b151beef025ea0a6ba530784a5b894149659578843efc1c68ba736",
+    "writing.webp": "23f2e3ab2df890f02178b24e5dd184006c662b0b6c261061b742fade24b33093",
+    "running.webp": "8cc07cfec11b89c12499feecbbb2225699533192e2f1c8fb8d884bb19cd15950",
+    "searching.webp": "fc970e2b08ba00282b7a6f641c19dedf31ecbfbfd0c899a439ca010f6cd656e6",
+    "proud.webp": "adc8d1e823e4c6c92d0cc5513c34d4b90c9142b3a0ca6194d1e906a8eb54cc12",
+    "oops.webp": "da097e09d863a72c69dcd982df13984794121bed80ce5530d56676b9c728b5f0",
+    "surprised.webp": "aad0d612d9a839a97d578922b78cfe2e7c75d30b260b56e3b3c95aa1159f7145",
+    "tired.webp": "2cdbcdd200ccc347a69bcf39a60441c967911bbb37f12b9c5d61c8f7796626ab",
+    "yawn.webp": "87674418647662f780dcdc1a4cfdadf370926da7bc3eaa36ae60bd27de76f126",
+    "stretch.webp": "3e40608b7a2b6e880d282fedde6070b3bd25d8d5d8330c8aa4483faa7c9750de",
+    "hum.webp": "6eeb999d6359fa7437aa703f1b18300f953f71cd637a753fba114ad8b03f0801",
+    "bye.webp": "b484735b9444e413743c2dc6e7d09bfd271742340e665b8991076eb529a3bb95",
+    "asking.webp": "6c74302e9286ca323b9614baf46cf19824d2ea6e07259161b1f71575b9929815"
+  },
+  "license": "CC BY-NC-SA 4.0",
+  "change": "Resized source poses to half size and repacked them as a PNG atlas; pose mapping in this script."
+}

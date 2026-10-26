@@ -1,0 +1,342 @@
+[
+  {
+    "pose": "Idle",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      0,
+      0,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "LookLeft",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      192,
+      0,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "LookRight",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      384,
+      0,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "LookUp",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      576,
+      0,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "LookDown",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      768,
+      0,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Blink",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      0,
+      208,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Pat",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      192,
+      208,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Cheer",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      384,
+      208,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Wave",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      576,
+      208,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Goodbye",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      768,
+      208,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Sleep",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      0,
+      416,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Wake",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      192,
+      208,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Eat",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      192,
+      416,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Drag",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      384,
+      416,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Surprise",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      576,
+      416,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Pout",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      768,
+      416,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "TypingLeft",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      0,
+      624,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "TypingRight",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      192,
+      624,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "RiceHat",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      384,
+      624,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "RiceHatTilt",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      576,
+      624,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "GreetA",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      768,
+      624,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "GreetB",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      576,
+      208,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Tired",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      0,
+      832,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "BegTokens",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      192,
+      832,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "TokenDazed",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      384,
+      832,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "TiredYawn",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      576,
+      832,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "BegReach",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      768,
+      832,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Think",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      0,
+      1040,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Read",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      384,
+      624,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Search",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      192,
+      1040,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Draw",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      192,
+      624,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Stretch",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      192,
+      208,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Run",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      384,
+      1040,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Hum",
+    "image": "KimiCommunity/atlas.png",
+    "rect": [
+      576,
+      1040,
+      192,
+      208
+    ]
+  }
+]

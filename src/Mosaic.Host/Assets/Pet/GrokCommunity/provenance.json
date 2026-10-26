@@ -1,0 +1,7 @@
+{
+  "source": "https://github.com/fywdy/chatgpt-chibi-pets",
+  "file": "dist/codex-native/grok-gothic-chibi-v1/spritesheet.webp",
+  "sha256": "a7d283a24eb03075fe4e3292646c135c1fb59d4a934c40fa301ddd64ded7c4dc",
+  "license": "CC BY-NC 4.0",
+  "change": "Cropped selected v2 sprite cells and repacked them as a PNG atlas; pose mapping in this script."
+}

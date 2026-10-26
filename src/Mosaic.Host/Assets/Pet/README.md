@@ -1,5 +1,13 @@
 # AI 娘桌宠素材
 
+## 当前社区扩展（2026-10-26）
+
+原有 11 款素材继续保留，另加 9 款可选形象：`GrokCommunity`、`KimiCommunity`、`ZhipuCommunity` 来自 fywdy 的 [chatgpt-chibi-pets](https://github.com/fywdy/chatgpt-chibi-pets)；`CrossPetGpt`、`CrossPetClaude`、`CrossPetDeepSeek`、`CrossPetGemini`、`CrossPetQwen`、`CrossPetGlm` 来自 [CrossPet](https://github.com/lokicorvus/crosspet)。每款有 `atlas.png`、`frames.json` 和 `provenance.json`。Mosaic 离线读取 PNG 图集；外部 WebP 原图不在运行时下载。
+
+现有 29 个姿态之外，增加想一想、读一读、找线索、画一画、伸懒腰、跑起来、哼首歌七个手动动作。CrossPet 形象使用对应的原画动作；fywdy 的角色使用其 v2 图集中的等待、审查、奔跑、跳跃等格。原有 11 款为新动作使用最接近的已有姿态。所有角色仍保留原先的自动响应和交互。
+
+转换脚本为 [import_community_pets.py](../../../../../tools/import_community_pets.py)，来源、原作者、各自的非商业许可证及修改说明见 [Community-Pets-NOTICE.md](../../../../../packaging/licenses/Community-Pets-NOTICE.md)。CrossPet 衍生图集以 CC BY-NC-SA 4.0 提供，fywdy 衍生图集以 CC BY-NC 4.0 提供；许可证分别适用于对应目录，不改变其他素材或代码的许可。
+
 ## 当前：四位正常比例伙伴（V0.8.15）
 
 新增 [GptStandard](GptStandard/idle.png)、[GeminiStandard](GeminiStandard/idle.png)、[ClaudeStandard](ClaudeStandard/idle.png)、[QwenStandard](QwenStandard/idle.png)。每套包含 idle.png、social.png、actions.png 与 frames.json，覆盖 27 幅独立绘制的成年动漫比例关键帧，再复用本角色待机图与单枚 token 组成两帧下落。各角色共有 29 个缓存姿态，十一款共 319 个；所有正常比例版默认显示高度为 Q 版两倍。

@@ -63,6 +63,11 @@ public sealed class DesktopPetWindow : Window
             var item = new MenuItem { Header = label }; item.Click += (_, _) => Interacted?.Invoke(action); menu.Items.Add(item);
         }
         menu.Items.Add(new Separator());
+        foreach (var (label, action) in new[] { ("想一想", PetTrigger.Think), ("读一读", PetTrigger.Read), ("找线索", PetTrigger.Search), ("画一画", PetTrigger.Draw), ("伸懒腰", PetTrigger.Stretch), ("跑起来", PetTrigger.Run), ("哼首歌", PetTrigger.Hum) })
+        {
+            var item = new MenuItem { Header = label }; item.Click += (_, _) => Interacted?.Invoke(action); menu.Items.Add(item);
+        }
+        menu.Items.Add(new Separator());
         var settings = new MenuItem { Header = "桌宠设置…" }; settings.Click += (_, _) => SettingsRequested?.Invoke(); menu.Items.Add(settings);
         var hide = new MenuItem { Header = "收起这位伙伴" }; hide.Click += (_, _) => DisableRequested?.Invoke(); menu.Items.Add(hide);
         return menu;
@@ -110,6 +115,9 @@ public sealed class DesktopPetWindow : Window
                 case PetPose.Tired: case PetPose.BegTokens: case PetPose.TokenDazed: break;
                 case PetPose.TypingLeft: case PetPose.TypingRight: break; // Only the two hand frames change while typing.
                 case PetPose.RiceHat: case PetPose.RiceHatTilt: rotation = Math.Sin(phase * .65) * 2; break;
+                case PetPose.Run: y = -5 * Math.Abs(Math.Sin(phase * 2)); rotation = Math.Sin(phase * 2) * 3; break;
+                case PetPose.Stretch: scaleY = 1 + Math.Sin(Math.Min(elapsed / 2.5, 1) * Math.PI) * .04; break;
+                case PetPose.Hum: rotation = Math.Sin(phase * .5) * 3; break;
                 default: y = Math.Sin(now / 900d) * 2; break;
             }
         }

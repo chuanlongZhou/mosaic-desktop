@@ -1,0 +1,342 @@
+[
+  {
+    "pose": "Idle",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      0,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "LookLeft",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      0,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "LookRight",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      0,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "LookUp",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      0,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "LookDown",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      0,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Blink",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      0,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Pat",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      352,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Cheer",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      704,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Wave",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      704,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Goodbye",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      1056,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Sleep",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      1408,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Wake",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      0,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Eat",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      704,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Drag",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      352,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Surprise",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      352,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Pout",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      704,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "TypingLeft",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      1056,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "TypingRight",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      1056,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "RiceHat",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      1408,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "RiceHatTilt",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      1408,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "GreetA",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      0,
+      640,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "GreetB",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      0,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Tired",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      352,
+      640,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "BegTokens",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      704,
+      640,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "TokenDazed",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      704,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "TiredYawn",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      1056,
+      640,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "BegReach",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      704,
+      640,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Think",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      1408,
+      640,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Read",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      0,
+      960,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Search",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      352,
+      960,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Draw",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      704,
+      960,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Stretch",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      0,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Run",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      1056,
+      960,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Hum",
+    "image": "CrossPetGemini/atlas.png",
+    "rect": [
+      1408,
+      960,
+      352,
+      320
+    ]
+  }
+]

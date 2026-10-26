@@ -42,6 +42,7 @@ internal static class DesktopPetTests
         CheckExpressionsAndGreetings();
         CheckPersonalities();
         CheckStandardCharacters();
+        CheckCommunityCharacters();
         CheckHoverAndClick();
         var pet = new DesktopPetBehavior();
         Assert(pet.Trigger(PetTrigger.Enter, 10000) && pet.Pose == PetPose.Cheer, "Enter did not cheer.");
@@ -178,7 +179,8 @@ internal static class DesktopPetTests
 
     private static void CheckStandardCharacters()
     {
-        Assert(DesktopPetCharacters.All.Count == 11 && DesktopPetCharacters.All.Select(character => character.Id).Distinct().Count() == 11, "Standard variants replaced an existing character.");
+        Assert(DesktopPetCharacters.All.Count == 20 && DesktopPetCharacters.All.Select(character => character.Id).Distinct().Count() == 20, "Community variants replaced or duplicated an existing character.");
+        Assert(DesktopPetCharacters.All.Take(11).Select(item => item.Id).SequenceEqual(Enum.GetValues<PetCharacter>().Take(11)), "The original character roster changed order.");
         Assert((int)PetCharacter.WhaleGirl == 0 && (int)PetCharacter.DeepSeekStandard == 2 && (int)PetCharacter.Gpt == 3 && (int)PetCharacter.Qwen == 6, "Existing persisted character IDs changed.");
         foreach (var (chibi, standard) in new[]
         {
@@ -201,6 +203,32 @@ internal static class DesktopPetTests
             }
         }
         Console.WriteLine("  Standard: four independent adult identities; 2x size, legacy IDs, all actions/keyframe captions and shared personality dialogue verified.");
+    }
+
+    private static void CheckCommunityCharacters()
+    {
+        Assert((int)PetCharacter.GrokCommunity == 11 && (int)PetCharacter.CrossPetGlm == 19, "Community characters changed persisted IDs.");
+        foreach (var (variant, original) in new[]
+        {
+            (PetCharacter.CrossPetGpt, PetCharacter.Gpt), (PetCharacter.CrossPetClaude, PetCharacter.Claude),
+            (PetCharacter.CrossPetGemini, PetCharacter.Gemini), (PetCharacter.CrossPetQwen, PetCharacter.Qwen)
+        })
+            Assert(ReferenceEquals(DesktopPetDialogue.ClickLines(variant), DesktopPetDialogue.ClickLines(original)), "CrossPet appearance lost its matching dialogue.");
+        foreach (var character in new[] { PetCharacter.GrokCommunity, PetCharacter.KimiCommunity, PetCharacter.ZhipuCommunity })
+            Assert(!DesktopPetDialogue.ClickLines(character).Any(line => line.Contains("小鲸鱼") || line.Contains("鱼片")), "New model reused whale dialogue.");
+        foreach (var (trigger, pose) in new[]
+        {
+            (PetTrigger.Think, PetPose.Think), (PetTrigger.Read, PetPose.Read),
+            (PetTrigger.Search, PetPose.Search), (PetTrigger.Draw, PetPose.Draw),
+            (PetTrigger.Stretch, PetPose.Stretch), (PetTrigger.Run, PetPose.Run),
+            (PetTrigger.Hum, PetPose.Hum)
+        })
+        {
+            var pet = new DesktopPetBehavior(character: PetCharacter.CrossPetGlm);
+            Assert(pet.Trigger(trigger, 10000) && pet.Pose == pose && pet.Bubble.Length > 0, $"{trigger}: action did not start.");
+            pet.Tick(20000, 0, false, 90, false, 0, 0);
+            Assert((pet.Pose is PetPose.Idle or PetPose.Blink) && pet.Bubble.Length == 0, $"{trigger}: action did not settle.");
+        }
     }
 
     private static void CheckHoverAndClick()
@@ -247,6 +275,6 @@ internal static class DesktopPetTests
             Assert(heard.Count >= 15, "Repeated clicks failed to explore the character dialogue pool.");
         }
         Assert(DesktopPetDialogue.ClickLines(PetCharacter.DeepSeekChibi).SequenceEqual(DesktopPetDialogue.ClickLines(PetCharacter.DeepSeekStandard)), "Two forms of the same whale personality lost their shared voice.");
-        Console.WriteLine("  Interaction: silent hover and click share actions/phase; 100 persona lines, no consecutive repeats, action priority and wake verified.");
+        Console.WriteLine("  Interaction: silent hover and click share actions/phase; 160 persona lines, no consecutive repeats, action priority and wake verified.");
     }
 }

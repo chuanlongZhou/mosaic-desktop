@@ -1,0 +1,342 @@
+[
+  {
+    "pose": "Idle",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      0,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "LookLeft",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      0,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "LookRight",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      0,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "LookUp",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      0,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "LookDown",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      0,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Blink",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      352,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Pat",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      704,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Cheer",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      1056,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Wave",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      1056,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Goodbye",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      1408,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Sleep",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      0,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Wake",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      352,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Eat",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      1056,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Drag",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      704,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Surprise",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      704,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Pout",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      1056,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "TypingLeft",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      1408,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "TypingRight",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      1408,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "RiceHat",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      0,
+      640,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "RiceHatTilt",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      0,
+      640,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "GreetA",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      352,
+      640,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "GreetB",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      0,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Tired",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      704,
+      640,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "BegTokens",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      1056,
+      640,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "TokenDazed",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      1056,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "TiredYawn",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      1408,
+      640,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "BegReach",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      1056,
+      640,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Think",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      0,
+      960,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Read",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      352,
+      960,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Search",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      704,
+      960,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Draw",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      1056,
+      960,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Stretch",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      352,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Run",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      1408,
+      960,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Hum",
+    "image": "CrossPetQwen/atlas.png",
+    "rect": [
+      0,
+      1280,
+      352,
+      320
+    ]
+  }
+]
