@@ -84,13 +84,13 @@ public sealed class DesktopOverlay : IDisposable
         if (height == 0) _menuHeights.Remove(screen); else _menuHeights[screen] = height;
         // AppBar registration may already have updated rcWork. Fit existing windows
         // explicitly as well, including restored title bars at the top of the screen.
-        if (Enabled) ShellWorkArea.Apply(_dockHeight, true, _menuHeights);
+        if (Enabled) ShellWorkArea.Apply(_dockHeight, true, _menuHeights, screen);
     }
     public void RefreshLayout()
     {
         if (!Enabled || Environment.TickCount64 - _lastRefresh < 150) return;
         _lastRefresh = Environment.TickCount64;
-        ShellWorkArea.Apply(_dockHeight, true, _menuHeights);
+        ShellWorkArea.Apply(_dockHeight, false, _menuHeights);
     }
     public void Dispose()
     {

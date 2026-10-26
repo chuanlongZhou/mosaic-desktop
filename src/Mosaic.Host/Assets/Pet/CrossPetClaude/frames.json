@@ -1,0 +1,342 @@
+[
+  {
+    "pose": "Idle",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      0,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "LookLeft",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      0,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "LookRight",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      0,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "LookUp",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      0,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "LookDown",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      0,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Blink",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      352,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Pat",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      0,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Cheer",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      704,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Wave",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      704,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Goodbye",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      1056,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Sleep",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      1408,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Wake",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      0,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Eat",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      704,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Drag",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      352,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Surprise",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      352,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Pout",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      704,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "TypingLeft",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      1056,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "TypingRight",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      1056,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "RiceHat",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      704,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "RiceHatTilt",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      704,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "GreetA",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      1408,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "GreetB",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      0,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Tired",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      1408,
+      0,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "BegTokens",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      0,
+      640,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "TokenDazed",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      704,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "TiredYawn",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      352,
+      640,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "BegReach",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      0,
+      640,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Think",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      704,
+      640,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Read",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      704,
+      640,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Search",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      1056,
+      640,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Draw",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      1056,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Stretch",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      0,
+      320,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Run",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      1408,
+      640,
+      352,
+      320
+    ]
+  },
+  {
+    "pose": "Hum",
+    "image": "CrossPetClaude/atlas.png",
+    "rect": [
+      0,
+      960,
+      352,
+      320
+    ]
+  }
+]

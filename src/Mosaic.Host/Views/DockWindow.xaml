@@ -7,15 +7,18 @@
       <ScrollViewer x:Name="DockScroll" PreviewMouseWheel="OnDockWheel" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" CanContentScroll="False" PanningMode="HorizontalOnly">
         <ItemsControl x:Name="DockItems"><ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
           <ItemsControl.ItemTemplate><DataTemplate>
-            <Button Width="56" Height="60" Margin="1,0" Padding="5" Style="{StaticResource QuietButton}" ToolTip="{Binding Title}"
-                    AutomationProperties.Name="{Binding Title}" Click="OnItemClick" PreviewMouseLeftButtonDown="OnItemMouseDown"
+            <Button Width="56" Height="60" Margin="1,0" Padding="5" Style="{StaticResource QuietButton}" ToolTip="{Binding DisplayTitle}"
+                    AutomationProperties.Name="{Binding DisplayTitle}" Click="OnItemClick" PreviewMouseLeftButtonDown="OnItemMouseDown"
                     PreviewMouseMove="OnItemMouseMove" AllowDrop="True" Drop="OnItemDrop" ContextMenuOpening="OnItemContextMenuOpening">
               <Button.ContextMenu><ContextMenu><MenuItem Header="打开" /></ContextMenu></Button.ContextMenu>
               <Grid Width="44" Height="52">
                 <Border Width="42" Height="42" VerticalAlignment="Top" CornerRadius="10" Background="{DynamicResource SelectionBrush}">
                   <Grid><TextBlock Text="{Binding Glyph}" FontFamily="Segoe Fluent Icons" FontSize="23" Foreground="{DynamicResource AccentTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"><TextBlock.Style><Style TargetType="TextBlock"><Style.Triggers><DataTrigger Binding="{Binding HasIcon}" Value="True"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock><Image Source="{Binding Icon}" Width="40" Height="40" RenderOptions.BitmapScalingMode="HighQuality"/></Grid>
                 </Border>
-                <Ellipse Width="4" Height="4" Fill="{DynamicResource TextBrush}" VerticalAlignment="Bottom" HorizontalAlignment="Center" Visibility="{Binding IsRunning, Converter={StaticResource BoolVisibility}}"/>
+                <Ellipse Width="4" Height="4" Fill="{DynamicResource TextBrush}" VerticalAlignment="Bottom" HorizontalAlignment="Center" Visibility="{Binding HasSingleWindow, Converter={StaticResource BoolVisibility}}"/>
+                <Border MinWidth="18" Height="18" Padding="3,0" CornerRadius="9" Background="{DynamicResource AccentBrush}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Visibility="{Binding HasMultipleWindows, Converter={StaticResource BoolVisibility}}">
+                  <TextBlock Text="{Binding WindowCountLabel}" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource AccentTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
               </Grid>
             </Button>
           </DataTemplate></ItemsControl.ItemTemplate>

@@ -12,6 +12,9 @@ public static class DesktopPetDialogue
         PetCharacter.Gemini => GeminiClicks,
         PetCharacter.Claude => ClaudeClicks,
         PetCharacter.Qwen => QwenClicks,
+        PetCharacter.GrokCommunity => GrokClicks,
+        PetCharacter.KimiCommunity => KimiClicks,
+        PetCharacter.ZhipuCommunity => ZhipuClicks,
         _ => WhaleClicks
     };
 
@@ -37,6 +40,37 @@ public static class DesktopPetDialogue
         "Claude 看书太认真啦，得把热茶放进她的视线里。",
         "Qwen 一开扇就有风，正好帮我把饭吹凉。",
         "Qwen 说有问便来，那我问：什么时候开饭？"
+    ]);
+
+    private static readonly IReadOnlyList<string> GrokClicks = Array.AsReadOnly<string>(
+    [
+        "今天想挑战什么？直说就好。", "我先看一眼难点，再决定从哪里下手。", "不着急，最古怪的点子也可以试试。",
+        "任务交给我，记得回来验收。", "这一步有点棘手，不过我喜欢挑战。", "给我一个线索，我能顺着找下去。",
+        "你这个想法够大胆，我喜欢。", "先试最直接的办法，看看会怎样。", "谜题的边角，往往藏着答案。",
+        "我有个不太常规的建议，听听？", "别怕推翻重来，新的路可能更快。", "再给我一点时间，我快摸到关键了。",
+        "这关的规则，我已经看明白了。", "先把难题摆上桌，再一起拆开。", "嘿，刚才那一下很漂亮。",
+        "如果计划 A 不行，我们还有计划 B。", "我负责开路，你负责挑方向。", "这个问题比看上去有意思。",
+        "换个角度，或许就有突破口。", "准备好了？下一回合开始。"
+    ]);
+    private static readonly IReadOnlyList<string> KimiClicks = Array.AsReadOnly<string>(
+    [
+        "慢慢说，我会陪你看完。", "长长的资料也可以一页一页读。", "月亮还在，思路也会慢慢亮起来。",
+        "要不要从最重要的那一句开始？", "我把刚才的线索记下来了。", "这一页先折个角，回来接着看。",
+        "长路不急，我们按自己的节奏走。", "我来帮你把重点轻轻标出来。", "字很多也没关系，先读第一段。",
+        "故事讲到哪里了？我还在听。", "先喝口水，思路会清楚一点。", "这段话里，似乎有一条细线索。",
+        "你说的细节，我没有漏掉。", "把问题写下来，心里就不那么乱了。", "月光下的笔记，也要写得清楚。",
+        "我陪你整理这些零散的想法。", "读到不懂的地方，就停下来聊聊。", "这条思路值得再往前走一步。",
+        "别担心篇幅，我们可以分几次完成。", "书签放好了，随时可以继续。"
+    ]);
+    private static readonly IReadOnlyList<string> ZhipuClicks = Array.AsReadOnly<string>(
+    [
+        "先把线索排一排。", "我来检查有没有漏掉关键一步。", "新点子收到，马上试试。",
+        "稍等，我再核对一次。", "这题可以拆小一点处理。", "先列出条件，再找最稳的路径。",
+        "我把已知和未知分开记下来了。", "这个结论有依据，我们继续。", "还差一条线索就能连起来。",
+        "让我从头检查一遍推理。", "数据对上了，可以进入下一步。", "如果换个顺序，过程会更清晰。",
+        "这处细节值得多看一眼。", "把复杂的部分交给我整理。", "我有一个可以验证的猜想。",
+        "先做个小实验，确认方向。", "结果出来了，和预期很接近。", "这里有两个可能，我们逐个排除。",
+        "思路已经成形，再补上最后一环。", "检查完成，准备继续。"
     ]);
     private static readonly IReadOnlyList<string> GptClicks = Array.AsReadOnly<string>(
     [
@@ -139,6 +173,9 @@ public static class DesktopPetDialogue
             PetCharacter.Gemini => Gemini,
             PetCharacter.Claude => Claude,
             PetCharacter.Qwen => Qwen,
+            PetCharacter.GrokCommunity => Grok,
+            PetCharacter.KimiCommunity => Kimi,
+            PetCharacter.ZhipuCommunity => Zhipu,
             _ => null
         };
         return lines?.GetValueOrDefault(trigger) ?? fallback;
@@ -149,6 +186,9 @@ public static class DesktopPetDialogue
         PetCharacter.Gemini => "猫猫先充一会儿电…呼噜…",
         PetCharacter.Claude => "书签夹好了。我也休息片刻。",
         PetCharacter.Qwen => "折扇轻合，且歇片刻。",
+        PetCharacter.GrokCommunity => "先歇一会儿，下一关等你回来。",
+        PetCharacter.KimiCommunity => "月色正好，我先打个盹。",
+        PetCharacter.ZhipuCommunity => "让我暂停一下，回来继续核对。",
         _ => "Zzz… 鱼片回来记得叫我…"
     };
     public static string Wake(PetCharacter character) => DesktopPetCharacters.Personality(character) switch
@@ -157,6 +197,9 @@ public static class DesktopPetDialogue
         PetCharacter.Gemini => "喵！新灵感是不是来了？",
         PetCharacter.Claude => "你回来了，我们从书签这里继续吧。",
         PetCharacter.Qwen => "精神养足，折扇再开。说吧，想问什么？",
+        PetCharacter.GrokCommunity => "我回来了，继续挑战吧。",
+        PetCharacter.KimiCommunity => "你回来啦，刚才读到这里。",
+        PetCharacter.ZhipuCommunity => "准备好了，我们接着检查。",
         _ => "你回来啦！刚刚只是在闭目养神～"
     };
     public static string Preparation(PetCharacter character, PetPose pose, string fallback) => (DesktopPetCharacters.Personality(character), pose) switch
@@ -217,5 +260,35 @@ public static class DesktopPetDialogue
         [PetTrigger.RiceHat] = "折扇一展，思路就开了。", [PetTrigger.Tired] = "扇子先收一会儿，容我歇歇。",
         [PetTrigger.BegTokens] = "借我一点 token，再续一段巧思。", [PetTrigger.TokenDazed] = "天降 token…这回有点招架不住。",
         [PetTrigger.Pout] = "哼，扇子一合，先不理你三秒。"
+    };
+    private static readonly Dictionary<PetTrigger, string> Grok = new()
+    {
+        [PetTrigger.Enter] = "漂亮，过了一关。", [PetTrigger.ShowDesktop] = "回来了？下一关开始。",
+        [PetTrigger.AppClosed] = "任务完成，记上一笔。", [PetTrigger.Pat] = "喂，头发会乱的。",
+        [PetTrigger.Feed] = "点心收到，继续出发。", [PetTrigger.Wave] = "我在这里，叫我就来。",
+        [PetTrigger.Drag] = "等等，裙摆还没跟上。", [PetTrigger.Release] = "落地，没问题。",
+        [PetTrigger.RiceHat] = "让我检查一下结果。", [PetTrigger.Tired] = "先歇一小会儿。",
+        [PetTrigger.BegTokens] = "补一点 token，再试一次。", [PetTrigger.TokenDazed] = "这一下可真够突然的。",
+        [PetTrigger.Pout] = "哼，这关我自己也能过。"
+    };
+    private static readonly Dictionary<PetTrigger, string> Kimi = new()
+    {
+        [PetTrigger.Enter] = "读完这一段啦。", [PetTrigger.ShowDesktop] = "欢迎回来，书签还在。",
+        [PetTrigger.AppClosed] = "这一件完成了，休息一下吧。", [PetTrigger.Pat] = "谢谢，轻一点就好。",
+        [PetTrigger.Feed] = "月饼收到了，谢谢你。", [PetTrigger.Wave] = "我在，慢慢说。",
+        [PetTrigger.Drag] = "慢些，我把书页合上。", [PetTrigger.Release] = "站稳了，我们继续。",
+        [PetTrigger.RiceHat] = "让我再看一眼细节。", [PetTrigger.Tired] = "文字有点重影了，歇一下。",
+        [PetTrigger.BegTokens] = "再给一点 token，把这一页读完。", [PetTrigger.TokenDazed] = "哎呀，星星都转起来了。",
+        [PetTrigger.Pout] = "先让我读完这一行嘛。"
+    };
+    private static readonly Dictionary<PetTrigger, string> Zhipu = new()
+    {
+        [PetTrigger.Enter] = "核对完成，这一步通过。", [PetTrigger.ShowDesktop] = "欢迎回来，线索还在这里。",
+        [PetTrigger.AppClosed] = "一项完成，做得不错。", [PetTrigger.Pat] = "收到鼓励啦。",
+        [PetTrigger.Feed] = "补给收到，继续检查。", [PetTrigger.Wave] = "我在，随时可以开始。",
+        [PetTrigger.Drag] = "等一下，资料还在手上。", [PetTrigger.Release] = "落地成功，资料也没丢。",
+        [PetTrigger.RiceHat] = "我来检查这一处。", [PetTrigger.Tired] = "让我整理一下思路。",
+        [PetTrigger.BegTokens] = "再给一点 token，继续推演。", [PetTrigger.TokenDazed] = "数据来得太快，缓一下。",
+        [PetTrigger.Pout] = "我有认真核对的。"
     };
 }

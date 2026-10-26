@@ -1,5 +1,8 @@
 $ErrorActionPreference = 'Stop'
 $mosaicRoot = Split-Path -Parent $PSScriptRoot
+if (-not $env:DOTNET_CLI_HOME) { $env:DOTNET_CLI_HOME = Join-Path $mosaicRoot '.tools\dotnet-home' }
+if (-not $env:NUGET_PACKAGES) { $env:NUGET_PACKAGES = Join-Path $mosaicRoot '.tools\nuget-packages' }
+$env:DOTNET_ADD_GLOBAL_TOOLS_TO_PATH = 'false'
 $mosaicLocalDotnet = Join-Path $mosaicRoot '.tools\dotnet\dotnet.exe'
 if (Test-Path -LiteralPath $mosaicLocalDotnet) {
     $mosaicDotnet = $mosaicLocalDotnet

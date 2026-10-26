@@ -10,11 +10,15 @@ using Mosaic.Platform.Windows;
 
 namespace Mosaic.Host.Services;
 
-public sealed record DockApplication(DockItem Item, string Identity, ImageSource? Icon, nint[] Windows, bool Imported)
+public sealed record DockApplication(DockItem Item, string Identity, ImageSource? Icon, nint[] Windows, bool Imported, string[] WindowTitles)
 {
     public string Title => Item.Title;
+    public string DisplayTitle => Windows.Length > 1 ? $"{Title} · {Windows.Length} 个窗口" : Title;
     public string Glyph => Item.Glyph;
     public bool IsRunning => Windows.Length > 0;
+    public bool HasSingleWindow => Windows.Length == 1;
+    public bool HasMultipleWindows => Windows.Length > 1;
+    public string WindowCountLabel => Windows.Length > 99 ? "99+" : Windows.Length.ToString();
     public bool HasIcon => Icon is not null;
 }
 
@@ -38,9 +42,10 @@ public sealed class DockApplications
         void Add(DockItem item, string identity, bool imported)
         {
             if (!seen.Add(identity)) return;
-            var windows = running.Where(w => string.Equals(w.Identity, identity, StringComparison.OrdinalIgnoreCase)).Select(w => w.Window).ToArray();
+            var matches = running.Where(w => string.Equals(w.Identity, identity, StringComparison.OrdinalIgnoreCase)).ToArray();
             var iconPath = item.Target;
-            result.Add(new(item, identity, Icon(iconPath), windows, imported));
+            result.Add(new(item, identity, Icon(iconPath), matches.Select(w => w.Window).ToArray(), imported,
+                matches.Select(w => w.Title).ToArray()));
         }
         // Keep home and search available even for existing profiles with older default entries.
         Add(new() { Id = "mosaic-home", Title = "Mosaic 工作台", Glyph = "\uE80F", Command = "dashboard.open" }, "mosaic-home", false);
@@ -148,7 +153,7 @@ public sealed class DockApplications
                 var path = process.MainModule?.FileName ?? "";
                 if (path.Length == 0) return true;
                 var id = ProcessAppId(process.Handle);
-                result.Add(new(window, id.Contains('!') ? id : path, path, process.ProcessName));
+                result.Add(new(window, id.Contains('!') ? id : path, path, title.ToString()));
             }
             catch (Exception ex) when (ex is System.ComponentModel.Win32Exception or InvalidOperationException or ArgumentException) { }
             return true;

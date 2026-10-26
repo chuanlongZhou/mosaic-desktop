@@ -1,0 +1,28 @@
+{
+  "source": "https://github.com/lokicorvus/crosspet",
+  "directory": "characters/gemini",
+  "files": {
+    "idle.webp": "fa0c2937114fdd283a65d113a356626c1f02d8a1ba892d8ca85f50b97d7b44f4",
+    "listening.webp": "a312a1091e4b37ef25b13fad7e1d62481e25362fd41492f201292316f08126d9",
+    "thinking.webp": "e65d59aad594010da377f461413a6d11b0e55454c6fcb8a42d5bfc7c4cc832b0",
+    "reading.webp": "b53d38a36b1b0de652034813b5290b47b85fa4d86985c49707d21a9b5af043f2",
+    "writing.webp": "56c16f8f18eee052fdf7fa614f2848928abea03c70b62fe3253da1a50bf81fc1",
+    "running.webp": "7ac7e9b86e1b12668ef8f4b2324e6ea258f373f4cd14e2459433aa3b4fc94ed5",
+    "searching.webp": "eff8337f073bf88fc5ff5cc9f2c3bf61119ad8c6d219c4859d2041f6dfe3ec8b",
+    "drawing.webp": "b25b7f706b117618e13133dc4d21ee84fd29e2c995514b61fe4526456d43b1fd",
+    "happy.webp": "63d24384615ea901cb695e32538e738555da95856b92a60b961b54d4a6a2f886",
+    "proud.webp": "88b3367a1f4df49cc474d977e053633e3e7b49baebc4b933a459ad0f0a1136bf",
+    "oops.webp": "c4a3b7e1d090f1183e79cecb8d8917ce66b64b4a3bc90522a9ee1e2c857319f3",
+    "surprised.webp": "d9466d9bdeb90852ca4321b5504d622baa8ece0d99328a513bd7d374975e18a4",
+    "pat.webp": "fb931506a0e861310ad7029d2666aaefe80868ccba3afe43353e83b7cad9895d",
+    "sleeping.webp": "977b199b24104e40b1093d862df1bc4b7cf795e7105acc7701e0ce97a128a044",
+    "tired.webp": "883aa194a2d9883c1f5313e4ddb15ed3fbf6f615891fc8767f4a6c4619aec2ba",
+    "yawn.webp": "3f1776393a2d981e3dda669f4d97cffb0a087035aee87689fbd34b554df1c258",
+    "stretch.webp": "248f3a2124de15f8098cab2437716f7d1a374cd6c2bdc5f3e2efaf674db3f805",
+    "hum.webp": "7d287e6719bd8e3191e9c743a2c05e9eec458ae9345d888e37aa23078d393e70",
+    "bye.webp": "684a18a7620ca21ec63a851463682391b0571698b395f110a2db3f403dadb322",
+    "asking.webp": "a313a2203957cd84009a0ef70a8be54d6267ad2638acc528c2706a3a16a64237"
+  },
+  "license": "CC BY-NC-SA 4.0",
+  "change": "Resized source poses to half size and repacked them as a PNG atlas; pose mapping in this script."
+}

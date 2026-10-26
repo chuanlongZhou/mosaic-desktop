@@ -1,0 +1,342 @@
+[
+  {
+    "pose": "Idle",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      0,
+      0,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "LookLeft",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      192,
+      0,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "LookRight",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      384,
+      0,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "LookUp",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      576,
+      0,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "LookDown",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      768,
+      0,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Blink",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      0,
+      208,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Pat",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      192,
+      208,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Cheer",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      384,
+      208,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Wave",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      576,
+      208,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Goodbye",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      768,
+      208,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Sleep",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      0,
+      416,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Wake",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      192,
+      208,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Eat",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      192,
+      416,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Drag",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      384,
+      416,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Surprise",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      576,
+      416,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Pout",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      768,
+      416,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "TypingLeft",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      0,
+      624,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "TypingRight",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      192,
+      624,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "RiceHat",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      384,
+      624,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "RiceHatTilt",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      576,
+      624,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "GreetA",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      768,
+      624,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "GreetB",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      576,
+      208,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Tired",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      0,
+      832,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "BegTokens",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      192,
+      832,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "TokenDazed",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      384,
+      832,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "TiredYawn",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      576,
+      832,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "BegReach",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      768,
+      832,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Think",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      0,
+      1040,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Read",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      384,
+      624,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Search",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      192,
+      1040,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Draw",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      192,
+      624,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Stretch",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      192,
+      208,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Run",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      384,
+      1040,
+      192,
+      208
+    ]
+  },
+  {
+    "pose": "Hum",
+    "image": "ZhipuCommunity/atlas.png",
+    "rect": [
+      576,
+      1040,
+      192,
+      208
+    ]
+  }
+]

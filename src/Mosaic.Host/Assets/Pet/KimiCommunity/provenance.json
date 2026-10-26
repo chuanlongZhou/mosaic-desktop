@@ -1,0 +1,7 @@
+{
+  "source": "https://github.com/fywdy/chatgpt-chibi-pets",
+  "file": "dist/codex-native/kimi-moon-maid-chibi-v2/spritesheet.webp",
+  "sha256": "5b3d882e7a1509861f1757babc7073a01e4c91b2cdae81bbca1afcc899e12b61",
+  "license": "CC BY-NC 4.0",
+  "change": "Cropped selected v2 sprite cells and repacked them as a PNG atlas; pose mapping in this script."
+}

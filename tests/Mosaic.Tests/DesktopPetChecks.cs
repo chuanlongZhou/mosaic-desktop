@@ -127,7 +127,7 @@ internal static class DesktopPetChecks
         var directory = Path.GetFullPath(".artifacts/pet-check"); Directory.CreateDirectory(directory);
         using (var stream = File.Create(Path.Combine(directory, "pet-settings.png"))) encoder.Save(stream);
         host.Close();
-        Console.WriteLine("  Pet: 319 cached poses; eleven identities, keyframe sequences from neutral, preview/menu, retired walking, alpha hit tests, input, topmost and fullscreen verified.");
+        Console.WriteLine($"  Pet: {Enum.GetValues<PetCharacter>().Length * Enum.GetValues<PetPose>().Length} cached poses; {Enum.GetValues<PetCharacter>().Length} identities, keyframe sequences from neutral, preview/menu, retired walking, alpha hit tests, input, topmost and fullscreen verified.");
     }
     private static void CheckHoverInput(DesktopPetService service, DesktopPetWindow window)
     {
@@ -279,6 +279,16 @@ internal static class DesktopPetChecks
     {
         var items = window.Sprite.ContextMenu!.Items.OfType<MenuItem>().ToArray();
         Assert(!items.Any(item => item.Header.ToString()!.Contains("走")), "Walking remains in the desktop menu.");
+        foreach (var (label, pose) in new[]
+        {
+            ("想一想", PetPose.Think), ("读一读", PetPose.Read), ("找线索", PetPose.Search),
+            ("画一画", PetPose.Draw), ("伸懒腰", PetPose.Stretch), ("跑起来", PetPose.Run),
+            ("哼首歌", PetPose.Hum)
+        })
+        {
+            items.Single(item => Equals(item.Header, label)).RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
+            Assert(pet.Behavior.Pose == pose, $"Community action did not start from the desktop menu: {label}.");
+        }
         var foreground = NativeShell.CaptureForeground(); var left = window.Left; var top = window.Top;
         var probe = new WhalePetSprite(); probe.SetCharacter(window.Sprite.Character);
         foreach (var (label, pose) in new[] { ("疲惫", PetPose.Tired), ("求 token", PetPose.BegTokens), ("被 token 砸晕", PetPose.TokenDazed) })

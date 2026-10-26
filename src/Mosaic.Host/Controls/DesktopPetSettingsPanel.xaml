@@ -14,7 +14,7 @@
   <TextBlock Text="最多 5 位，可重复选择同一角色；各自保存位置、大小和反应。主位可收起，其他伙伴可移除。保存后一起应用。" Foreground="{DynamicResource MutedBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,4,0,16"/>
   <TextBlock Text="选择桌宠" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8"/>
   <ComboBox x:Name="CharacterPicker" DisplayMemberPath="Name" SelectedValuePath="Id" SelectionChanged="OnCharacterChanged" AutomationProperties.Name="桌宠角色" Margin="0,0,0,8"/>
-  <TextBlock Text="共 12 款，新增 Deepseek Q版 mk2：原版鲸鱼娘，以及 DeepSeek、GPT、Gemini、Claude、Qwen 的 Q 版与正常比例版。正常比例显示高度加倍。先选择伙伴，再选择她的角色。" Foreground="{DynamicResource MutedBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,16"/>
+  <TextBlock Text="共 21 款：原有 11 款、Deepseek Q版 mk2，以及 Grok、Kimi、智谱社区图集和 6 款 CrossPet 画风。社区素材仅供非商业使用，来源见随程序附带的许可说明。先选择伙伴，再选择她的角色。" Foreground="{DynamicResource MutedBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,16"/>
   <Border Background="{DynamicResource HeroBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="14" Padding="12" Margin="0,0,0,18">
    <Grid x:Name="PreviewStage" ClipToBounds="True"><Grid.ColumnDefinitions><ColumnDefinition Width="160"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
     <local:WhalePetSprite x:Name="PreviewSprite" Width="152" Height="170" RenderTransformOrigin=".5,.85" AutomationProperties.Name="鲸鱼娘动作预览"/>
@@ -40,6 +40,13 @@
    <Button x:Name="SignaturePreviewButton" Content="头顶饭盆" Tag="RiceHat" Click="OnPreview" Margin="0,0,8,8"/>
    <Button Content="陪你打字" Tag="Typing" Click="OnPreview" Margin="0,0,8,8"/>
    <Button Content="打个招呼" Tag="Wave" Click="OnPreview" Margin="0,0,8,8"/>
+   <Button Content="想一想" Tag="Think" Click="OnPreview" Margin="0,0,8,8"/>
+   <Button Content="读一读" Tag="Read" Click="OnPreview" Margin="0,0,8,8"/>
+   <Button Content="找线索" Tag="Search" Click="OnPreview" Margin="0,0,8,8"/>
+   <Button Content="画一画" Tag="Draw" Click="OnPreview" Margin="0,0,8,8"/>
+   <Button Content="伸懒腰" Tag="Stretch" Click="OnPreview" Margin="0,0,8,8"/>
+   <Button Content="跑起来" Tag="Run" Click="OnPreview" Margin="0,0,8,8"/>
+   <Button Content="哼首歌" Tag="Hum" Click="OnPreview" Margin="0,0,8,8"/>
    <Button Content="疲惫" Tag="Tired" Click="OnPreview" Margin="0,0,8,8"/>
    <Button Content="求 token" Tag="BegTokens" Click="OnPreview" Margin="0,0,8,8"/>
    <Button Content="被 token 砸晕" Tag="TokenDazed" Click="OnPreview" Margin="0,0,8,8"/>

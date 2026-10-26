@@ -1,0 +1,7 @@
+{
+  "source": "https://github.com/fywdy/chatgpt-chibi-pets",
+  "file": "dist/codex-native/zhipu-chibi-tech-v2/spritesheet.webp",
+  "sha256": "2296fa87437ed4bd4bf65af20d95454016928b1f29a2a006db57ef581a64a12b",
+  "license": "CC BY-NC 4.0",
+  "change": "Cropped selected v2 sprite cells and repacked them as a PNG atlas; pose mapping in this script."
+}

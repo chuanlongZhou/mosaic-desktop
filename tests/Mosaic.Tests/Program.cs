@@ -8,15 +8,44 @@ if (args.Contains("--mk2-check")) { await Mk2Checks.RunAsync(args.Length > 1 ? a
 if (args.Contains("--hourly-chime-check")) { await HourlyChimeChecks.RunAsync(args.Length > 1 ? args[1] : ".artifacts/hourly-chime-check"); return 0; }
 if (args.Contains("--desktop-native-status")) { DesktopNativeProbe.Print(); return 0; }
 if (args.Contains("--ui-check")) { await UiLayoutChecks.RunAsync(); return 0; }
+if (args.Contains("--menu-check")) { await UiLayoutChecks.RunAsync(menuOnly: true); return 0; }
+if (args.Contains("--dock-check")) { await DockChecks(); return 0; }
 if (args.Contains("--pet-check")) { await DesktopPetTests.Settings(); await DesktopPetTests.Behavior(); await DesktopPetChecks.RunAsync(); return 0; }
 if (args.Contains("--pet-performance-check")) { var index = Array.IndexOf(args, "--perf-report"); await DesktopPetPerformanceChecks.RunAsync(index >= 0 && index + 1 < args.Length ? args[index + 1] : ".artifacts/pet-check/performance-latest.json"); return 0; }
 if (args.Contains("--work-area-notification-probe")) return WorkAreaNotificationChecks.RunProbe();
 if (args.Contains("--work-area-notification-check")) { await WorkAreaNotificationChecks.RunAsync(); return 0; }
 
+if (args.Contains("--window-probe-secondary"))
+{
+    var thread = new Thread(() =>
+    {
+        var screen = System.Windows.Forms.Screen.AllScreens.First(s => !s.Primary);
+        using var window = new System.Windows.Forms.Form
+        {
+            Text = "Mosaic secondary maximize fixture", StartPosition = System.Windows.Forms.FormStartPosition.Manual,
+            Bounds = new System.Drawing.Rectangle(screen.Bounds.Left + 100, screen.Bounds.Top + 100, 600, 400)
+        };
+        window.Shown += (_, _) => window.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+        System.Windows.Forms.Application.Run(window);
+    });
+    thread.SetApartmentState(ApartmentState.STA); thread.Start(); thread.Join(); return 0;
+}
 if (args.Contains("--dock-probe") || args.Contains("--window-probe-max"))
 {
     var maximized = args.Contains("--window-probe-max");
     var thread = new Thread(() => new System.Windows.Application().Run(new System.Windows.Window { Title = "Mosaic Dock test fixture", Width = 260, Height = 120, WindowState = maximized ? System.Windows.WindowState.Maximized : System.Windows.WindowState.Normal }));
+    thread.SetApartmentState(ApartmentState.STA); thread.Start(); thread.Join(); return 0;
+}
+if (args.Contains("--dock-probe-multi"))
+{
+    var thread = new Thread(() =>
+    {
+        var app = new System.Windows.Application { ShutdownMode = System.Windows.ShutdownMode.OnMainWindowClose };
+        var main = new System.Windows.Window { Title = "Mosaic Dock multi A", Width = 260, Height = 120 };
+        var second = new System.Windows.Window { Title = "Mosaic Dock multi B", Width = 260, Height = 120 };
+        main.Loaded += (_, _) => second.Show();
+        app.Run(main);
+    });
     thread.SetApartmentState(ApartmentState.STA); thread.Start(); thread.Join(); return 0;
 }
 
@@ -58,7 +87,7 @@ var tests = new (string Name, Func<Task> Run)[]
     ("Cancelled and conflicting switches preserve the committed workspace", LibraryWorkspaceTests.SwitchCancellationAndConflicts),
     ("Interrupted switch recovery follows the committed settings pointer", LibraryWorkspaceTests.InterruptedCommitRecovery),
     ("Resource previews bound text and avoid unavailable/network reads", LibraryWorkspaceTests.PreviewBounds),
-    ("WPF Dashboard, Palette, Library, bulk edits and workspace activation", UiLayoutChecks.RunAsync)
+    ("WPF Dashboard, Palette, Library, bulk edits and workspace activation", () => UiLayoutChecks.RunAsync())
 };
 var failed = 0;
 foreach (var (name, run) in tests)
@@ -110,7 +139,7 @@ static async Task DockChecks()
     Assert(entries.Select(x => x.Identity).Distinct(StringComparer.OrdinalIgnoreCase).Count() == entries.Count, "Duplicate application identity.");
     Assert(entries.Where(x => x.IsRunning).All(x => x.Windows.Length > 0), "Missing activation handles.");
     Assert(home.Title == "Home", "Discovery mutated persistent configuration.");
-    Console.WriteLine("  Dock applications: " + string.Join(", ", entries.Select(x => x.Title + (x.IsRunning ? " [running]" : ""))));
+    Console.WriteLine("  Dock applications: " + string.Join(", ", entries.Select(x => x.Title + (x.IsRunning ? $" [{x.Windows.Length} window(s)]" : ""))));
     var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar");
     if (Directory.Exists(folder))
         foreach (var shortcut in Directory.EnumerateFiles(folder, "*.lnk").Take(128))
@@ -133,6 +162,24 @@ static async Task DockChecks()
         Assert(closed.All(x => !x.Windows.Contains(handle)), "Closed application remained in Dock.");
     }
     finally { if (!probe.HasExited) { probe.Kill(); await probe.WaitForExitAsync(); } }
+    var multiStart = new System.Diagnostics.ProcessStartInfo(Environment.ProcessPath!) { UseShellExecute = false };
+    multiStart.ArgumentList.Add("--dock-probe-multi");
+    multiStart.Environment["DOTNET_ROOT"] = start.Environment["DOTNET_ROOT"];
+    using var multi = System.Diagnostics.Process.Start(multiStart)!;
+    try
+    {
+        Mosaic.Host.Services.DockApplication? grouped = null;
+        for (var i = 0; i < 40 && grouped is null; i++)
+        {
+            await Task.Delay(100);
+            var running = await source.ReadAsync([], false);
+            grouped = running.FirstOrDefault(x => x.WindowTitles.Contains("Mosaic Dock multi A") && x.WindowTitles.Contains("Mosaic Dock multi B"));
+        }
+        if (grouped is null) throw new Exception("Two windows from one application were not grouped in Dock.");
+        Assert(grouped.Windows.Length == 2 && grouped.HasMultipleWindows && grouped.DisplayTitle.Contains("2 个窗口"), "Dock did not expose multiple windows for selection.");
+        Assert(grouped.WindowTitles.Distinct().Count() == 2, "Dock lost individual window titles.");
+    }
+    finally { if (!multi.HasExited) { multi.Kill(); await multi.WaitForExitAsync(); } }
 }
 static async Task Throws<T>(Func<Task> action) where T : Exception
 {

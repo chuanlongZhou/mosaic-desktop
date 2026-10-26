@@ -24,7 +24,8 @@ public static class ShellWorkArea
         }, 0);
         return areas;
     }
-    public static void Apply(int dockHeight, bool fitExisting = false, IReadOnlyDictionary<System.Drawing.Rectangle, double>? menuHeights = null)
+    public static void Apply(int dockHeight, bool fitExisting = false, IReadOnlyDictionary<System.Drawing.Rectangle, double>? menuHeights = null,
+        System.Drawing.Rectangle? fitOnly = null)
     {
         EnumDisplayMonitors(0, 0, (nint monitor, nint dc, ref Rect rect, nint data) =>
         {
@@ -36,12 +37,12 @@ public static class ShellWorkArea
             var bounds = System.Drawing.Rectangle.FromLTRB(desired.Left, desired.Top, desired.Right, desired.Bottom);
             if (menuHeights?.TryGetValue(bounds, out var menuHeight) == true) desired.Top += (int)Math.Ceiling(menuHeight * scale);
             if ((info.Flags & 1) != 0) desired.Bottom -= (int)Math.Ceiling(dockHeight * scale);
-            if (!desired.Equals(info.Work))
-            {
-                SetWorkArea(ref desired);
-                fitExisting = true;
-            }
-            if (fitExisting) FitWindows(info.Monitor, desired);
+            var changed = !desired.Equals(info.Work);
+            if (changed && !SetWorkArea(ref desired)) return true;
+            // A work-area change on one display must not reposition maximized
+            // windows on the other displays.
+            if (changed || (fitExisting && (fitOnly is null || fitOnly.Value == bounds)))
+                FitWindows(monitor, info.Monitor, desired);
             return true;
         }, 0);
     }
@@ -49,15 +50,16 @@ public static class ShellWorkArea
     {
         foreach (var area in areas) { var copy = area; SetWorkArea(ref copy); }
     }
-    private static void SetWorkArea(ref Rect area)
+    private static bool SetWorkArea(ref Rect area)
     {
         // SPIF_SENDCHANGE broadcasts synchronously. A WinForms SystemEvents
         // listener can then wait for this WPF dispatcher while SPI waits for the
         // listener, freezing the shell on an intermediate animation frame.
-        if (SystemParametersInfo(0x2F, 0, ref area, 0))
-            SendNotifyMessage(new nint(0xffff), 0x1A, new nint(0x2F), 0);
+        if (!SystemParametersInfo(0x2F, 0, ref area, 0)) return false;
+        SendNotifyMessage(new nint(0xffff), 0x1A, new nint(0x2F), 0);
+        return true;
     }
-    private static void FitWindows(Rect monitor, Rect work)
+    private static void FitWindows(nint monitorHandle, Rect monitor, Rect work)
     {
         // Bring existing maximized windows into the new work area, and keep restored title bars reachable.
         EnumWindows((window, _) =>
@@ -68,13 +70,18 @@ public static class ShellWorkArea
             if (!GetWindowRect(window, out var rect)) return true;
             DwmGetWindowAttribute(window, 14, out int cloaked, sizeof(int));
             if (cloaked != 0 || (!IsZoomed(window) && (GetWindowLongPtr(window, -16).ToInt64() & 0xC00000) == 0)) return true;
-            if (rect.Left < monitor.Left - 16 || rect.Left >= monitor.Right || rect.Top < monitor.Top - 16 || rect.Top >= monitor.Bottom) return true;
+            if (MonitorFromWindow(window, 2) != monitorHandle) return true;
             if (IsZoomed(window))
             {
-                DwmGetWindowAttribute(window, 9, out Rect frame, Marshal.SizeOf<Rect>());
+                if (DwmGetWindowAttribute(window, 9, out Rect frame, Marshal.SizeOf<Rect>()) < 0 ||
+                    frame.Right <= frame.Left || frame.Bottom <= frame.Top ||
+                    frame.Left < monitor.Left - 16 || frame.Right > monitor.Right + 16 ||
+                    frame.Top < monitor.Top - 16 || frame.Bottom > monitor.Bottom + 16) return true;
                 var left = frame.Left - rect.Left; var right = rect.Right - frame.Right;
                 var top = frame.Top - rect.Top; var bottom = rect.Bottom - frame.Bottom;
                 var target = new Rect { Left = work.Left - left, Top = work.Top - top, Right = work.Right + right, Bottom = work.Bottom + bottom };
+                if (target.Left < monitor.Left - 32 || target.Right > monitor.Right + 32 ||
+                    target.Top < monitor.Top - 32 || target.Bottom > monitor.Bottom + 32) return true;
                 if (!target.Equals(rect)) SetWindowPos(window, 0, target.Left, target.Top, target.Right - target.Left, target.Bottom - target.Top, 0x4234);
             }
             else if (rect.Top < work.Top)
@@ -91,6 +98,7 @@ public static class ShellWorkArea
     [DllImport("user32.dll")] private static extern bool IsZoomed(nint window);
     [DllImport("user32.dll")] private static extern nint GetWindow(nint window, uint command);
     [DllImport("user32.dll")] private static extern bool GetWindowRect(nint window, out Rect rect);
+    [DllImport("user32.dll")] private static extern nint MonitorFromWindow(nint window, uint flags);
     [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW")] private static extern nint GetWindowLongPtr(nint window, int index);
     [DllImport("user32.dll")] private static extern bool SetWindowPos(nint window, nint after, int x, int y, int width, int height, uint flags);
     [DllImport("dwmapi.dll")] private static extern int DwmGetWindowAttribute(nint window, int attribute, out Rect rect, int size);

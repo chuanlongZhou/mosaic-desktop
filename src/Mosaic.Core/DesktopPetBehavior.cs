@@ -2,8 +2,10 @@ using Mosaic.Core.Models;
 
 namespace Mosaic.Core;
 
-public enum PetPose { Idle, LookLeft, LookRight, LookUp, LookDown, Blink, Pat, Cheer, Wave, Goodbye, Sleep, Wake, Eat, Drag, Surprise, Pout, TypingLeft, TypingRight, RiceHat, RiceHatTilt, GreetA, GreetB, Tired, BegTokens, TokenDazed, TiredYawn, BegReach, TokenFallHigh, TokenFallLow }
-public enum PetTrigger { Enter, ShowDesktop, AppClosed, Pat, Feed, Wave, Drag, Release, Pout, Typing, RiceHat, Click, Tired, BegTokens, TokenDazed, Hover }
+public enum PetPose { Idle, LookLeft, LookRight, LookUp, LookDown, Blink, Pat, Cheer, Wave, Goodbye, Sleep, Wake, Eat, Drag, Surprise, Pout, TypingLeft, TypingRight, RiceHat, RiceHatTilt, GreetA, GreetB, Tired, BegTokens, TokenDazed, TiredYawn, BegReach, TokenFallHigh, TokenFallLow,
+    Think, Read, Search, Draw, Stretch, Run, Hum }
+public enum PetTrigger { Enter, ShowDesktop, AppClosed, Pat, Feed, Wave, Drag, Release, Pout, Typing, RiceHat, Click, Tired, BegTokens, TokenDazed, Hover,
+    Think, Read, Search, Draw, Stretch, Run, Hum }
 
 public sealed class DesktopPetBehavior
 {
@@ -33,7 +35,8 @@ public sealed class DesktopPetBehavior
     public bool Trigger(PetTrigger trigger, long now)
     {
         if (trigger is PetTrigger.Hover or PetTrigger.Click) return Interact(trigger, now);
-        var direct = trigger is PetTrigger.Pat or PetTrigger.Feed or PetTrigger.Wave or PetTrigger.Drag or PetTrigger.Release or PetTrigger.Pout or PetTrigger.RiceHat or PetTrigger.Tired or PetTrigger.BegTokens or PetTrigger.TokenDazed;
+        var direct = trigger is PetTrigger.Pat or PetTrigger.Feed or PetTrigger.Wave or PetTrigger.Drag or PetTrigger.Release or PetTrigger.Pout or PetTrigger.RiceHat or PetTrigger.Tired or PetTrigger.BegTokens or PetTrigger.TokenDazed
+            or PetTrigger.Think or PetTrigger.Read or PetTrigger.Search or PetTrigger.Draw or PetTrigger.Stretch or PetTrigger.Run or PetTrigger.Hum;
         var cooldown = trigger switch { PetTrigger.Enter => 2200, PetTrigger.ShowDesktop => 4000, PetTrigger.AppClosed => 6000, _ => 0 };
         if (!direct && (_pose is PetPose.Sleep or PetPose.Drag || _priority > 1 && now < _until)) return false;
         if (trigger == PetTrigger.Typing)
@@ -59,6 +62,13 @@ public sealed class DesktopPetBehavior
             PetTrigger.Tired => (PetPose.Tired, "算力快见底了…让我缓一缓。", 4000),
             PetTrigger.BegTokens => (PetPose.BegTokens, "鱼片，投喂一点 token 好不好？", 4500),
             PetTrigger.TokenDazed => (PetPose.TokenDazed, "Token 太多啦！小鲸鱼要晕过去了…", 5000),
+            PetTrigger.Think => (PetPose.Think, "让我想一想。", 4000),
+            PetTrigger.Read => (PetPose.Read, "一起读一会儿吧。", 4500),
+            PetTrigger.Search => (PetPose.Search, "我来找找线索。", 3800),
+            PetTrigger.Draw => (PetPose.Draw, "画点新点子！", 4200),
+            PetTrigger.Stretch => (PetPose.Stretch, "伸个懒腰，继续出发。", 2500),
+            PetTrigger.Run => (PetPose.Run, "出发！", 2800),
+            PetTrigger.Hum => (PetPose.Hum, "哼着小曲陪你。", 3200),
             _ => (PetPose.Pout, "才不是大肥鱼呢，哼～", 2200)
         };
         Start(pose, DesktopPetDialogue.Line(_character, trigger, bubble), now, duration, direct ? 3 : trigger == PetTrigger.Enter ? 1 : 2);
