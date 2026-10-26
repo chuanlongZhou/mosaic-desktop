@@ -26,6 +26,7 @@ internal static class UiLayoutChecks
                 var app = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
                 app.Resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri("/Mosaic;component/Themes/Dark.xaml", UriKind.Relative) });
                 CheckMenuTheme();
+                DesktopPetChecks.Check();
                 var root = Path.Combine(Path.GetTempPath(), "Mosaic.Tests", Guid.NewGuid().ToString("N"));
                 var services = new AppServices(new JsonDocumentStore(root));
                 services.InitializeAsync().GetAwaiter().GetResult();
@@ -69,6 +70,7 @@ internal static class UiLayoutChecks
                 CheckDesktopScene();
                 CheckDockAutoHide(services);
                 CheckMenuBarAutoHide(services);
+                CheckMenuBarMotion(services);
                 CheckNotificationArea(services);
                 CheckPalette(services, root);
                 CheckLibraryPaging(root + ".paging");
@@ -105,11 +107,12 @@ internal static class UiLayoutChecks
             ((CheckBox)window.FindName("AnimationsCheck")).IsChecked = false;
             ((CheckBox)window.FindName("TransparencyCheck")).IsChecked = true;
             ((Slider)window.FindName("SurfaceOpacitySlider")).Value = 75;
+            ((Mosaic.Host.Controls.HotkeyInput)window.FindName("PinMenuHotkeyInput")).Value = new() { Modifiers = 6, Key = 0x77 };
             if (ThemeManager.Current.Theme != "Light" || UiEffects.Enabled || ((SolidColorBrush)Application.Current.Resources["WidgetBrush"]).Color.A >= 255)
                 throw new Exception("Live appearance preview did not apply theme, opacity and motion settings.");
             ((Button)window.FindName("SaveSettingsButton")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             PumpUntil(() => ((Grid)window.FindName("SettingsOverlay")).Visibility == Visibility.Collapsed);
-            if (services.Settings.Appearance.Theme != "Light" || services.Settings.Appearance.Accent != "Rose" || services.Settings.Appearance.AnimationsEnabled || !services.Settings.Appearance.TransparencyEnabled)
+            if (services.Settings.Appearance.Theme != "Light" || services.Settings.Appearance.Accent != "Rose" || services.Settings.Appearance.AnimationsEnabled || !services.Settings.Appearance.TransparencyEnabled || services.Settings.Shortcuts.PinMenuBar.Key != 0x77)
                 throw new Exception("Appearance controls did not persist the chosen combination.");
             window.ShowSettings(); theme.SelectedIndex = 2;
             ((Button)window.FindName("CancelSettingsButton")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
@@ -119,6 +122,9 @@ internal static class UiLayoutChecks
                 ThemeManager.Apply(new() { Theme = name, AnimationsEnabled = false });
                 if (((SolidColorBrush)Application.Current.Resources["WidgetBrush"]).Color.A != 255) throw new Exception("Opaque mode retained transparent component surfaces.");
             }
+            ThemeManager.Apply(new() { AnimationsEnabled = true });
+            if (!UiEffects.Enabled) throw new Exception("The enabled Mosaic animation setting did not enable UI motion.");
+            ThemeManager.Apply(new() { AnimationsEnabled = false });
             var vm = (DashboardViewModel)window.DataContext;
             vm.NewTask = "待办编辑检查"; vm.AddTaskCommand.Execute(null);
             var task = vm.Tasks.Last(); task.Title = "已编辑的待办";
@@ -213,7 +219,7 @@ internal static class UiLayoutChecks
         var fixture = new Window { Title = "Mosaic menu work-area fixture", WindowState = WindowState.Maximized };
         fixture.Show();
         var settings = services.CopySettings(); settings.Desktop.MenuBarAutoHide = true; Complete(services.SaveSettingsAsync(settings));
-        var bar = new DesktopBarWindow(services, _ => Task.CompletedTask, System.Windows.Forms.Screen.PrimaryScreen!);
+        var bar = new DesktopBarWindow(services, request => request.Id == "menubar.pin.toggle" ? services.ToggleMenuBarPinAsync() : Task.CompletedTask, System.Windows.Forms.Screen.PrimaryScreen!);
         bar.SetAutoHideAllowed(true);
         void CheckWorkArea(bool reserved)
         {
@@ -252,11 +258,18 @@ internal static class UiLayoutChecks
             CheckWorkArea(true);
             bar.SetAutoHideAllowed(true);
             PumpUntil(() => bar.IsAutoHidden);
-            settings = services.CopySettings(); settings.Desktop.MenuBarAutoHide = false; Complete(services.SaveSettingsAsync(settings)); bar.RefreshConfiguration();
+            var pinButton = (Button)bar.FindName("PinMenuButton");
+            pinButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            PumpUntil(() => !services.Settings.Desktop.MenuBarAutoHide && pinButton.IsEnabled);
             if (bar.IsAutoHidden || bar.Height < 32) throw new Exception("Always-visible top menu setting did not apply.");
+            if (!Equals(pinButton.Content, "已固定")) throw new Exception("Pinned mode indicator did not update.");
             CheckWorkArea(true);
-            settings = services.CopySettings(); settings.Desktop.MenuBarAutoHide = true; Complete(services.SaveSettingsAsync(settings)); bar.RefreshConfiguration();
+            bar.RaiseEvent(new System.Windows.Input.MouseEventArgs(System.Windows.Input.Mouse.PrimaryDevice, Environment.TickCount) { RoutedEvent = System.Windows.Input.Mouse.MouseLeaveEvent });
+            Complete(Task.Delay(1100));
+            if (bar.IsAutoHidden) throw new Exception("Pinned menu auto-hid after pointer exit.");
+            pinButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             PumpUntil(() => bar.IsAutoHidden);
+            if (!services.Settings.Desktop.MenuBarAutoHide || !Equals(pinButton.Content, "固定")) throw new Exception("Unpin did not restore automatic mode and indicator.");
             CheckWorkArea(false);
             Console.WriteLine("  top menu: visible/edge-revealed bar reserves work area below its bottom, existing maximized window resizes, hidden bar releases space; menu hold and setting changes verified");
         }
@@ -264,7 +277,105 @@ internal static class UiLayoutChecks
     }
 
     [DllImport("user32.dll")] private static extern bool GetWindowRect(nint window, out ShellWorkArea.Rect rect);
+    [DllImport("user32.dll")] private static extern bool SetWindowPos(nint window, nint after, int x, int y, int width, int height, uint flags);
     [DllImport("dwmapi.dll")] private static extern int DwmGetWindowAttribute(nint window, int attribute, out ShellWorkArea.Rect rect, int size);
+
+    private static void CheckMenuBarMotion(AppServices services)
+    {
+        var originalAreas = ShellWorkArea.Capture();
+        var originalMotion = UiEffects.Enabled;
+        var screen = System.Windows.Forms.Screen.PrimaryScreen!;
+        var originalTop = originalAreas.First(a => a.Left == screen.Bounds.Left && a.Right == screen.Bounds.Right).Top;
+        var fixture = new Window { Title = "Mosaic animated work-area fixture", WindowState = WindowState.Maximized };
+        var bar = new DesktopBarWindow(services, _ => Task.CompletedTask, screen);
+        var heights = new List<double>();
+        bar.WorkAreaChanged += () => heights.Add(bar.ReservedHeight);
+        void Enter() => bar.RaiseEvent(new System.Windows.Input.MouseEventArgs(System.Windows.Input.Mouse.PrimaryDevice, Environment.TickCount) { RoutedEvent = System.Windows.Input.Mouse.MouseEnterEvent });
+        void Leave() => bar.RaiseEvent(new System.Windows.Input.MouseEventArgs(System.Windows.Input.Mouse.PrimaryDevice, Environment.TickCount) { RoutedEvent = System.Windows.Input.Mouse.MouseLeaveEvent });
+        void CheckBoundary(bool visible)
+        {
+            PumpUntil(() =>
+            {
+                var area = ShellWorkArea.Capture().First(a => a.Left == screen.Bounds.Left && a.Right == screen.Bounds.Right);
+                GetWindowRect(new WindowInteropHelper(bar).Handle, out var bounds);
+                DwmGetWindowAttribute(new WindowInteropHelper(fixture).Handle, 9, out var frame, Marshal.SizeOf<ShellWorkArea.Rect>());
+                return area.Top == (visible ? bounds.Bottom : originalTop) && Math.Abs(frame.Top - area.Top) <= 2;
+            });
+        }
+        try
+        {
+            UiEffects.Enabled = true;
+            fixture.Show();
+            GetWindowRect(new WindowInteropHelper(fixture).Handle, out var initialFixtureBounds);
+            bar.SetAutoHideAllowed(true); bar.Show();
+            PumpUntil(() => bar.IsAutoHidden);
+            Enter();
+            if (!bar.IsTransitioning) throw new Exception("Enabled menu motion jumped directly to the expanded state.");
+            PumpUntil(() => !bar.IsTransitioning);
+            if (heights.Where(h => h > 0 && h < ShellWorkArea.BarHeight).Distinct().Count() < 2)
+                throw new Exception("Menu expansion did not animate intermediate work-area heights.");
+            CheckBoundary(true);
+            var paintedMenu = (FrameworkElement)bar.Content;
+            paintedMenu.UpdateLayout();
+            if (paintedMenu.ActualHeight < 31.9) throw new Exception("Expanded menu content is still clipped to a thin strip.");
+            var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap((int)Math.Ceiling(paintedMenu.ActualWidth), (int)Math.Ceiling(paintedMenu.ActualHeight), 96, 96, PixelFormats.Pbgra32);
+            bitmap.Render(paintedMenu);
+            var pixels = new byte[bitmap.PixelWidth * bitmap.PixelHeight * 4];
+            bitmap.CopyPixels(pixels, bitmap.PixelWidth * 4, 0);
+            var visiblePixels = 0; var textPixels = 0;
+            for (var pixel = 0; pixel < pixels.Length; pixel += 4)
+            {
+                if (pixels[pixel + 3] > 128) visiblePixels++;
+                if (pixels[pixel] > 180 && pixels[pixel + 1] > 180 && pixels[pixel + 2] > 180) textPixels++;
+            }
+            if (visiblePixels < bitmap.PixelWidth * 20 || textPixels < 30) throw new Exception("Expanded menu did not paint its surface and labels.");
+            var imageDirectory = Path.GetFullPath(".artifacts/menu-recovery"); Directory.CreateDirectory(imageDirectory);
+            var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder(); encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bitmap));
+            using (var output = File.Create(Path.Combine(imageDirectory, "expanded-menu.png"))) encoder.Save(output);
+            // Reproduce an already-maximized Mosaic window that did not process
+            // the shell's appbar resize. Explicit fitting must include our own
+            // ordinary windows while continuing to exclude shell tool windows.
+            SetWindowPos(new WindowInteropHelper(fixture).Handle, 0, initialFixtureBounds.Left, initialFixtureBounds.Top,
+                initialFixtureBounds.Right - initialFixtureBounds.Left, initialFixtureBounds.Bottom - initialFixtureBounds.Top, 0x34);
+            ShellWorkArea.Apply(0, true, new Dictionary<System.Drawing.Rectangle, double> { [screen.Bounds] = ShellWorkArea.BarHeight });
+            CheckBoundary(true);
+            Leave();
+            try { PumpUntil(() => bar.IsTransitioning && bar.ReservedHeight > 0 && bar.ReservedHeight < ShellWorkArea.BarHeight); }
+            catch (TimeoutException ex) { throw new Exception($"Menu collapse did not reach an intermediate frame: transitioning={bar.IsTransitioning}, hidden={bar.IsAutoHidden}, hover={bar.IsMouseOver}, height={bar.ReservedHeight}, frames={string.Join(',', heights.Select(h => h.ToString("F1")))}", ex); }
+            var beforeReverse = bar.ReservedHeight;
+            Enter();
+            if (Math.Abs(beforeReverse - bar.ReservedHeight) > .01) throw new Exception("Reversing menu motion jumped to an endpoint.");
+            PumpUntil(() => !bar.IsTransitioning); CheckBoundary(true);
+            Leave(); PumpUntil(() => bar.IsTransitioning && bar.ReservedHeight < ShellWorkArea.BarHeight);
+            var menuButton = (Button)bar.FindName("MenuButton");
+            menuButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            PumpUntil(() => !bar.IsTransitioning); Complete(Task.Delay(1100));
+            if (bar.IsAutoHidden || menuButton.ContextMenu?.IsOpen != true)
+                throw new Exception("Opening a menu during collapse did not reverse and hold the bar.");
+            menuButton.ContextMenu.IsOpen = false;
+            PumpUntil(() => bar.IsTransitioning && bar.ReservedHeight < ShellWorkArea.BarHeight);
+            UiEffects.Enabled = false;
+            if (bar.IsTransitioning || !bar.IsAutoHidden || bar.IsVisible || bar.ReservesWorkArea)
+                throw new Exception("Disabling motion during collapse did not finish and release space immediately.");
+            CheckBoundary(false);
+            UiEffects.Enabled = true; Enter();
+            PumpUntil(() => bar.ReservedHeight > 0 && bar.ReservedHeight < ShellWorkArea.BarHeight);
+            UiEffects.Enabled = false;
+            if (bar.IsTransitioning || bar.ReservedHeight != ShellWorkArea.BarHeight || !bar.IsVisible)
+                throw new Exception("Disabling motion during expansion did not finish immediately.");
+            CheckBoundary(true);
+            UiEffects.Enabled = true; Leave();
+            PumpUntil(() => bar.IsTransitioning && bar.ReservedHeight < ShellWorkArea.BarHeight);
+        }
+        finally
+        {
+            bar.Close();
+            PumpUntil(() => ShellWorkArea.Capture().SequenceEqual(originalAreas));
+            fixture.Close(); UiEffects.Enabled = originalMotion;
+            ShellWorkArea.Restore(originalAreas);
+        }
+        Console.WriteLine($"  menu motion: {heights.Count} intermediate/endpoint updates, smooth reversal/menu hold, live animation-disable, maximized-window fitting and close during transition verified");
+    }
 
     private static void CheckNotificationArea(AppServices services)
     {

@@ -1,0 +1,202 @@
+[
+  {
+    "pose": "Idle",
+    "image": "whale-idle-v2.png",
+    "rect": [
+      84,
+      79,
+      337,
+      357
+    ]
+  },
+  {
+    "pose": "LookLeft",
+    "image": "whale-idle-v2.png",
+    "rect": [
+      526,
+      80,
+      336,
+      358
+    ]
+  },
+  {
+    "pose": "LookRight",
+    "image": "whale-idle-v2.png",
+    "rect": [
+      948,
+      78,
+      328,
+      359
+    ]
+  },
+  {
+    "pose": "LookUp",
+    "image": "whale-idle-v2.png",
+    "rect": [
+      1386,
+      79,
+      323,
+      357
+    ]
+  },
+  {
+    "pose": "LookDown",
+    "image": "whale-idle-v2.png",
+    "rect": [
+      81,
+      505,
+      343,
+      347
+    ]
+  },
+  {
+    "pose": "Blink",
+    "image": "whale-idle-v2.png",
+    "rect": [
+      522,
+      505,
+      345,
+      348
+    ]
+  },
+  {
+    "pose": "Sleep",
+    "image": "whale-idle-v2.png",
+    "rect": [
+      914,
+      627,
+      405,
+      231
+    ]
+  },
+  {
+    "pose": "Wake",
+    "image": "whale-idle-v2.png",
+    "rect": [
+      1387,
+      510,
+      347,
+      351
+    ]
+  },
+  {
+    "pose": "Pat",
+    "image": "whale-social-v2.png",
+    "rect": [
+      71,
+      78,
+      348,
+      348
+    ]
+  },
+  {
+    "pose": "Cheer",
+    "image": "whale-social-v2.png",
+    "rect": [
+      505,
+      70,
+      332,
+      359
+    ]
+  },
+  {
+    "pose": "Wave",
+    "image": "whale-social-v2.png",
+    "rect": [
+      937,
+      69,
+      343,
+      359
+    ]
+  },
+  {
+    "pose": "Goodbye",
+    "image": "whale-social-v2.png",
+    "rect": [
+      1403,
+      76,
+      321,
+      353
+    ]
+  },
+  {
+    "pose": "Eat",
+    "image": "whale-social-v2.png",
+    "rect": [
+      81,
+      536,
+      345,
+      326
+    ]
+  },
+  {
+    "pose": "Drag",
+    "image": "whale-social-v2.png",
+    "rect": [
+      530,
+      490,
+      304,
+      328
+    ]
+  },
+  {
+    "pose": "Surprise",
+    "image": "whale-social-v2.png",
+    "rect": [
+      954,
+      522,
+      331,
+      342
+    ]
+  },
+  {
+    "pose": "Pout",
+    "image": "whale-social-v2.png",
+    "rect": [
+      1403,
+      526,
+      322,
+      339
+    ]
+  },
+  {
+    "pose": "TypingLeft",
+    "image": "whale-typing-bowl-v2.png",
+    "rect": [
+      75,
+      43,
+      538,
+      560
+    ]
+  },
+  {
+    "pose": "TypingRight",
+    "image": "whale-typing-bowl-v2.png",
+    "rect": [
+      703,
+      43,
+      537,
+      560
+    ]
+  },
+  {
+    "pose": "RiceHat",
+    "image": "whale-typing-bowl-v2.png",
+    "rect": [
+      87,
+      659,
+      525,
+      553
+    ]
+  },
+  {
+    "pose": "RiceHatTilt",
+    "image": "whale-typing-bowl-v2.png",
+    "rect": [
+      686,
+      660,
+      524,
+      552
+    ]
+  }
+]

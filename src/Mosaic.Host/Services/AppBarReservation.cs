@@ -25,7 +25,7 @@ public sealed class AppBarReservation : IDisposable
     private AppBarData Data() => new() { Size = (uint)Marshal.SizeOf<AppBarData>(), Window = _window, Edge = _bottom ? 3u : 1u };
     public void SetHeight(double height)
     {
-        height = Math.Clamp(height, 0, ShellWorkArea.BarHeight);
+        height = Math.Max(0, height);
         var scale = Math.Max(96, GetDpiForWindow(_window)) / 96.0;
         var changed = Math.Ceiling(height * scale) != Math.Ceiling(_height * scale);
         _height = height;

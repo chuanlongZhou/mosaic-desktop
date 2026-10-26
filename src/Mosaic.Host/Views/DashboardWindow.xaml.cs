@@ -42,6 +42,8 @@ public partial class DashboardWindow : Window
         _ownsViewModel = sharedViewModel is null;
         _vm = sharedViewModel ?? new(services, execute, search?.Library);
         InitializeComponent();
+        BuildVersionLabel.Text = $"MOSAIC · V{typeof(App).Assembly.GetName().Version?.ToString(3)}";
+        PetSettingsPanel.Changed += MarkSettingsDirty;
         ThemeCombo.ItemsSource = new[] { new Choice("Midnight", "午夜蓝"), new Choice("Graphite", "石墨灰"), new Choice("Forest", "森林绿"), new Choice("Plum", "暮光紫"), new Choice("Light", "晨光浅色") };
         AccentCombo.ItemsSource = new[] { new Choice("Blue", "天空蓝"), new Choice("Mint", "薄荷绿"), new Choice("Violet", "鸢尾紫"), new Choice("Rose", "玫瑰粉"), new Choice("Amber", "琥珀金") };
         SettingsOverlay.AddHandler(TextBox.TextChangedEvent, new TextChangedEventHandler((_, _) => MarkSettingsDirty()));
@@ -172,7 +174,7 @@ public partial class DashboardWindow : Window
         _loadingSettings = true;
         _settingsReturnFocus = Keyboard.FocusedElement;
         OverlayEnabledCheck.IsChecked = _services.Settings.Desktop.OverlayEnabled;
-        MenuBarAutoHideCheck.IsChecked = _services.Settings.Desktop.MenuBarAutoHide;
+        MenuBarPinnedCheck.IsChecked = !_services.Settings.Desktop.MenuBarAutoHide;
         SyncPinsCheck.IsChecked = _services.Settings.Dock.SyncTaskbarPins;
         DockEnabledCheck.IsChecked = _services.Settings.Modules.Dock;
         ClockEnabledCheck.IsChecked = _services.Settings.Modules.DesktopClock;
@@ -183,6 +185,7 @@ public partial class DashboardWindow : Window
         AutoHideCheck.IsChecked = _services.Settings.Dock.AutoHide;
         StartupDashboardCheck.IsChecked = _services.Settings.OpenDashboardOnStartup;
         SnapGridCheck.IsChecked = _services.Settings.Desktop.SnapToGrid;
+        PetSettingsPanel.Load(_services.Settings.Pet);
         ThemeCombo.SelectedItem = ThemeCombo.Items.Cast<Choice>().Single(x => x.Id == _services.Settings.Appearance.Theme);
         AccentCombo.SelectedItem = AccentCombo.Items.Cast<Choice>().Single(x => x.Id == _services.Settings.Appearance.Accent);
         TransparencyCheck.IsChecked = _services.Settings.Appearance.TransparencyEnabled;
@@ -205,6 +208,8 @@ public partial class DashboardWindow : Window
         }));
     }
     private void OnSettingsClick(object sender, RoutedEventArgs e) => ShowSettings();
+    private void OnPetSettingsClick(object sender, RoutedEventArgs e) => ShowPetSettings();
+    public void ShowPetSettings() { ShowSettings(); SettingsTabs.SelectedItem = PetSettingsTab; }
     private async void OnSearchClick(object sender, RoutedEventArgs e) => await _execute(new("palette.toggle"));
     private void OnDashboardClick(object sender, RoutedEventArgs e) => ShowSection("plugins");
     private void OnLibraryClick(object sender, RoutedEventArgs e) => ShowSection("library");
@@ -235,6 +240,12 @@ public partial class DashboardWindow : Window
     }
     private void OnModuleSettingsChanged(object? sender, EventArgs e)
     {
+        if (SettingsOverlay.Visibility == Visibility.Visible)
+        {
+            var loading = _loadingSettings; _loadingSettings = true;
+            MenuBarPinnedCheck.IsChecked = !_services.Settings.Desktop.MenuBarAutoHide;
+            _loadingSettings = loading;
+        }
         PluginManagerItems.ItemsSource = _services.Settings.Desktop.Widgets.Select(x => new PluginCardViewModel(x, _vm)).ToArray();
         ApplyDesktopMode(_services.Settings.Desktop.OverlayEnabled);
         LibraryNav.Visibility = _services.Settings.Modules.Library ? Visibility.Visible : Visibility.Collapsed;
@@ -296,7 +307,7 @@ public partial class DashboardWindow : Window
             await _saveDesktopLayout();
             var candidate = _services.CopySettings();
             candidate.Desktop.OverlayEnabled = OverlayEnabledCheck.IsChecked == true;
-            candidate.Desktop.MenuBarAutoHide = MenuBarAutoHideCheck.IsChecked == true;
+            candidate.Desktop.MenuBarAutoHide = MenuBarPinnedCheck.IsChecked != true;
             candidate.Dock.SyncTaskbarPins = SyncPinsCheck.IsChecked == true;
             candidate.Modules.Dock = DockEnabledCheck.IsChecked == true;
             candidate.Modules.DesktopClock = ClockEnabledCheck.IsChecked == true;
@@ -309,10 +320,12 @@ public partial class DashboardWindow : Window
             candidate.OpenDashboardOnStartup = StartupDashboardCheck.IsChecked == true;
             candidate.Desktop.SnapToGrid = SnapGridCheck.IsChecked == true;
             candidate.Appearance = AppearanceDraft();
+            PetSettingsPanel.ApplyTo(candidate.Pet);
             candidate.Shortcuts = new()
             {
                 Desktop = DesktopHotkeyInput.Value.Copy(), Dashboard = DashboardHotkeyInput.Value.Copy(),
-                Library = LibraryHotkeyInput.Value.Copy(), Workspaces = WorkspacesHotkeyInput.Value.Copy(), EditLayout = EditHotkeyInput.Value.Copy()
+                Library = LibraryHotkeyInput.Value.Copy(), Workspaces = WorkspacesHotkeyInput.Value.Copy(), EditLayout = EditHotkeyInput.Value.Copy(),
+                PinMenuBar = PinMenuHotkeyInput.Value.Copy()
             };
             candidate.Search.HotkeyEnabled = SearchHotkeyInput.Value.Enabled;
             candidate.Search.HotkeyModifiers = SearchHotkeyInput.Value.Modifiers;
@@ -352,6 +365,7 @@ public partial class DashboardWindow : Window
         DesktopHotkeyInput.Value = shortcuts.Desktop.Copy(); DashboardHotkeyInput.Value = shortcuts.Dashboard.Copy();
         LibraryHotkeyInput.Value = shortcuts.Library.Copy(); WorkspacesHotkeyInput.Value = shortcuts.Workspaces.Copy();
         EditHotkeyInput.Value = shortcuts.EditLayout.Copy(); SearchHotkeyInput.Value = search;
+        PinMenuHotkeyInput.Value = shortcuts.PinMenuBar.Copy();
     }
     private void OnResetHotkeysClick(object sender, RoutedEventArgs e) { SetShortcutInputs(new(), new() { Modifiers = 3, Key = 0x20 }); MarkSettingsDirty(); }
     private sealed record Choice(string Id, string Label);

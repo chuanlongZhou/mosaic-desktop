@@ -26,7 +26,7 @@ public sealed class ActiveProfile : VersionedDocument
     }
 }
 
-public sealed class AppSettings : VersionedDocument
+public sealed class AppSettings : VersionedDocument, IJsonOnDeserialized
 {
     public string CurrentWorkspaceId { get; set; } = "personal";
     public ModuleSettings Modules { get; set; } = new();
@@ -37,6 +37,13 @@ public sealed class AppSettings : VersionedDocument
     public LibrarySettings Library { get; set; } = new();
     public AppearanceSettings Appearance { get; set; } = new();
     public ShortcutSettings Shortcuts { get; set; } = new();
+    public DesktopPetSettings Pet { get; set; } = new();
+
+    void IJsonOnDeserialized.OnDeserialized()
+    {
+        if (Shortcuts is not null && Search is not null)
+            Shortcuts.MigrateMenuPin(Search.HotkeyModifiers, Search.HotkeyVirtualKey, Search.Enabled && Search.HotkeyEnabled);
+    }
 
     public override void Validate()
     {
@@ -46,6 +53,8 @@ public sealed class AppSettings : VersionedDocument
         Search.Validate();
         if (Appearance is null || Shortcuts is null) throw new InvalidDataException("外观或快捷键设置无效。");
         Appearance.Validate();
+        if (Pet is null) throw new InvalidDataException("桌宠设置无效。");
+        Pet.Validate();
         Shortcuts.Validate(Search.HotkeyModifiers, Search.HotkeyVirtualKey, Search.Enabled && Search.HotkeyEnabled);
         if (Library is null || Library.ViewMode is not ("cards" or "list")) throw new InvalidDataException("资源库视图无效。");
         if (Modules is null || Dock is null || Desktop is null || Dock.Items is null || Dock.Items.Count > 24)

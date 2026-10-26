@@ -1,0 +1,63 @@
+<UserControl x:Class="Mosaic.Host.Controls.DesktopPetSettingsPanel"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:local="clr-namespace:Mosaic.Host.Controls">
+ <StackPanel>
+  <CheckBox x:Name="EnabledCheck" Content="启用桌宠陪伴" FontWeight="SemiBold" AutomationProperties.Name="启用桌宠"/>
+  <TextBlock x:Name="PetCountLabel" FontSize="16" FontWeight="SemiBold" Margin="0,14,0,8"/>
+  <Grid Margin="0,0,0,8"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+   <ComboBox x:Name="InstancePicker" DisplayMemberPath="Name" SelectedValuePath="Id" SelectionChanged="OnInstanceChanged" AutomationProperties.Name="正在设置的桌宠"/>
+   <Button x:Name="AddPetButton" Grid.Column="1" Content="添加一位" Click="OnAddPet" Margin="8,0,0,0"/>
+   <Button x:Name="RemovePetButton" Grid.Column="2" Content="移除" Click="OnRemovePet" Margin="8,0,0,0"/>
+  </Grid>
+  <CheckBox x:Name="VisibleCheck" Content="显示这位伙伴" Checked="OnVisibleChanged" Unchecked="OnVisibleChanged" AutomationProperties.Name="显示当前桌宠"/>
+  <TextBlock Text="最多 5 位，可重复选择同一角色；各自保存位置、大小和反应。主位可收起，其他伙伴可移除。保存后一起应用。" Foreground="{DynamicResource MutedBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,4,0,16"/>
+  <TextBlock Text="选择桌宠" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8"/>
+  <ComboBox x:Name="CharacterPicker" DisplayMemberPath="Name" SelectedValuePath="Id" SelectionChanged="OnCharacterChanged" AutomationProperties.Name="桌宠角色" Margin="0,0,0,8"/>
+  <TextBlock Text="保留三款鲸鱼娘，新增 GPT、Gemini、Claude、Qwen。先选择上方伙伴，再选择她的角色。" Foreground="{DynamicResource MutedBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,16"/>
+  <Border Background="{DynamicResource HeroBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="14" Padding="12" Margin="0,0,0,18">
+   <Grid x:Name="PreviewStage" ClipToBounds="True"><Grid.ColumnDefinitions><ColumnDefinition Width="160"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+    <local:WhalePetSprite x:Name="PreviewSprite" Width="152" Height="170" RenderTransformOrigin=".5,.85" AutomationProperties.Name="鲸鱼娘动作预览"/>
+    <StackPanel x:Name="CharacterInfo" Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
+     <TextBlock x:Name="CharacterName" Text="鲸鱼娘 · 原版 Q 版" FontSize="22" FontWeight="SemiBold" TextWrapping="Wrap"/>
+     <TextBlock x:Name="CharacterTagline" Text="今天也要一起摸鱼呀～" TextWrapping="Wrap" Foreground="{DynamicResource AccentTextBrush}" Margin="0,8,0,10"/>
+     <TextBlock x:Name="CharacterDescription" Text="蓝发、鲸鳍和大尾巴。" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" LineHeight="20"/>
+     <TextBlock Text="悬停摸头或打招呼 · 单击随机聊天&#x0a;双击投喂 · 拖动搬家 · 右键更多" TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource MutedBrush}" LineHeight="20" Margin="0,6,0,0"/>
+    </StackPanel>
+   </Grid>
+  </Border>
+  <TextBlock Text="试试她的动作" FontSize="16" FontWeight="SemiBold"/>
+  <WrapPanel Margin="0,10,0,0">
+   <Button Content="随机聊一句" Tag="Click" Click="OnPreview" Margin="0,0,8,8"/>
+   <Button Content="摸摸头" Tag="Pat" Click="OnPreview" Margin="0,0,8,8"/>
+   <Button x:Name="FeedPreviewButton" Content="喂白米饭" Tag="Feed" Click="OnPreview" Margin="0,0,8,8"/>
+   <Button x:Name="SignaturePreviewButton" Content="头顶饭盆" Tag="RiceHat" Click="OnPreview" Margin="0,0,8,8"/>
+   <Button Content="陪你打字" Tag="Typing" Click="OnPreview" Margin="0,0,8,8"/>
+   <Button Content="打个招呼" Tag="Wave" Click="OnPreview" Margin="0,0,8,8"/>
+   <Button Content="疲惫" Tag="Tired" Click="OnPreview" Margin="0,0,8,8"/>
+   <Button Content="求 token" Tag="BegTokens" Click="OnPreview" Margin="0,0,8,8"/>
+   <Button Content="被 token 砸晕" Tag="TokenDazed" Click="OnPreview" Margin="0,0,8,8"/>
+   <Button Content="加油蹦跳" Tag="Enter" Click="OnPreview" Margin="0,0,8,8"/>
+   <Button Content="睡个懒觉" Tag="Sleep" Click="OnPreview" Margin="0,0,8,8"/>
+   <Button x:Name="TeasePreviewButton" Content="叫她大肥鱼" Tag="Pout" Click="OnPreview" Margin="0,0,8,8"/>
+  </WrapPanel>
+  <TextBlock x:Name="PreviewCaption" Text="动作预览，不会改变桌宠开关。" Foreground="{DynamicResource MutedBrush}" FontSize="12" TextWrapping="Wrap" MinHeight="36" Margin="0,0,0,12"/>
+  <Separator Margin="0,0,0,16"/>
+  <TextBlock Text="她会回应这些时刻" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,12"/>
+  <CheckBox x:Name="CursorCheck" Content="鼠标移动 → 看向鼠标所在方向"/>
+  <CheckBox x:Name="EnterCheck" Content="按回车 → 开心蹦跳，给你加油"/>
+  <CheckBox x:Name="TypingCheck" Content="打字时 → 小手交替敲键盘，停下后待机" AutomationProperties.Name="桌宠打字响应"/>
+  <CheckBox x:Name="DesktopCheck" Content="Win+D → 挥手欢迎你回桌面"/>
+  <CheckBox x:Name="CloseCheck" Content="关闭应用主窗口 → 挥手说辛苦啦"/>
+  <CheckBox x:Name="IdleCheck" Content="长时间不操作 → 打盹，回来后伸懒腰"/>
+  <TextBlock x:Name="IdleLabel" Margin="0,14,0,8"/>
+  <Slider x:Name="IdleSlider" Minimum="30" Maximum="600" TickFrequency="30" IsSnapToTickEnabled="True" ValueChanged="OnSliderChanged" AutomationProperties.Name="桌宠闲置入睡秒数"/>
+  <TextBlock x:Name="SizeLabel" Margin="0,20,0,8"/>
+  <Slider x:Name="SizeSlider" Minimum="128" Maximum="320" TickFrequency="8" IsSnapToTickEnabled="True" ValueChanged="OnSliderChanged" AutomationProperties.Name="桌宠大小"/>
+  <CheckBox x:Name="BubbleCheck" Content="显示心情气泡" Margin="0,20,0,0"/>
+  <CheckBox x:Name="FullscreenCheck" Content="全屏游戏或视频时自动藏起来"/>
+  <Button Content="恢复桌宠位置" Click="OnResetPosition" HorizontalAlignment="Left" Margin="0,16,0,8"/>
+  <TextBlock x:Name="PositionLabel" Text="拖动位置会自动保存在本机。" TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource MutedBrush}"/>
+  <TextBlock Text="键盘动作有冷却时间；输入、快捷键和应用操作照常进行。桌宠动画跟随「外观」中的动画开关。" TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource MutedBrush}" Margin="0,18,0,0"/>
+ </StackPanel>
+</UserControl>

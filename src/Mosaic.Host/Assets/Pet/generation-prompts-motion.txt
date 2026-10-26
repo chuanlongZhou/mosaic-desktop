@@ -1,0 +1,42 @@
+Tool: built-in image_gen, true transparent alpha, generated 2026-10-25.
+Original character reference: whale-idle-v2.png.
+DeepSeek versions reference: References/deepseek-reference.png (right chibi / left standard).
+
+originalMotion
+Use case: identity-preserve. Asset: transparent animation sprites for an EXISTING desktop pet. Use the input only as character identity, proportions, costume and rendering reference; ignore its background and layout.
+Make EXACTLY SIX separate FULL BODY sprites in THREE columns and TWO rows, a very SPACIOUS 2048x1536 sheet. TRUE transparent alpha. Every whole character including ahoge, hair, shoes, hands and whale tail completely visible. Silhouettes SMALL and centered within each cell, total silhouette maximum55% cell width and65%cell height, huge empty transparent margins all around and generous gutters between cells. No overlap. No text, labels, numbers, borders, background, floor shadows, particles, disconnected effects or extra people.
+Poses in strict row-major order:
+TOP LEFT = WalkA: three-quarter SIDE view facing RIGHT, walking right with RIGHT leg stepping forward, LEFT leg behind, left arm swings forward.
+TOP CENTER = WalkB: same orientation, same head position and body scale, walking passing pose with feet close together, rear heel raised.
+TOP RIGHT = WalkC: same orientation, LEFT leg stepping forward, RIGHT leg behind, RIGHT arm swings forward. Clearly opposite legs and arms from WalkA.
+BOTTOM LEFT = WalkD: same orientation, second passing pose, opposite foot heel lifted from WalkB. Full tail trails behind naturally. No props on all walking frames. All four WALK frames face RIGHT, same head size and same foot baseline for seamless looping.
+BOTTOM CENTER = GreetA: front-facing standing, big friendly smile, raising the hand on viewer's RIGHT beside head, palm outward tilted inward for waving.
+BOTTOM RIGHT = GreetB: EXACT same as GreetA, identical face, head position, body, hair, feet and tail, only waving forearm/hand swings outward to make a visible second greeting frame. Same ONE raised hand, not switching hands. All six sprites same body/head scale.
+Do not enlarge figures to fill the cells. Keep lots of transparent space above and below every ahoge and shoe. High quality fine anime linework, clean readable shapes, cel shading.
+ORIGINAL CHIBI whale-girl, exactly the reference sheet's simple TWO-heads-tall round chibi character. Bright cyan blue gradient hair, little blue whale barrette on side of white maid headband, fin ears, simple short navy maid skirt with white frilly apron and blue neck bow, tiny legs and shoes, simple solid bright-blue whale tail with white underside. Keep the original's simple costume; NO gold skirt embroidery and NO whale logo on apron.
+
+chibiMotion
+Use case: identity-preserve. Asset: transparent animation sprites for an EXISTING desktop pet. Use the input only as character identity, proportions, costume and rendering reference; ignore its background and layout.
+Make EXACTLY SIX separate FULL BODY sprites in THREE columns and TWO rows, a very SPACIOUS 2048x1536 sheet. TRUE transparent alpha. Every whole character including ahoge, hair, shoes, hands and whale tail completely visible. Silhouettes SMALL and centered within each cell, total silhouette maximum55% cell width and65%cell height, huge empty transparent margins all around and generous gutters between cells. No overlap. No text, labels, numbers, borders, background, floor shadows, particles, disconnected effects or extra people.
+Poses in strict row-major order:
+TOP LEFT = WalkA: three-quarter SIDE view facing RIGHT, walking right with RIGHT leg stepping forward, LEFT leg behind, left arm swings forward.
+TOP CENTER = WalkB: same orientation, same head position and body scale, walking passing pose with feet close together, rear heel raised.
+TOP RIGHT = WalkC: same orientation, LEFT leg stepping forward, RIGHT leg behind, RIGHT arm swings forward. Clearly opposite legs and arms from WalkA.
+BOTTOM LEFT = WalkD: same orientation, second passing pose, opposite foot heel lifted from WalkB. Full tail trails behind naturally. No props on all walking frames. All four WALK frames face RIGHT, same head size and same foot baseline for seamless looping.
+BOTTOM CENTER = GreetA: front-facing standing, big friendly smile, raising the hand on viewer's RIGHT beside head, palm outward tilted inward for waving.
+BOTTOM RIGHT = GreetB: EXACT same as GreetA, identical face, head position, body, hair, feet and tail, only waving forearm/hand swings outward to make a visible second greeting frame. Same ONE raised hand, not switching hands. All six sprites same body/head scale.
+Do not enlarge figures to fill the cells. Keep lots of transparent space above and below every ahoge and shoe. High quality fine anime linework, clean readable shapes, cel shading.
+Use ONLY the RIGHT CHIBI figure from reference. 2.5 heads tall cute round face compact body, navy blue hair fading light-blue curls, white frilly headband with small blue bow, fin-shaped side locks, gold-embroidered navy maid skirt, white apron with small blue whale motif, blue bow shoes, blue whale tail with pale underside. Preserve chibi proportions in ALL six figures, never normal adult.
+
+standardMotion
+Use case: identity-preserve. Asset: transparent animation sprites for an EXISTING desktop pet. Use the input only as character identity, proportions, costume and rendering reference; ignore its background and layout.
+Make EXACTLY SIX separate FULL BODY sprites in THREE columns and TWO rows, a very SPACIOUS 2048x1536 sheet. TRUE transparent alpha. Every whole character including ahoge, hair, shoes, hands and whale tail completely visible. Silhouettes SMALL and centered within each cell, total silhouette maximum55% cell width and65%cell height, huge empty transparent margins all around and generous gutters between cells. No overlap. No text, labels, numbers, borders, background, floor shadows, particles, disconnected effects or extra people.
+Poses in strict row-major order:
+TOP LEFT = WalkA: three-quarter SIDE view facing RIGHT, walking right with RIGHT leg stepping forward, LEFT leg behind, left arm swings forward.
+TOP CENTER = WalkB: same orientation, same head position and body scale, walking passing pose with feet close together, rear heel raised.
+TOP RIGHT = WalkC: same orientation, LEFT leg stepping forward, RIGHT leg behind, RIGHT arm swings forward. Clearly opposite legs and arms from WalkA.
+BOTTOM LEFT = WalkD: same orientation, second passing pose, opposite foot heel lifted from WalkB. Full tail trails behind naturally. No props on all walking frames. All four WALK frames face RIGHT, same head size and same foot baseline for seamless looping.
+BOTTOM CENTER = GreetA: front-facing standing, big friendly smile, raising the hand on viewer's RIGHT beside head, palm outward tilted inward for waving.
+BOTTOM RIGHT = GreetB: EXACT same as GreetA, identical face, head position, body, hair, feet and tail, only waving forearm/hand swings outward to make a visible second greeting frame. Same ONE raised hand, not switching hands. All six sprites same body/head scale.
+Do not enlarge figures to fill the cells. Keep lots of transparent space above and below every ahoge and shoe. High quality fine anime linework, clean readable shapes, cel shading.
+Use ONLY the LEFT ADULT woman from reference. NORMAL adult anime proportions, 6.5 to7 heads tall, small head, long torso and long legs, modest long navy maid skirt with gold embroidery, white apron with small blue whale emblem, long navy-to-light-blue hair, white maid headband blue bow, blue eyes, fin side locks and blue whale tail white underside. Preserve NORMAL adult proportions in EVERY figure, NEVER chibi. Walking feet and ankles visible below skirt, natural clear alternating foot steps.

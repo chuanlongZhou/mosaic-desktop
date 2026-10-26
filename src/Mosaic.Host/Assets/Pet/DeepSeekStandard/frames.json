@@ -1,0 +1,202 @@
+[
+  {
+    "pose": "Idle",
+    "image": "DeepSeekStandard/idle.png",
+    "rect": [
+      18,
+      48,
+      344,
+      465
+    ]
+  },
+  {
+    "pose": "LookLeft",
+    "image": "DeepSeekStandard/idle.png",
+    "rect": [
+      393,
+      54,
+      319,
+      460
+    ]
+  },
+  {
+    "pose": "LookRight",
+    "image": "DeepSeekStandard/idle.png",
+    "rect": [
+      745,
+      53,
+      328,
+      464
+    ]
+  },
+  {
+    "pose": "LookUp",
+    "image": "DeepSeekStandard/idle.png",
+    "rect": [
+      1122,
+      54,
+      301,
+      463
+    ]
+  },
+  {
+    "pose": "LookDown",
+    "image": "DeepSeekStandard/idle.png",
+    "rect": [
+      37,
+      609,
+      306,
+      442
+    ]
+  },
+  {
+    "pose": "Blink",
+    "image": "DeepSeekStandard/idle.png",
+    "rect": [
+      395,
+      602,
+      307,
+      447
+    ]
+  },
+  {
+    "pose": "Sleep",
+    "image": "DeepSeekStandard/idle.png",
+    "rect": [
+      715,
+      754,
+      394,
+      281
+    ]
+  },
+  {
+    "pose": "Wake",
+    "image": "DeepSeekStandard/idle.png",
+    "rect": [
+      1127,
+      591,
+      314,
+      462
+    ]
+  },
+  {
+    "pose": "Pat",
+    "image": "DeepSeekStandard/social.png",
+    "rect": [
+      54,
+      100,
+      275,
+      408
+    ]
+  },
+  {
+    "pose": "Cheer",
+    "image": "DeepSeekStandard/social.png",
+    "rect": [
+      396,
+      105,
+      302,
+      402
+    ]
+  },
+  {
+    "pose": "Wave",
+    "image": "DeepSeekStandard/social.png",
+    "rect": [
+      778,
+      91,
+      281,
+      418
+    ]
+  },
+  {
+    "pose": "Goodbye",
+    "image": "DeepSeekStandard/social.png",
+    "rect": [
+      1154,
+      106,
+      261,
+      401
+    ]
+  },
+  {
+    "pose": "Eat",
+    "image": "DeepSeekStandard/social.png",
+    "rect": [
+      61,
+      626,
+      273,
+      406
+    ]
+  },
+  {
+    "pose": "Drag",
+    "image": "DeepSeekStandard/social.png",
+    "rect": [
+      413,
+      637,
+      290,
+      341
+    ]
+  },
+  {
+    "pose": "Surprise",
+    "image": "DeepSeekStandard/social.png",
+    "rect": [
+      782,
+      628,
+      298,
+      404
+    ]
+  },
+  {
+    "pose": "Pout",
+    "image": "DeepSeekStandard/social.png",
+    "rect": [
+      1145,
+      626,
+      281,
+      406
+    ]
+  },
+  {
+    "pose": "TypingLeft",
+    "image": "DeepSeekStandard/typing-bowl.png",
+    "rect": [
+      167,
+      154,
+      355,
+      474
+    ]
+  },
+  {
+    "pose": "TypingRight",
+    "image": "DeepSeekStandard/typing-bowl.png",
+    "rect": [
+      767,
+      155,
+      351,
+      469
+    ]
+  },
+  {
+    "pose": "RiceHat",
+    "image": "DeepSeekStandard/typing-bowl.png",
+    "rect": [
+      177,
+      723,
+      351,
+      458
+    ]
+  },
+  {
+    "pose": "RiceHatTilt",
+    "image": "DeepSeekStandard/typing-bowl.png",
+    "rect": [
+      772,
+      726,
+      359,
+      455
+    ]
+  }
+]

@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.InteropServices;
 
 namespace Mosaic.Host.Services;
@@ -42,6 +42,7 @@ public sealed class StartMenuKeyFilter
 
 public sealed class StartMenuKeyGuard : IDisposable
 {
+    public event Action? WindowsKeyPressed;
     private HookThread? _state;
     public bool IsEnabled => _state is { StopRequested: false };
     public void SetEnabled(bool enabled)
@@ -56,7 +57,7 @@ public sealed class StartMenuKeyGuard : IDisposable
         var error = state.Ready.Task.Result;
         if (error != 0) { Dispose(); throw new Win32Exception(error, "无法启用开始菜单按键拦截。"); }
     }
-    private static void Run(HookThread state)
+    private void Run(HookThread state)
     {
         state.Id = GetCurrentThreadId();
         PeekMessage(out _, 0, 0, 0, 0); // Ensure PostThreadMessage can wake this thread.
@@ -72,6 +73,7 @@ public sealed class StartMenuKeyGuard : IDisposable
             if (action == StartMenuKeyAction.Block) return 1;
             if (action == StartMenuKeyAction.MaskWindowsRelease)
             {
+                WindowsKeyPressed?.Invoke();
                 // Deliver an unused menu-mask key before the Win release. This
                 // cancels Start without swallowing a modifier's key-up event.
                 var inputs = new[] { Key(0xE8, false), Key(0xE8, true), Key((ushort)input.Key, true) };

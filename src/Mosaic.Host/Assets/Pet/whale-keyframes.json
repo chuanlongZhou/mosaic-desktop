@@ -1,0 +1,22 @@
+[
+  {
+    "pose": "TiredYawn",
+    "image": "whale-keyframes.png",
+    "rect": [
+      135,
+      70,
+      684,
+      749
+    ]
+  },
+  {
+    "pose": "BegReach",
+    "image": "whale-keyframes.png",
+    "rect": [
+      1015,
+      71,
+      690,
+      748
+    ]
+  }
+]

@@ -1,0 +1,272 @@
+[
+  {
+    "pose": "Idle",
+    "image": "Gemini/idle.png",
+    "rect": [
+      49,
+      7,
+      374,
+      424
+    ]
+  },
+  {
+    "pose": "LookLeft",
+    "image": "Gemini/idle.png",
+    "rect": [
+      444,
+      7,
+      367,
+      424
+    ]
+  },
+  {
+    "pose": "LookRight",
+    "image": "Gemini/idle.png",
+    "rect": [
+      855,
+      5,
+      362,
+      426
+    ]
+  },
+  {
+    "pose": "LookUp",
+    "image": "Gemini/idle.png",
+    "rect": [
+      46,
+      439,
+      375,
+      410
+    ]
+  },
+  {
+    "pose": "LookDown",
+    "image": "Gemini/idle.png",
+    "rect": [
+      455,
+      441,
+      362,
+      408
+    ]
+  },
+  {
+    "pose": "Blink",
+    "image": "Gemini/idle.png",
+    "rect": [
+      863,
+      440,
+      362,
+      409
+    ]
+  },
+  {
+    "pose": "Sleep",
+    "image": "Gemini/idle.png",
+    "rect": [
+      38,
+      880,
+      400,
+      355
+    ]
+  },
+  {
+    "pose": "Wake",
+    "image": "Gemini/idle.png",
+    "rect": [
+      448,
+      856,
+      398,
+      376
+    ]
+  },
+  {
+    "pose": "TiredYawn",
+    "image": "Gemini/idle.png",
+    "rect": [
+      894,
+      852,
+      309,
+      394
+    ]
+  },
+  {
+    "pose": "Pat",
+    "image": "Gemini/social.png",
+    "rect": [
+      40,
+      7,
+      357,
+      408
+    ]
+  },
+  {
+    "pose": "Cheer",
+    "image": "Gemini/social.png",
+    "rect": [
+      454,
+      2,
+      357,
+      413
+    ]
+  },
+  {
+    "pose": "Wave",
+    "image": "Gemini/social.png",
+    "rect": [
+      885,
+      14,
+      336,
+      401
+    ]
+  },
+  {
+    "pose": "Goodbye",
+    "image": "Gemini/social.png",
+    "rect": [
+      36,
+      412,
+      373,
+      425
+    ]
+  },
+  {
+    "pose": "Eat",
+    "image": "Gemini/social.png",
+    "rect": [
+      453,
+      434,
+      369,
+      395
+    ]
+  },
+  {
+    "pose": "Drag",
+    "image": "Gemini/social.png",
+    "rect": [
+      871,
+      415,
+      361,
+      417
+    ]
+  },
+  {
+    "pose": "Surprise",
+    "image": "Gemini/social.png",
+    "rect": [
+      53,
+      836,
+      364,
+      401
+    ]
+  },
+  {
+    "pose": "Pout",
+    "image": "Gemini/social.png",
+    "rect": [
+      479,
+      839,
+      332,
+      397
+    ]
+  },
+  {
+    "pose": "BegReach",
+    "image": "Gemini/social.png",
+    "rect": [
+      872,
+      834,
+      367,
+      402
+    ]
+  },
+  {
+    "pose": "TypingLeft",
+    "image": "Gemini/actions.png",
+    "rect": [
+      58,
+      8,
+      348,
+      410
+    ]
+  },
+  {
+    "pose": "TypingRight",
+    "image": "Gemini/actions.png",
+    "rect": [
+      460,
+      21,
+      362,
+      398
+    ]
+  },
+  {
+    "pose": "RiceHat",
+    "image": "Gemini/actions.png",
+    "rect": [
+      879,
+      8,
+      365,
+      414
+    ]
+  },
+  {
+    "pose": "RiceHatTilt",
+    "image": "Gemini/actions.png",
+    "rect": [
+      40,
+      427,
+      377,
+      411
+    ]
+  },
+  {
+    "pose": "GreetA",
+    "image": "Gemini/actions.png",
+    "rect": [
+      463,
+      424,
+      339,
+      414
+    ]
+  },
+  {
+    "pose": "GreetB",
+    "image": "Gemini/actions.png",
+    "rect": [
+      880,
+      424,
+      353,
+      414
+    ]
+  },
+  {
+    "pose": "Tired",
+    "image": "Gemini/actions.png",
+    "rect": [
+      67,
+      851,
+      325,
+      391
+    ]
+  },
+  {
+    "pose": "BegTokens",
+    "image": "Gemini/actions.png",
+    "rect": [
+      470,
+      857,
+      333,
+      387
+    ]
+  },
+  {
+    "pose": "TokenDazed",
+    "image": "Gemini/actions.png",
+    "rect": [
+      869,
+      866,
+      352,
+      369
+    ]
+  }
+]

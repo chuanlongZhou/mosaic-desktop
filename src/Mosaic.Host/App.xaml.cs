@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Text.Json;
 using System.Windows;
 using Mosaic.Core.Commands;
@@ -20,11 +20,13 @@ public partial class App : Application
     private System.Drawing.Icon? _trayIcon;
     private AppServices? _services;
     private DesktopOverlay? _overlay;
-    private Forms.ToolStripMenuItem? _overlayMenu, _dashboardMenu;
+    private Forms.ToolStripMenuItem? _overlayMenu, _dashboardMenu, _menuPinItem;
     private DockWindow? _dock;
     private DashboardViewModel? _desktopVm;
     private DesktopSurface? _desktopSurface;
     private DesktopSceneMonitor? _desktopScene;
+    private DesktopPetService? _pet;
+    private Forms.ToolStripMenuItem? _petMenu;
     private readonly List<DesktopBarWindow> _bars = [];
     private DashboardWindow? _dashboard;
     private PaletteWindow? _palette;
@@ -35,6 +37,7 @@ public partial class App : Application
     private Forms.ToolStripItem? _libraryMenu, _workspacesMenu;
     private Task _workspaceSwitch = Task.CompletedTask;
     private bool _switching;
+    private bool _windowsKeyPinned;
     private bool _fullscreen;
     private bool _exiting;
     private bool _exitRequested;
@@ -57,11 +60,12 @@ public partial class App : Application
         try
         {
             _instance = new SingleInstance(_dataRoot);
-            if (!_instance.IsPrimary) { await _instance.NotifyPrimaryAsync(e.Args.Contains("--exit") ? "shutdown" : e.Args.Contains("--library") ? "library" : e.Args.Contains("--workspaces") ? "workspaces" : e.Args.Contains("--dashboard") ? "dashboard" : "palette"); Shutdown(); return; }
+            if (!_instance.IsPrimary) { await _instance.NotifyPrimaryAsync(e.Args.Contains("--exit") ? "shutdown" : e.Args.Contains("--pet") ? "pet" : e.Args.Contains("--library") ? "library" : e.Args.Contains("--workspaces") ? "workspaces" : e.Args.Contains("--dashboard") ? "dashboard" : "palette"); Shutdown(); return; }
             if (e.Args.Contains("--exit")) { Shutdown(); return; }
             _services = new(new JsonDocumentStore(_dataRoot));
             await _services.InitializeAsync();
             ThemeManager.Initialize(_services);
+            if (e.Args.Contains("--pet")) await _services.UpdatePetAsync(pet => pet.Enable());
             if (e.Args.Contains("--overlay"))
             {
                 var candidate = _services.CopySettings(); candidate.Desktop.OverlayEnabled = true;
@@ -86,6 +90,7 @@ public partial class App : Application
                 input.Value = binding; return true;
             };
             _native.DesktopModeRequested += async () => await ExecuteAsync(new("desktop.toggle"));
+            _native.MenuBarPinRequested += async () => await ExecuteAsync(new("menubar.pin.toggle"));
             _native.DashboardRequested += () => ShowDashboard();
             _native.PaletteRequested += ShowPalette;
             _native.LibraryRequested += async () => await ExecuteAsync(new("library.open"));
@@ -105,14 +110,16 @@ public partial class App : Application
             {
                 _shellLayoutTimer.Stop(); _overlay?.RefreshLayout(); _desktopSurface?.RefreshAttachment();
                 if (_services.Settings.Desktop.OverlayEnabled) _desktopScene.Refresh();
-                _dock?.EnsureTopmost(); foreach (var bar in _bars) bar.EnsureTopmost();
+                _pet?.EnsureTopmost(); _dock?.EnsureTopmost(); foreach (var bar in _bars) bar.EnsureTopmost();
             };
             _native.ShellLayoutChanged += () => { if (!_shellLayoutTimer.IsEnabled) _shellLayoutTimer.Start(); };
-            _native.FullscreenChanged += full => Dispatcher.BeginInvoke(() => { if (_fullscreen != full) { _fullscreen = full; ApplyVisibility(); } });
+            _native.FullscreenChanged += full => Dispatcher.BeginInvoke(() => { if (_fullscreen != full) { _fullscreen = full; ApplyVisibility(); } _pet?.SetFullscreen(full); });
+            _pet = new(_services, ShowPetSettings);
+            _pet.SaveFailed += message => { ShowDashboard(); _dashboard?.SetStatus(message, true); };
             CreateTray();
             ApplyModules();
             _listener = _instance.ListenAsync(action => Dispatcher.BeginInvoke(new Action(async () =>
-            { if (action == "shutdown") await ExitAsync(); else if (action == "palette") ShowPalette(); else if (action == "library") await ExecuteAsync(new("library.open")); else if (action == "workspaces") await ExecuteAsync(new("workspaces.open")); else ShowDashboard(); })));
+            { if (action == "shutdown") await ExitAsync(); else if (action == "pet") { await _services.UpdatePetAsync(pet => pet.Enable()); ShowPetSettings(); } else if (action == "palette") ShowPalette(); else if (action == "library") await ExecuteAsync(new("library.open")); else if (action == "workspaces") await ExecuteAsync(new("workspaces.open")); else ShowDashboard(); })));
             if ((!_services.Settings.Desktop.OverlayEnabled && _services.FirstRun) || _services.Settings.OpenDashboardOnStartup || e.Args.Contains("--dashboard")) ShowDashboard();
             if (e.Args.Contains("--palette")) ShowPalette();
             if (e.Args.Contains("--library")) await ExecuteAsync(new("library.open"));
@@ -138,6 +145,9 @@ public partial class App : Application
             return Task.CompletedTask;
         });
         _services!.Commands.Register("app.exit", _ => ExitAsync());
+        _services.Commands.Register("menubar.pin.toggle", _ => _services.ToggleMenuBarPinAsync());
+        _services.Commands.Register("pet.toggle", _ => _services.UpdatePetAsync(pet => { if (pet.Enabled) pet.Enabled = false; else pet.Enable(); }));
+        _services.Commands.Register("pet.settings", _ => { ShowPetSettings(); return Task.CompletedTask; });
         _services.Commands.Register("desktop.toggle", async _ =>
         {
             if (_desktopSurface is not null) await _desktopSurface.FlushLayoutAsync();
@@ -177,6 +187,8 @@ public partial class App : Application
         };
         _overlayMenu = new Forms.ToolStripMenuItem("启用 Mosaic 桌面  Ctrl+Alt+M");
         _overlayMenu.Click += async (_, _) => await ExecuteAsync(new("desktop.toggle")); menu.Items.Add(_overlayMenu);
+        _menuPinItem = new Forms.ToolStripMenuItem("固定顶部菜单");
+        _menuPinItem.Click += async (_, _) => await ExecuteAsync(new("menubar.pin.toggle")); menu.Items.Add(_menuPinItem);
         _searchMenu = menu.Items.Add("全局搜索  " + NativeShell.DescribeHotkey(_services!.Settings.Search), null, (_, _) => ShowPalette());
         _searchMenu.Enabled = _services.Settings.Search.Enabled;
         menu.Items.Add("搜索目录与快捷键…", null, (_, _) => ShowSearchSettings());
@@ -187,6 +199,9 @@ public partial class App : Application
         _workspacesMenu = menu.Items.Add("工作空间", null, async (_, _) => await ExecuteAsync(new("workspaces.open")));
         _workspacesMenu.Enabled = _services.Settings.Modules.Workspaces;
         menu.Items.Add("Mosaic 设置", null, (_, _) => ShowDashboard(true));
+        _petMenu = new Forms.ToolStripMenuItem("桌宠");
+        _petMenu.Click += async (_, _) => await ExecuteAsync(new("pet.toggle")); menu.Items.Add(_petMenu);
+        menu.Items.Add("桌宠设置与动作预览…", null, (_, _) => ShowPetSettings());
         menu.Items.Add("打开 JSON 配置目录", null, (_, _) => ShellLauncher.OpenResource(_dataRoot));
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add("退出 Mosaic", null, async (_, _) => await ExitAsync());
@@ -210,6 +225,11 @@ public partial class App : Application
         _dashboard.Activate();
         if (!_dashboard.ShowSection(section, resourceId, workspaceId)) throw new InvalidOperationException("入口已关闭，或布局仍在编辑；请检查模块设置并保存或取消布局。");
         if (settings) _dashboard.ShowSettings();
+    }
+
+    private void ShowPetSettings()
+    {
+        ShowDashboard(); _dashboard?.ShowPetSettings();
     }
 
     public void ShowPalette()
@@ -276,16 +296,34 @@ public partial class App : Application
     private void ApplyModules()
     {
         if (_services is null) return;
+        _pet?.ApplySettings();
+        if (_petMenu is not null) _petMenu.Checked = _services.Settings.Pet.Enabled;
         var overlay = _services.Settings.Desktop.OverlayEnabled;
         if (!overlay) { foreach (var bar in _bars) bar.Close(); _bars.Clear(); }
         if (overlay)
         {
-            _overlay ??= new DesktopOverlay();
+            if (_overlay is null)
+            {
+                _overlay = new DesktopOverlay();
+                _overlay.WindowsKeyPressed += () => Dispatcher.BeginInvoke(() =>
+                {
+                    if (_exiting || _exitRequested || _overlay?.Enabled != true) return;
+                    _windowsKeyPinned = !_windowsKeyPinned;
+                    _dock?.SetWindowsKeyPinned(_windowsKeyPinned);
+                    foreach (var bar in _bars) bar.SetWindowsKeyPinned(_windowsKeyPinned);
+                });
+            }
             _overlay.Enable();
             _overlay.ConfigureDock(_services.Settings.Modules.Dock, _services.Settings.Dock.AutoHide, _services.Settings.Dock.IconSize);
         }
-        else { _overlay?.Dispose(); _overlay = null; }
+        else { _windowsKeyPinned = false; _overlay?.Dispose(); _overlay = null; }
         if (_overlayMenu is not null) { _overlayMenu.Checked = overlay; _overlayMenu.Text = (overlay ? "切回 Windows 桌面  " : "启用 Mosaic 桌面  ") + NativeShell.DescribeHotkey(_services.Settings.Shortcuts.Desktop); }
+        if (_menuPinItem is not null)
+        {
+            _menuPinItem.Checked = !_services.Settings.Desktop.MenuBarAutoHide;
+            _menuPinItem.Enabled = overlay;
+            _menuPinItem.Text = "固定顶部菜单  " + NativeShell.DescribeHotkey(_services.Settings.Shortcuts.PinMenuBar);
+        }
         _dashboard?.ApplyDesktopMode(overlay);
         if (overlay && _services.Settings.Modules.Dock)
         {
@@ -309,6 +347,11 @@ public partial class App : Application
         foreach (var bar in _bars) bar.RefreshConfiguration();
         _desktopScene?.SetEnabled(overlay);
         if (overlay && _desktopScene is not null) ApplyShellScene(_desktopScene.Current);
+        if (_windowsKeyPinned)
+        {
+            _dock?.SetWindowsKeyPinned(true);
+            foreach (var bar in _bars) bar.SetWindowsKeyPinned(true);
+        }
         ApplyVisibility();
     }
 
@@ -356,6 +399,7 @@ public partial class App : Application
     protected override void OnExit(ExitEventArgs e)
     {
         _shellLayoutTimer.Stop();
+        _pet?.Dispose();
         _desktopScene?.Dispose();
         _desktopSurface?.Dispose();
         _overlay?.Dispose();

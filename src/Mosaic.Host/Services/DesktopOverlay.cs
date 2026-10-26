@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Threading;
@@ -18,6 +18,7 @@ public sealed class DesktopOverlay : IDisposable
     private Process? _guard;
     private readonly Dictionary<nint, bool> _original = [];
     private StartMenuKeyGuard? _startMenuKeys;
+    public event Action? WindowsKeyPressed;
     public bool Enabled { get; private set; }
     public DesktopOverlay() => _timer.Tick += (_, _) => { HideShell(); ShellWorkArea.Apply(_dockHeight, false, _menuHeights); };
 
@@ -38,7 +39,9 @@ public sealed class DesktopOverlay : IDisposable
             _taskbarState = AppBarReservation.TaskbarState();
             AppBarReservation.SetTaskbarState(_taskbarState.Value | 1);
             Enabled = true;
-            _startMenuKeys = new(); _startMenuKeys.SetEnabled(true);
+            _startMenuKeys = new();
+            _startMenuKeys.WindowsKeyPressed += () => WindowsKeyPressed?.Invoke();
+            _startMenuKeys.SetEnabled(true);
             HideShell(); _timer.Start();
         }
         catch { Dispose(); throw; }

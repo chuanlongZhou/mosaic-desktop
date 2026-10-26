@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -28,7 +28,15 @@ public partial class DockWindow : Window
     private Point _mouseDown;
     private bool _dragging, _collapsed, _busy;
     private bool _autoHideAllowed;
-    private bool CanAutoHide => _services.Settings.Dock.AutoHide && _autoHideAllowed;
+    private bool? _windowsKeyPinned;
+    public void SetWindowsKeyPinned(bool pinned)
+    {
+        _windowsKeyPinned = pinned;
+        _hideTimer.Stop();
+        if (pinned) { if (!IsVisible) Show(); ExpandDock(); EnsureTopmost(); }
+        else if (CanAutoHide) CollapseDock();
+    }
+    private bool CanAutoHide => _windowsKeyPinned is bool pinned ? !pinned : _services.Settings.Dock.AutoHide && _autoHideAllowed;
     public bool IsAutoHidden => _collapsed;
 
     public void SetAutoHideAllowed(bool allowed)

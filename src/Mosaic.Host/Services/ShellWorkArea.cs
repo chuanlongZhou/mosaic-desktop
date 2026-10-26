@@ -38,7 +38,7 @@ public static class ShellWorkArea
             if ((info.Flags & 1) != 0) desired.Bottom -= (int)Math.Ceiling(dockHeight * scale);
             if (!desired.Equals(info.Work))
             {
-                SystemParametersInfo(0x2F, 0, ref desired, 2);
+                SetWorkArea(ref desired);
                 fitExisting = true;
             }
             if (fitExisting) FitWindows(info.Monitor, desired);
@@ -47,7 +47,15 @@ public static class ShellWorkArea
     }
     public static void Restore(IEnumerable<Rect> areas)
     {
-        foreach (var area in areas) { var copy = area; SystemParametersInfo(0x2F, 0, ref copy, 2); }
+        foreach (var area in areas) { var copy = area; SetWorkArea(ref copy); }
+    }
+    private static void SetWorkArea(ref Rect area)
+    {
+        // SPIF_SENDCHANGE broadcasts synchronously. A WinForms SystemEvents
+        // listener can then wait for this WPF dispatcher while SPI waits for the
+        // listener, freezing the shell on an intermediate animation frame.
+        if (SystemParametersInfo(0x2F, 0, ref area, 0))
+            SendNotifyMessage(new nint(0xffff), 0x1A, new nint(0x2F), 0);
     }
     private static void FitWindows(Rect monitor, Rect work)
     {
@@ -55,8 +63,9 @@ public static class ShellWorkArea
         EnumWindows((window, _) =>
         {
             if (!IsWindowVisible(window) || GetWindow(window, 4) != 0 || (GetWindowLongPtr(window, -20).ToInt64() & 0x80) != 0) return true;
-            GetWindowThreadProcessId(window, out var pid);
-            if (pid == Environment.ProcessId || !GetWindowRect(window, out var rect)) return true;
+            // Mosaic's ordinary settings windows need the same work-area fit as
+            // other apps. Tool windows (menu, Dock and popups) were excluded above.
+            if (!GetWindowRect(window, out var rect)) return true;
             DwmGetWindowAttribute(window, 14, out int cloaked, sizeof(int));
             if (cloaked != 0 || (!IsZoomed(window) && (GetWindowLongPtr(window, -16).ToInt64() & 0xC00000) == 0)) return true;
             if (rect.Left < monitor.Left - 16 || rect.Left >= monitor.Right || rect.Top < monitor.Top - 16 || rect.Top >= monitor.Bottom) return true;
@@ -81,7 +90,6 @@ public static class ShellWorkArea
     [DllImport("user32.dll")] private static extern bool IsWindowVisible(nint window);
     [DllImport("user32.dll")] private static extern bool IsZoomed(nint window);
     [DllImport("user32.dll")] private static extern nint GetWindow(nint window, uint command);
-    [DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(nint window, out uint pid);
     [DllImport("user32.dll")] private static extern bool GetWindowRect(nint window, out Rect rect);
     [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW")] private static extern nint GetWindowLongPtr(nint window, int index);
     [DllImport("user32.dll")] private static extern bool SetWindowPos(nint window, nint after, int x, int y, int width, int height, uint flags);
@@ -91,5 +99,6 @@ public static class ShellWorkArea
     [DllImport("user32.dll")] private static extern bool EnumDisplayMonitors(nint dc, nint clip, MonitorCallback callback, nint data);
     [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern bool GetMonitorInfo(nint monitor, ref MonitorInfo info);
     [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern bool SystemParametersInfo(uint action, uint parameter, ref Rect rect, uint flags);
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern bool SendNotifyMessage(nint window, uint message, nint parameter, nint value);
     [DllImport("shcore.dll")] private static extern int GetDpiForMonitor(nint monitor, int type, out uint x, out uint y);
 }

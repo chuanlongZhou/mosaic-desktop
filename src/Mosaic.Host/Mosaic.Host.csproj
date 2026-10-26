@@ -9,12 +9,42 @@
     <PlatformTarget>x64</PlatformTarget>
     <AssemblyName>Mosaic</AssemblyName>
     <RootNamespace>Mosaic.Host</RootNamespace>
-    <Version>0.8.1</Version>
+    <Version>0.8.14</Version>
     <Description>Mosaic Desktop — lightweight native Windows desktop</Description>
   </PropertyGroup>
   <ItemGroup>
+    <Resource Include="Assets/Pet/*-v2.png" />
+    <Resource Include="Assets/Pet/frames-v2.json" />
+    <Resource Include="Assets/Pet/whale-motion.png" />
+    <Resource Include="Assets/Pet/whale-motion-frames.json" />
+    <Resource Include="Assets/Pet/whale-emotions.png" />
+    <Resource Include="Assets/Pet/whale-emotion-frames.json" />
+    <Resource Include="Assets/Pet/whale-keyframes.png" />
+    <Resource Include="Assets/Pet/whale-keyframes.json" />
+    <Resource Include="Assets/Pet/token-chip.png" />
+    <Resource Include="Assets/Pet/token-chip.json" />
+    <Resource Include="Assets/Pet/DeepSeekChibi/*.png" />
+    <Resource Include="Assets/Pet/DeepSeekChibi/frames.json" />
+    <Resource Include="Assets/Pet/DeepSeekChibi/motion-frames.json" />
+    <Resource Include="Assets/Pet/DeepSeekChibi/emotion-frames.json" />
+    <Resource Include="Assets/Pet/DeepSeekChibi/keyframes.json" />
+    <Resource Include="Assets/Pet/DeepSeekStandard/*.png" />
+    <Resource Include="Assets/Pet/DeepSeekStandard/frames.json" />
+    <Resource Include="Assets/Pet/DeepSeekStandard/motion-frames.json" />
+    <Resource Include="Assets/Pet/DeepSeekStandard/emotion-frames.json" />
+    <Resource Include="Assets/Pet/DeepSeekStandard/keyframes.json" />
+    <Resource Include="Assets/Pet/Gpt/*.png" />
+    <Resource Include="Assets/Pet/Gpt/frames.json" />
+    <Resource Include="Assets/Pet/Gemini/*.png" />
+    <Resource Include="Assets/Pet/Gemini/frames.json" />
+    <Resource Include="Assets/Pet/Claude/*.png" />
+    <Resource Include="Assets/Pet/Claude/frames.json" />
+    <Resource Include="Assets/Pet/Qwen/*.png" />
+    <Resource Include="Assets/Pet/Qwen/frames.json" />
     <PackageReference Include="ManagedShell" Version="0.0.374" />
     <Content Include="../../packaging/licenses/ManagedShell-LICENSE.txt" Link="licenses/ManagedShell-LICENSE.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="../../packaging/licenses/DeepSeek-Pets-NOTICE.md" Link="licenses/DeepSeek-Pets-NOTICE.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="../../packaging/licenses/AI-Companions-NOTICE.md" Link="licenses/AI-Companions-NOTICE.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Using Remove="System.Windows.Forms" />
     <Using Remove="System.Drawing" />
     <ProjectReference Include="../Mosaic.Core/Mosaic.Core.csproj" />

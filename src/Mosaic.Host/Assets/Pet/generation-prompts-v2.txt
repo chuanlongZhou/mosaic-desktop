@@ -1,0 +1,32 @@
+SHEET 1
+Use case: identity-preserve.
+Asset type: transparent production sprite sheet for the existing whale-girl desktop pet.
+Input image 1 is the identity / outfit / rendering-style reference, not a layout reference. Keep exactly the same cute chibi face, long gradient blue hair, white maid headband, whale fin ears, navy-white frilly apron dress, tiny shoes, large curved blue whale tail, delicate anime line art and cel shading.
+CRITICAL LAYOUT CORRECTION: The reference sheet is too crowded and cuts off tails. Redraw the requested poses much SMALLER and FARTHER APART. Every character must be completely visible with entire ahoge, hair, tail, hands, shoes and props, no clipping. No neighboring pixels inside another cell. Use real transparent alpha, no white or colored background, no panel border, no text.
+Canvas requested 2048x1024, EXACTLY FOUR COLUMNS and TWO ROWS (8 equal cells). Place full-body characters at cell centers. Each character including tail occupies at most 60% of its cell WIDTH and 65% of its cell HEIGHT. This means LARGE empty transparent gutters and wide transparent exterior margins (at least 70px per 512px cell). Do not fill available space by enlarging subjects. Same scale and aligned feet within each cell. Keep all pixels far away from all cell edges. No shadows outside the characters.
+Poses row-major, LEFT TO RIGHT, TOP TO BOTTOM:
+Row1: 1 neutral friendly standing idle facing viewer; 2 head and eyes looking LEFT; 3 head and eyes looking RIGHT; 4 eyes looking UP.
+Row2: 5 eyes looking DOWN; 6 happy blink, closed eyes, standing upright; 7 sleeping curled on her hands, whole tail visible; 8 waking, stretching her arms, sleepy smiling face.
+Exactly these eight separate poses, one per cell.
+
+SHEET 2
+Use case: identity-preserve.
+Asset type: transparent production sprite sheet for the existing whale-girl desktop pet.
+Input image 1 is the identity / outfit / rendering-style reference, not a layout reference. Keep exactly the same cute chibi face, long gradient blue hair, white maid headband, whale fin ears, navy-white frilly apron dress, tiny shoes, large curved blue whale tail, delicate anime line art and cel shading.
+CRITICAL LAYOUT CORRECTION: The reference sheet is too crowded and cuts off tails. Redraw the requested poses much SMALLER and FARTHER APART. Every character must be completely visible with entire ahoge, hair, tail, hands, shoes and props, no clipping. No neighboring pixels inside another cell. Use real transparent alpha, no white or colored background, no panel border, no text.
+Canvas requested 2048x1024, EXACTLY FOUR COLUMNS and TWO ROWS (8 equal cells). Place full-body characters at cell centers. Each character including tail occupies at most 60% of its cell WIDTH and 65% of its cell HEIGHT. This means LARGE empty transparent gutters and wide transparent exterior margins (at least 70px per 512px cell). Do not fill available space by enlarging subjects. Same scale and aligned feet within each cell. Keep all pixels far away from all cell edges. No shadows outside the characters.
+Poses row-major, LEFT TO RIGHT, TOP TO BOTTOM:
+Row1: 1 being patted, happy closed eyes, blush, both hands touching cheeks; 2 celebrating with both hands raised and an excited smile; 3 waving hello with left hand and friendly open blue eyes; 4 waving goodbye with right hand, head tilted, soft smile.
+Row2: 5 holding a white bowl of white rice and chopsticks eating happily; 6 being picked up / dangling feet, surprised, no human hand; 7 round-eyed surprised, hands raised, NO disconnected exclamation marks or floating particles; 8 proud cute pout, hands on hips.
+Exactly these eight separate poses, one per cell.
+
+SHEET 3
+Use case: identity-preserve.
+Asset type: transparent desktop pet animation sprite sheet, four separate full-body sprites in an EXACT 2 by 2 grid on square 1536x1536 canvas.
+Input image: identity, outfit and rendering reference. Keep exactly the same chibi blue whale girl, two-head-tall proportions, same delicate anime rendering, long gradient blue hair, white maid headband, whale-fin ears, large blue whale tail, navy-and-white modest frilly maid dress, apron and tiny shoes.
+IMPORTANT: wide clean transparent gutters and exterior margins, real transparent alpha. One character per cell. Each character including all props must fit inside the central 65% of its cell, with at least 100px clear space from every edge of each 768px cell. Do NOT enlarge characters to fill the canvas. Every ahoge, hair tip, shoe, hand and the whole curved tail must be fully visible. No clipped tail, no pixels from other cells, no disconnected sparkles, no text, no borders, no shadows outside subject.
+Top left: standing in front of a small cute pale-blue computer keyboard at waist height, focused happy face looking down at the keyboard, LEFT hand pressing a key and RIGHT hand raised slightly. Her feet fully visible below her dress. This is typing animation frame A.
+Top right: EXACT SAME position, scale, keyboard, feet, face and hair as top left, but RIGHT hand pressing a key and LEFT hand raised slightly. This is typing animation frame B. Change only hand positions and a tiny delighted smile.
+Bottom left: standing proudly, balancing a small white ceramic rice bowl with a mound of plain white rice on TOP OF HER HEAD above the headband, eyes looking upward at her bowl, tiny hands out to balance. Whole bowl and rice remain clearly visible with transparent space above them. This is bowl-balancing animation frame A.
+Bottom right: EXACT SAME character, position, scale, feet and rice bowl on her head as bottom left, but gently tilted in the opposite direction with an amused smile and hands balancing, bowl stays safely on her head. This is bowl-balancing animation frame B.
+All four feet align at the same baseline inside their cells, same body height and scale. The keyboard should not hide her full dress or feet. Rice bowl is only on the bottom-row characters, not on typing characters.

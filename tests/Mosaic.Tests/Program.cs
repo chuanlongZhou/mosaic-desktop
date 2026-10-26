@@ -6,6 +6,10 @@ using Mosaic.Storage.Json;
 
 if (args.Contains("--desktop-native-status")) { DesktopNativeProbe.Print(); return 0; }
 if (args.Contains("--ui-check")) { await UiLayoutChecks.RunAsync(); return 0; }
+if (args.Contains("--pet-check")) { await DesktopPetTests.Settings(); await DesktopPetTests.Behavior(); await DesktopPetChecks.RunAsync(); return 0; }
+if (args.Contains("--pet-performance-check")) { var index = Array.IndexOf(args, "--perf-report"); await DesktopPetPerformanceChecks.RunAsync(index >= 0 && index + 1 < args.Length ? args[index + 1] : ".artifacts/pet-check/performance-latest.json"); return 0; }
+if (args.Contains("--work-area-notification-probe")) return WorkAreaNotificationChecks.RunProbe();
+if (args.Contains("--work-area-notification-check")) { await WorkAreaNotificationChecks.RunAsync(); return 0; }
 
 if (args.Contains("--dock-probe") || args.Contains("--window-probe-max"))
 {
@@ -17,12 +21,16 @@ if (args.Contains("--dock-probe") || args.Contains("--window-probe-max"))
 var tests = new (string Name, Func<Task> Run)[]
 {
     ("Defaults validate and source-generated JSON round-trips", DefaultsRoundTrip),
+    ("Desktop pet settings migrate and persist concurrent updates", DesktopPetTests.Settings),
+    ("Desktop pet reactions preserve cooldown, priority, idle and key semantics", DesktopPetTests.Behavior),
     ("Appearance and shortcut settings migrate, validate and persist", ExperienceTests.SettingsCompatibility),
+    ("Pinned menu mode persists, serializes rapid toggles and rejects conflicts", ExperienceTests.MenuPinPersistence),
     ("Workspaces retain independent desktop layouts across restart", ExperienceTests.WorkspaceDesktop),
     ("Global shortcut conflicts and cancelled changes preserve bindings", ExperienceTests.HotkeyTransactions),
     ("Hardware monitoring validates available and unavailable sensors", ExperienceTests.HardwareAvailability),
     ("Dock imports taskbar pins, deduplicates and keeps running windows transient", DockChecks),
     ("Desktop Start-menu filter preserves Windows combinations and releases modifiers", StartMenuKeys),
+    ("Work-area notifications keep WPF responsive with WinForms SystemEvents", WorkAreaNotificationChecks.RunAsync),
     ("Overlay restores Windows taskbar on normal exit and forced termination", OverlayRecoveryChecks.RunAsync),
     ("Responsive grids and moves preserve every widget without overlap", GridMoves),
     ("JSON replacement keeps the previous good revision", BackupAndRevision),

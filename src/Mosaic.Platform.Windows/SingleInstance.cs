@@ -26,7 +26,7 @@ public sealed class SingleInstance : IDisposable
             await using var pipe = new NamedPipeClientStream(".", _pipeName, PipeDirection.Out, PipeOptions.Asynchronous);
             using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(2));
             await pipe.ConnectAsync(timeout.Token);
-            if (action is not ("dashboard" or "palette" or "shutdown" or "library" or "workspaces")) return;
+            if (action is not ("dashboard" or "palette" or "shutdown" or "library" or "workspaces" or "pet")) return;
             await pipe.WriteAsync(Encoding.UTF8.GetBytes(action), timeout.Token);
         }
         catch (Exception ex) when (ex is IOException or OperationCanceledException or TimeoutException) { }
@@ -52,7 +52,7 @@ public sealed class SingleInstance : IDisposable
                     count += read;
                 }
                 var action = Encoding.UTF8.GetString(buffer, 0, count);
-                if (action is "dashboard" or "palette" or "shutdown" or "library" or "workspaces") activated(action);
+                if (action is "dashboard" or "palette" or "shutdown" or "library" or "workspaces" or "pet") activated(action);
             }
             catch (OperationCanceledException) { }
             catch (IOException) { await Task.Delay(250, _stop.Token).ConfigureAwait(false); }

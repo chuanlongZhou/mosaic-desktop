@@ -1,0 +1,202 @@
+[
+  {
+    "pose": "Idle",
+    "image": "DeepSeekChibi/idle.png",
+    "rect": [
+      55,
+      149,
+      318,
+      377
+    ]
+  },
+  {
+    "pose": "LookLeft",
+    "image": "DeepSeekChibi/idle.png",
+    "rect": [
+      425,
+      155,
+      303,
+      373
+    ]
+  },
+  {
+    "pose": "LookRight",
+    "image": "DeepSeekChibi/idle.png",
+    "rect": [
+      768,
+      148,
+      302,
+      380
+    ]
+  },
+  {
+    "pose": "LookUp",
+    "image": "DeepSeekChibi/idle.png",
+    "rect": [
+      1118,
+      157,
+      316,
+      372
+    ]
+  },
+  {
+    "pose": "LookDown",
+    "image": "DeepSeekChibi/idle.png",
+    "rect": [
+      65,
+      663,
+      314,
+      365
+    ]
+  },
+  {
+    "pose": "Blink",
+    "image": "DeepSeekChibi/idle.png",
+    "rect": [
+      428,
+      659,
+      307,
+      370
+    ]
+  },
+  {
+    "pose": "Sleep",
+    "image": "DeepSeekChibi/idle.png",
+    "rect": [
+      753,
+      747,
+      338,
+      280
+    ]
+  },
+  {
+    "pose": "Wake",
+    "image": "DeepSeekChibi/idle.png",
+    "rect": [
+      1136,
+      658,
+      303,
+      373
+    ]
+  },
+  {
+    "pose": "Pat",
+    "image": "DeepSeekChibi/social.png",
+    "rect": [
+      31,
+      124,
+      321,
+      374
+    ]
+  },
+  {
+    "pose": "Cheer",
+    "image": "DeepSeekChibi/social.png",
+    "rect": [
+      390,
+      122,
+      311,
+      379
+    ]
+  },
+  {
+    "pose": "Wave",
+    "image": "DeepSeekChibi/social.png",
+    "rect": [
+      750,
+      126,
+      310,
+      373
+    ]
+  },
+  {
+    "pose": "Goodbye",
+    "image": "DeepSeekChibi/social.png",
+    "rect": [
+      1135,
+      125,
+      290,
+      374
+    ]
+  },
+  {
+    "pose": "Eat",
+    "image": "DeepSeekChibi/social.png",
+    "rect": [
+      36,
+      613,
+      316,
+      371
+    ]
+  },
+  {
+    "pose": "Drag",
+    "image": "DeepSeekChibi/social.png",
+    "rect": [
+      398,
+      612,
+      312,
+      341
+    ]
+  },
+  {
+    "pose": "Surprise",
+    "image": "DeepSeekChibi/social.png",
+    "rect": [
+      753,
+      622,
+      319,
+      364
+    ]
+  },
+  {
+    "pose": "Pout",
+    "image": "DeepSeekChibi/social.png",
+    "rect": [
+      1118,
+      613,
+      307,
+      377
+    ]
+  },
+  {
+    "pose": "TypingLeft",
+    "image": "DeepSeekChibi/typing-bowl.png",
+    "rect": [
+      142,
+      140,
+      445,
+      466
+    ]
+  },
+  {
+    "pose": "TypingRight",
+    "image": "DeepSeekChibi/typing-bowl.png",
+    "rect": [
+      708,
+      140,
+      432,
+      466
+    ]
+  },
+  {
+    "pose": "RiceHat",
+    "image": "DeepSeekChibi/typing-bowl.png",
+    "rect": [
+      140,
+      702,
+      442,
+      482
+    ]
+  },
+  {
+    "pose": "RiceHatTilt",
+    "image": "DeepSeekChibi/typing-bowl.png",
+    "rect": [
+      703,
+      702,
+      442,
+      482
+    ]
+  }
+]

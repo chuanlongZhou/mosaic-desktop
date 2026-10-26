@@ -1,0 +1,98 @@
+[
+  {
+    "pose": "WalkA",
+    "image": "DeepSeekStandard/motion.png",
+    "rect": [
+      62,
+      11,
+      415,
+      517
+    ],
+    "anchor": [
+      300.5,
+      99.5
+    ],
+    "target": [
+      340,
+      116
+    ],
+    "scale": 0.8582375478927203
+  },
+  {
+    "pose": "WalkB",
+    "image": "DeepSeekStandard/motion.png",
+    "rect": [
+      521,
+      12,
+      384,
+      522
+    ],
+    "anchor": [
+      271.5,
+      98
+    ],
+    "target": [
+      340,
+      116
+    ],
+    "scale": 0.8582375478927203
+  },
+  {
+    "pose": "WalkC",
+    "image": "DeepSeekStandard/motion.png",
+    "rect": [
+      993,
+      17,
+      424,
+      511
+    ],
+    "anchor": [
+      308,
+      97.5
+    ],
+    "target": [
+      340,
+      116
+    ],
+    "scale": 0.8582375478927203
+  },
+  {
+    "pose": "WalkD",
+    "image": "DeepSeekStandard/motion.png",
+    "rect": [
+      64,
+      547,
+      403,
+      519
+    ],
+    "anchor": [
+      267,
+      94
+    ],
+    "target": [
+      340,
+      116
+    ],
+    "scale": 0.8582375478927203
+  },
+  {
+    "pose": "GreetA",
+    "image": "DeepSeekStandard/motion.png",
+    "rect": [
+      580,
+      550,
+      384,
+      512
+    ]
+  },
+  {
+    "pose": "GreetB",
+    "image": "DeepSeekStandard/motion.png",
+    "rect": [
+      1029,
+      550,
+      389,
+      511
+    ]
+  }
+]

@@ -34,11 +34,14 @@ public sealed class ShortcutBinding
 
 public sealed class ShortcutSettings
 {
+    private ShortcutBinding _pinMenuBar = new() { Key = 0x54 };
+    private bool _pinMenuBarSpecified;
     public ShortcutBinding Desktop { get; set; } = new() { Key = 0x4D };
     public ShortcutBinding Dashboard { get; set; } = new() { Key = 0x44 };
     public ShortcutBinding Library { get; set; } = new() { Key = 0x4C };
     public ShortcutBinding Workspaces { get; set; } = new() { Key = 0x57 };
     public ShortcutBinding EditLayout { get; set; } = new() { Key = 0x47 };
+    public ShortcutBinding PinMenuBar { get => _pinMenuBar; set { _pinMenuBar = value; _pinMenuBarSpecified = true; } }
     public IEnumerable<(string Action, string Label, ShortcutBinding Binding)> Entries()
     {
         yield return ("desktop", "切换桌面模式", Desktop);
@@ -46,6 +49,14 @@ public sealed class ShortcutSettings
         yield return ("library", "打开资源库", Library);
         yield return ("workspaces", "打开工作空间", Workspaces);
         yield return ("edit", "编辑桌面布局", EditLayout);
+        yield return ("menu-pin", "固定／取消固定顶部菜单", PinMenuBar);
+    }
+    internal void MigrateMenuPin(uint searchModifiers, uint searchKey, bool searchEnabled)
+    {
+        // A newly added default must not invalidate an older user's custom key.
+        if (_pinMenuBarSpecified) return;
+        if (Entries().Any(x => !ReferenceEquals(x.Binding, PinMenuBar) && x.Binding is { Enabled: true } && x.Binding.Identity == PinMenuBar.Identity) ||
+            (searchEnabled && PinMenuBar.Identity == $"{searchModifiers}:{searchKey}")) PinMenuBar.Enabled = false;
     }
     public void Validate(uint searchModifiers, uint searchKey, bool searchEnabled)
     {

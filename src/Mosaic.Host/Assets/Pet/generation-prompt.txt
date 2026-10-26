@@ -1,0 +1,11 @@
+Use case: stylized-concept
+Asset type: production transparent desktop pet sprite atlas, 4 columns by 4 rows, square 2048x2048 canvas. Each equal cell 512x512. No grid lines, no text.
+Primary request: a consistent adorable two-head-tall chibi DeepSeek fan whale girl (鲸鱼娘 / 蓝色大肥鱼). Long ocean-blue hair fading to pale cyan at tips, one curved ahoge, small dark-blue whale fin ears, big blue whale tail visible behind her, navy and white modest frilly maid dress with white apron and white headband, large expressive blue eyes, tiny shoes. Wholesome silly cute expression, rosy cheeks. Beautiful polished anime sticker illustration with clean soft dark-blue outlines and delicate cel shading. The SAME character and outfit in all sixteen cells.
+Scene/backdrop: actual transparent alpha. No environment, no floor, no background, no shadows outside character, no lettering or labels.
+Composition/framing: exactly 4x4 regular square cells. One full body character per cell, centered horizontally at the same scale (about 340px tall), aligned feet at y=440 within every cell. Keep whole character and tail entirely within each cell with at least 50px clear space between characters; generous transparent margins. No overlapping cells. Front-facing three-quarter cute chibi.
+Cell order left to right, top to bottom:
+row1: 1 neutral friendly idle facing viewer; 2 looking left with face and blue pupils clearly turned left; 3 looking right; 4 looking upward with blue pupils up.
+row2: 5 looking down; 6 eyes closed happy blink standing; 7 being patted, eyes squeezed happy, blushing with hands against cheeks; 8 joyful celebration, both hands raised and delighted eyes.
+row3: 9 waving hello with one hand; 10 waving goodbye gently with a tilted head; 11 sleeping curled slightly with closed eyes and cheek resting on hands; 12 waking up, stretching with sleepy eyes.
+row4: 13 holding a small white bowl of plain white rice and chopsticks, eating happily; 14 picked up / dangling, surprised little hands out and dangling feet; 15 surprised round eyes with hands up; 16 playful proud pout, hands on hips.
+Constraints: same identity, same scale, same aligned feet, no other characters, no human hands, no text, no watermark, no panel borders. Maintain perfectly transparent background including between cells.

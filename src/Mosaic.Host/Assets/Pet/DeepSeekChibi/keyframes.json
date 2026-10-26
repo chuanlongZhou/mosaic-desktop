@@ -1,0 +1,22 @@
+[
+  {
+    "pose": "TiredYawn",
+    "image": "DeepSeekChibi/keyframes.png",
+    "rect": [
+      145,
+      66,
+      683,
+      775
+    ]
+  },
+  {
+    "pose": "BegReach",
+    "image": "DeepSeekChibi/keyframes.png",
+    "rect": [
+      1016,
+      68,
+      679,
+      772
+    ]
+  }
+]

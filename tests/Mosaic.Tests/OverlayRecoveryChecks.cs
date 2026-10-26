@@ -9,7 +9,8 @@ internal static class OverlayRecoveryChecks
     public static async Task RunAsync()
     {
         var taskbar = FindWindow("Shell_TrayWnd", null);
-        if (taskbar == 0 || !IsWindowVisible(taskbar)) throw new Exception("Run shell recovery verification from Windows mode with a visible taskbar.");
+        if (taskbar == 0 || (!IsWindowVisible(taskbar) && (AppBarReservation.TaskbarState() & 1) == 0) || HasTrayService())
+            throw new Exception("Run shell recovery verification from Windows mode without another Mosaic notification-area service.");
         var executable = Path.GetFullPath(@"src\Mosaic.Host\bin\Release\net10.0-windows\Mosaic.exe");
         var data = Path.Combine(Path.GetTempPath(), "Mosaic.Tests", Guid.NewGuid().ToString("N"));
         var originalAreas = ShellWorkArea.Capture();
@@ -37,6 +38,24 @@ internal static class OverlayRecoveryChecks
             try
             {
                 await Until(() => !IsWindowVisible(taskbar), "Overlay did not hide the Windows taskbar.");
+                {
+                    var intermediateTops = new HashSet<int>();
+                    for (var sample = 0; sample < 200; sample++)
+                    {
+                        var menu = FindWindow(null, "Mosaic · 时间与菜单栏");
+                        if (menu != 0 && IsWindowVisible(menu))
+                        {
+                            var screen = System.Windows.Forms.Screen.FromHandle(menu);
+                            var fullHeight = (int)Math.Ceiling(ShellWorkArea.BarHeight * Math.Max(96, GetDpiForWindow(menu)) / 96.0);
+                            var area = ShellWorkArea.Capture().First(a => a.Left == screen.Bounds.Left && a.Right == screen.Bounds.Right);
+                            if (area.Top > screen.Bounds.Top && area.Top < screen.Bounds.Top + fullHeight) intermediateTops.Add(area.Top);
+                            if (area.Top == screen.Bounds.Top + fullHeight) break;
+                        }
+                        await Task.Delay(10);
+                    }
+                    if (intermediateTops.Count < 2) throw new Exception($"The running overlay did not animate real Windows work-area boundaries; observed {intermediateTops.Count} intermediate positions.");
+                    Console.WriteLine($"  running overlay: {intermediateTops.Count} distinct intermediate Windows work-area boundaries during menu reveal.");
+                }
                 // Each visible menu reserves its own monitor; a hidden menu gives
                 // the space back. The periodic shell refresh must preserve both.
                 bool MenuWorkAreasMatch()
@@ -102,8 +121,12 @@ internal static class OverlayRecoveryChecks
                             throw new Exception($"Maximized app does not fit work area: top/bottom {frame.Top}/{frame.Bottom}, expected {area.Top}/{area.Bottom}.");
                         var dock = FindWindow(null, "Mosaic · Dock");
                         if (dock == 0 || (GetWindowLongPtr(dock, -20).ToInt64() & 8) == 0) throw new Exception("Dock lost topmost state while another application was maximized.");
-                        var hit = WindowFromPoint(new NativePoint { X = frame.Left + 150, Y = frame.Top + 180 });
-                        if (GetAncestor(hit, 2) != probe.MainWindowHandle) throw new Exception("A desktop control covers the maximized application.");
+                        // Process startup may not receive foreground permission.
+                        // Raise only the fixture among ordinary windows; a wrongly
+                        // topmost desktop canvas would still cover it and fail.
+                        SetWindowPos(probe.MainWindowHandle, 0, 0, 0, 0, 0, 0x4013);
+                        await Until(() => GetAncestor(WindowFromPoint(new NativePoint { X = frame.Left + 150, Y = frame.Top + 180 }), 2) == probe.MainWindowHandle,
+                            "The raised maximized application is covered at the desktop canvas test point.");
                         using var managementRequest = Launch("--dashboard");
                         await Until(() => { var handle = FindWindow(null, "Mosaic · 设置中心"); return handle != 0 && IsWindowVisible(handle); }, "Management activation was blocked by shell layout updates.");
                         Console.WriteLine($"  Explorer child canvas stays behind maximized app; work area {area.Top}–{area.Bottom}; Dock retains topmost style.");
@@ -112,7 +135,7 @@ internal static class OverlayRecoveryChecks
                 }
                 using var exit = Launch("--exit");
                 await normal.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(10));
-                await Until(() => IsWindowVisible(taskbar), "Normal exit did not restore the taskbar.");
+                await Until(() => IsWindowVisible(taskbar) || (AppBarReservation.TaskbarState() & 1) != 0, "Normal exit did not restore the taskbar.");
                 if (!IsWindowVisible(desktopView) || !IsWindowVisible(icons)) throw new Exception("Normal exit did not preserve the desktop view and restore its icons.");
                 await Until(() => ShellWorkArea.Capture().SequenceEqual(originalAreas), "Normal exit did not restore work areas.");
                 if (AppBarReservation.TaskbarState() != originalTaskbarState) throw new Exception("Normal exit did not restore the original taskbar auto-hide setting.");
@@ -126,7 +149,7 @@ internal static class OverlayRecoveryChecks
                 await Until(() => !IsWindowVisible(taskbar), "Overlay did not hide the taskbar before crash verification.");
                 await Until(HasTrayService, "Notification area did not start before crash verification.");
                 crashed.Kill(); await crashed.WaitForExitAsync();
-                await Until(() => IsWindowVisible(taskbar), "Guard did not restore the taskbar after forced termination.");
+                await Until(() => IsWindowVisible(taskbar) || (AppBarReservation.TaskbarState() & 1) != 0, "Guard did not restore the taskbar after forced termination.");
                 await Until(() => ShellWorkArea.Capture().SequenceEqual(originalAreas), "Guard did not restore work areas after termination.");
                 if (AppBarReservation.TaskbarState() != originalTaskbarState) throw new Exception("Guard did not restore the original taskbar auto-hide setting.");
             }
@@ -148,6 +171,8 @@ internal static class OverlayRecoveryChecks
     [DllImport("user32.dll")] private static extern bool IsWindowVisible(nint window);
     [DllImport("user32.dll")] private static extern bool IsZoomed(nint window);
     [DllImport("user32.dll")] private static extern bool GetWindowRect(nint window, out ShellWorkArea.Rect rect);
+    [DllImport("user32.dll")] private static extern uint GetDpiForWindow(nint window);
+    [DllImport("user32.dll")] private static extern bool SetWindowPos(nint window, nint after, int x, int y, int width, int height, uint flags);
     [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW")] private static extern nint GetWindowLongPtr(nint window, int index);
     [DllImport("dwmapi.dll")] private static extern int DwmGetWindowAttribute(nint window, int attribute, out ShellWorkArea.Rect rect, int size);
 }

@@ -54,15 +54,41 @@ public sealed class AppServices(JsonDocumentStore store)
         await StateGate.WaitAsync();
         try
         {
-            if (candidate.CurrentWorkspaceId != Settings.CurrentWorkspaceId) throw new InvalidOperationException("请使用工作空间切换入口修改当前工作空间。");
-            candidate.Validate();
-            using var hotkeys = ReserveHotkeys?.Invoke(candidate);
-            await Store.SaveAsync(ProfilePath + "settings.json", candidate, MosaicJsonContext.Configured.AppSettings);
-            hotkeys?.Commit();
-            Settings = candidate;
-            SettingsChanged?.Invoke(this, EventArgs.Empty);
+            await CommitSettingsAsync(candidate);
         }
         finally { StateGate.Release(); }
+    }
+
+    public async Task ToggleMenuBarPinAsync()
+    {
+        await StateGate.WaitAsync();
+        try
+        {
+            var candidate = CopySettings();
+            candidate.Desktop.MenuBarAutoHide = !candidate.Desktop.MenuBarAutoHide;
+            await CommitSettingsAsync(candidate);
+        }
+        finally { StateGate.Release(); }
+    }
+    public async Task UpdatePetAsync(Action<DesktopPetSettings> update)
+    {
+        await StateGate.WaitAsync();
+        try
+        {
+            var candidate = CopySettings(); update(candidate.Pet);
+            await CommitSettingsAsync(candidate);
+        }
+        finally { StateGate.Release(); }
+    }
+    private async Task CommitSettingsAsync(AppSettings candidate)
+    {
+        if (candidate.CurrentWorkspaceId != Settings.CurrentWorkspaceId) throw new InvalidOperationException("请使用工作空间切换入口修改当前工作空间。");
+        candidate.Validate();
+        using var hotkeys = ReserveHotkeys?.Invoke(candidate);
+        await Store.SaveAsync(ProfilePath + "settings.json", candidate, MosaicJsonContext.Configured.AppSettings);
+        hotkeys?.Commit();
+        Settings = candidate;
+        SettingsChanged?.Invoke(this, EventArgs.Empty);
     }
     public async Task SaveWorkspaceAsync(WorkspaceDocument candidate)
     {

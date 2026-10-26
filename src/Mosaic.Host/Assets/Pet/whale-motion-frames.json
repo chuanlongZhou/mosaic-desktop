@@ -1,0 +1,98 @@
+[
+  {
+    "pose": "WalkA",
+    "image": "whale-motion.png",
+    "rect": [
+      60,
+      117,
+      362,
+      418
+    ],
+    "anchor": [
+      270,
+      168.5
+    ],
+    "target": [
+      346,
+      210
+    ],
+    "scale": 1.0442890442890442
+  },
+  {
+    "pose": "WalkB",
+    "image": "whale-motion.png",
+    "rect": [
+      550,
+      115,
+      346,
+      423
+    ],
+    "anchor": [
+      258.5,
+      170
+    ],
+    "target": [
+      346,
+      210
+    ],
+    "scale": 1.0442890442890442
+  },
+  {
+    "pose": "WalkC",
+    "image": "whale-motion.png",
+    "rect": [
+      1035,
+      113,
+      352,
+      421
+    ],
+    "anchor": [
+      261,
+      171.5
+    ],
+    "target": [
+      346,
+      210
+    ],
+    "scale": 1.0442890442890442
+  },
+  {
+    "pose": "WalkD",
+    "image": "whale-motion.png",
+    "rect": [
+      67,
+      587,
+      356,
+      429
+    ],
+    "anchor": [
+      264.5,
+      171.5
+    ],
+    "target": [
+      346,
+      210
+    ],
+    "scale": 1.0442890442890442
+  },
+  {
+    "pose": "GreetA",
+    "image": "whale-motion.png",
+    "rect": [
+      560,
+      618,
+      379,
+      404
+    ]
+  },
+  {
+    "pose": "GreetB",
+    "image": "whale-motion.png",
+    "rect": [
+      1051,
+      618,
+      377,
+      404
+    ]
+  }
+]

@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Input;
@@ -7,6 +7,8 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Globalization;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 using ManagedShell.WindowsTray;
 using Mosaic.Core.Commands;
 using Mosaic.Host.Services;
@@ -30,9 +32,26 @@ public partial class DesktopBarWindow : Window
     private bool HasOpenMenu => _menu?.IsOpen == true || _statusPopup?.IsOpen == true || SystemTrayService.IsNativeMenuOpen();
     private bool? _autoHide;
     private bool _autoHideAllowed;
-    private bool CanAutoHide => _autoHide == true && _autoHideAllowed;
+    private bool? _targetCollapsed;
+    private bool _closing;
+    private int _transitionVersion;
+    private readonly TranslateTransform _slide = new();
+    private static readonly DependencyProperty RevealProperty = DependencyProperty.Register("Reveal", typeof(double), typeof(DesktopBarWindow),
+        new PropertyMetadata(0.0, (target, args) => ((DesktopBarWindow)target).ApplyReveal((double)args.NewValue)));
+    private double Reveal => (double)GetValue(RevealProperty);
+    private bool? _windowsKeyPinned;
+    public void SetWindowsKeyPinned(bool pinned)
+    {
+        _windowsKeyPinned = pinned;
+        _hideTimer.Stop();
+        SetCollapsed(!pinned && CanAutoHide);
+        if (pinned) EnsureTopmost();
+    }
+    private bool CanAutoHide => _windowsKeyPinned is bool pinned ? !pinned : _autoHide == true && _autoHideAllowed;
     public bool IsAutoHidden { get; private set; }
-    public bool ReservesWorkArea => _reservation is not null;
+    public bool IsTransitioning { get; private set; }
+    public double ReservedHeight { get; private set; }
+    public bool ReservesWorkArea => ReservedHeight > 0;
     public event Action? WorkAreaChanged;
     public void SetAutoHideAllowed(bool allowed)
     {
@@ -45,6 +64,8 @@ public partial class DesktopBarWindow : Window
     public DesktopBarWindow(AppServices services, Func<CommandRequest, Task> execute, Forms.Screen screen, bool hostNotificationArea = false)
     {
         _services = services; _execute = execute; _screen = screen; InitializeComponent();
+        BarContent.RenderTransform = _slide;
+        UiEffects.MotionPreferenceChanged += OnMotionPreferenceChanged;
         Loaded += (_, _) =>
         {
             RefreshConfiguration(); UpdateTime();
@@ -66,13 +87,16 @@ public partial class DesktopBarWindow : Window
         };
         _edgeTimer.Tick += (_, _) =>
         {
-            if (!CanAutoHide || !IsAutoHidden) return;
+            if (!CanAutoHide || _targetCollapsed != true) return;
             var cursor = Forms.Cursor.Position; var bounds = _screen.Bounds;
             if (cursor.X >= bounds.Left && cursor.X < bounds.Right && cursor.Y >= bounds.Top && cursor.Y < bounds.Top + 6) SetCollapsed(false);
         };
         _edgeTimer.Start();
         Closed += (_, _) =>
         {
+            _closing = true; _transitionVersion++;
+            UiEffects.MotionPreferenceChanged -= OnMotionPreferenceChanged;
+            BeginAnimation(RevealProperty, null); IsTransitioning = false;
             if (_statusPopup is not null) _statusPopup.IsOpen = false;
             _systemTray?.Dispose(); _timer.Stop(); _hideTimer.Stop(); _edgeTimer.Stop();
             ReleaseWorkArea();
@@ -80,7 +104,13 @@ public partial class DesktopBarWindow : Window
     }
     public void RefreshConfiguration()
     {
-        if (!IsLoaded || _autoHide == _services.Settings.Desktop.MenuBarAutoHide) return;
+        if (!IsLoaded) return;
+        var pinned = !_services.Settings.Desktop.MenuBarAutoHide;
+        PinMenuButton.Content = pinned ? "已固定" : "固定";
+        PinMenuButton.SetResourceReference(ForegroundProperty, pinned ? "AccentBrush" : "MutedBrush");
+        if (pinned) PinMenuButton.SetResourceReference(BackgroundProperty, "SelectionBrush"); else PinMenuButton.Background = Brushes.Transparent;
+        PinMenuButton.ToolTip = (pinned ? "取消固定，恢复自动隐藏" : "固定顶部菜单，保持显示并预留空间") + " · " + NativeShell.DescribeHotkey(_services.Settings.Shortcuts.PinMenuBar);
+        if (_autoHide == _services.Settings.Desktop.MenuBarAutoHide) return;
         _autoHide = _services.Settings.Desktop.MenuBarAutoHide;
         _hideTimer.Stop();
         SetCollapsed(CanAutoHide && !IsMouseOver && !HasOpenMenu);
@@ -89,42 +119,90 @@ public partial class DesktopBarWindow : Window
     {
         if (_reservation is null) return;
         var reservation = _reservation; _reservation = null;
+        ReservedHeight = 0;
         reservation.Dispose();
         WorkAreaChanged?.Invoke();
     }
     private void SetCollapsed(bool collapsed)
     {
         collapsed &= CanAutoHide;
-        IsAutoHidden = collapsed;
-        Height = ShellWorkArea.BarHeight;
-        BarContent.Visibility = collapsed ? Visibility.Collapsed : Visibility.Visible;
-        var handle = new WindowInteropHelper(this).Handle;
-        var scale = Math.Max(96, GetDpiForWindow(handle)) / 96.0;
-        var bounds = _screen.Bounds;
-        // Hide the HWND completely: even a transparent activation strip can retain a compositor border.
-        // The edge timer detects the pointer independently of the window's visibility.
-        if (collapsed)
+        if (_closing) return;
+        if (_targetCollapsed == collapsed)
         {
-            SetWindowPos(handle, new nint(-1), bounds.Left, bounds.Top, bounds.Width, (int)Math.Ceiling(ShellWorkArea.BarHeight * scale), 0x10);
-            Hide();
-            ReleaseWorkArea();
+            if (!collapsed && (!IsVisible || WindowState == WindowState.Minimized)) ApplyReveal(Reveal);
+            return;
         }
+        _targetCollapsed = collapsed;
+        var target = collapsed ? 0.0 : 1.0;
+        // Preserve the current animated value before replacing its clock. A rapid
+        // hover/desktop change reverses from this position instead of jumping.
+        var current = Reveal;
+        SetValue(RevealProperty, current);
+        BeginAnimation(RevealProperty, null);
+        var version = ++_transitionVersion;
+        IsAutoHidden = false;
+        if (!UiEffects.Enabled || Math.Abs(current - target) < .001) FinishReveal(target);
         else
         {
-            // Even a temporary edge reveal owns screen space. Reserve it before
-            // showing the bar so maximized title bars and close buttons stay below it.
-            if (_reservation is null)
-            {
-                _reservation = new AppBarReservation(handle, bounds);
-                WorkAreaChanged?.Invoke();
-            }
-            if (WindowState == WindowState.Minimized) WindowState = WindowState.Normal;
-            if (!IsVisible) Show();
-            SetWindowPos(handle, new nint(-1), bounds.Left, bounds.Top, bounds.Width, (int)Math.Ceiling(ShellWorkArea.BarHeight * scale), 0x50);
+            IsTransitioning = true;
+            ApplyReveal(current);
+            var animation = new DoubleAnimation(current, target, TimeSpan.FromMilliseconds((collapsed ? 220 : 280) * Math.Abs(target - current)))
+            { EasingFunction = new CubicEase { EasingMode = EasingMode.EaseInOut } };
+            animation.Completed += (_, _) => { if (!_closing && version == _transitionVersion) FinishReveal(target); };
+            BeginAnimation(RevealProperty, animation, HandoffBehavior.SnapshotAndReplace);
         }
         if (!collapsed && CanAutoHide) { _hideTimer.Stop(); _hideTimer.Start(); }
     }
-    private void OnMouseEnter(object sender, MouseEventArgs e) { _hideTimer.Stop(); if (IsAutoHidden) SetCollapsed(false); }
+    private void OnMotionPreferenceChanged()
+    {
+        if (!UiEffects.Enabled && IsTransitioning && !_closing)
+        {
+            _transitionVersion++;
+            FinishReveal(_targetCollapsed == true ? 0 : 1);
+        }
+    }
+    private void FinishReveal(double target)
+    {
+        SetValue(RevealProperty, target);
+        BeginAnimation(RevealProperty, null);
+        IsTransitioning = false;
+        ApplyReveal(target);
+        IsAutoHidden = target == 0;
+    }
+    private void ApplyReveal(double progress)
+    {
+        if (_closing || !IsLoaded) return;
+        var height = ShellWorkArea.BarHeight * Math.Clamp(progress, 0, 1);
+        var handle = new WindowInteropHelper(this).Handle;
+        var scale = Math.Max(96, GetDpiForWindow(handle)) / 96.0;
+        var bounds = _screen.Bounds;
+        if (height == 0 && _targetCollapsed == true)
+        {
+            Hide();
+            Height = 1 / scale;
+            _slide.Y = -ShellWorkArea.BarHeight;
+            SetWindowPos(handle, new nint(-1), bounds.Left, bounds.Top, bounds.Width, 1, 0x10);
+            BarContent.Visibility = Visibility.Collapsed;
+            ReleaseWorkArea();
+            return;
+        }
+        // Clip a full-size bar while sliding it down from above the monitor. Its
+        // visible bottom and the real Windows work-area boundary move together.
+        Height = Math.Max(1 / scale, height);
+        _slide.Y = height - ShellWorkArea.BarHeight;
+        BarContent.Visibility = Visibility.Visible;
+        if (_reservation is null) _reservation = new AppBarReservation(handle, bounds, height, moveWindow: false);
+        else _reservation.SetHeight(height);
+        if (ReservedHeight != height)
+        {
+            ReservedHeight = height;
+            WorkAreaChanged?.Invoke();
+        }
+        if (WindowState == WindowState.Minimized) WindowState = WindowState.Normal;
+        if (!IsVisible) Show();
+        SetWindowPos(handle, new nint(-1), bounds.Left, bounds.Top, bounds.Width, Math.Max(1, (int)Math.Ceiling(height * scale)), 0x50);
+    }
+    private void OnMouseEnter(object sender, MouseEventArgs e) { _hideTimer.Stop(); if (_targetCollapsed == true) SetCollapsed(false); }
     private void OnMouseLeave(object sender, MouseEventArgs e) { if (CanAutoHide) { _hideTimer.Stop(); _hideTimer.Start(); } }
     private void UpdateTime()
     {
@@ -148,6 +226,7 @@ public partial class DesktopBarWindow : Window
     private void OpenStatusPopup(FrameworkElement target, UIElement content)
     {
         if (_statusPopup?.IsOpen == true) { _statusPopup.IsOpen = false; return; }
+        SetCollapsed(false);
         _hideTimer.Stop();
         _statusPopup = new Popup { PlacementTarget = target, Placement = PlacementMode.Bottom, StaysOpen = false, AllowsTransparency = true,
             Child = new Border { Background = (System.Windows.Media.Brush)FindResource("PanelBrush"), BorderBrush = System.Windows.Media.Brushes.SlateGray,
@@ -182,7 +261,7 @@ public partial class DesktopBarWindow : Window
     private void OnTrayMouseDown(object sender, MouseButtonEventArgs e)
     {
         if (TrayIcon(sender) is not { } icon) return;
-        _hideTimer.Stop(); _systemTray?.SetPlacement((FrameworkElement)sender);
+        SetCollapsed(false); _hideTimer.Stop(); _systemTray?.SetPlacement((FrameworkElement)sender);
         var element = (FrameworkElement)sender;
         var r = element.PointToScreen(new Point());
         var bottom = element.PointToScreen(new Point(element.ActualWidth, element.ActualHeight));
@@ -197,11 +276,14 @@ public partial class DesktopBarWindow : Window
     private void OnTrayMouseLeave(object sender, MouseEventArgs e) => TrayIcon(sender)?.IconMouseLeave(MousePosition());
     private void OnTrayKeyboardClick(object sender, RoutedEventArgs e)
     {
+        SetCollapsed(false); _hideTimer.Stop();
         TrayIcon(sender)?.IconMouseDown(MouseButton.Left, MousePosition(), (int)GetDoubleClickTime());
         TrayIcon(sender)?.IconMouseUp(MouseButton.Left, MousePosition(), (int)GetDoubleClickTime());
+        if (CanAutoHide) _hideTimer.Start();
     }
     private void OnInputLanguageClick(object sender, RoutedEventArgs e)
     {
+        SetCollapsed(false);
         var target = _inputTarget;
         var menu = new ContextMenu { PlacementTarget = InputLanguageButton };
         foreach (Forms.InputLanguage language in Forms.InputLanguage.InstalledInputLanguages)
@@ -226,12 +308,23 @@ public partial class DesktopBarWindow : Window
     public void EnsureTopmost() { if (IsVisible) NativeShell.KeepAbove(new WindowInteropHelper(this).Handle); }
     private async void OnSearchClick(object sender, RoutedEventArgs e) => await _execute(new("palette.toggle"));
     private async void OnSettingsClick(object sender, RoutedEventArgs e) => await _execute(new("dashboard.open"));
+    private async void OnPinMenuClick(object sender, RoutedEventArgs e)
+    {
+        PinMenuButton.IsEnabled = false;
+        try { await _execute(new("menubar.pin.toggle")); }
+        finally { PinMenuButton.IsEnabled = true; RefreshConfiguration(); }
+    }
     private void OnMenuClick(object sender, RoutedEventArgs e)
     {
+        SetCollapsed(false);
         var menu = new ContextMenu { PlacementTarget = (Button)sender };
         ((Button)sender).ContextMenu = menu;
         _menu = menu; _hideTimer.Stop();
         menu.Closed += (_, _) => { if (CanAutoHide) { _hideTimer.Stop(); _hideTimer.Start(); } };
+        var pin = new MenuItem { Header = "固定顶部菜单", IsCheckable = true, IsChecked = !_services.Settings.Desktop.MenuBarAutoHide,
+            InputGestureText = NativeShell.DescribeHotkey(_services.Settings.Shortcuts.PinMenuBar) };
+        pin.Click += async (_, _) => await _execute(new("menubar.pin.toggle"));
+        menu.Items.Add(pin); menu.Items.Add(new Separator());
         foreach (var (title, command) in new[] { ("设置与桌面组件", "dashboard.open"), ("编辑桌面布局", "desktop.edit"), ("资源库", "library.open"), ("工作空间", "workspaces.open"), ("切回 Windows", "desktop.toggle"), ("退出 Mosaic", "app.exit") })
         {
             var item = new MenuItem { Header = title }; item.Click += async (_, _) => await _execute(new(command)); menu.Items.Add(item);

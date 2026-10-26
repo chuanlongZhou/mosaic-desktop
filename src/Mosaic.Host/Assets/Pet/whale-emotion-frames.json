@@ -1,0 +1,32 @@
+[
+  {
+    "pose": "Tired",
+    "image": "whale-emotions.png",
+    "rect": [
+      56,
+      180,
+      532,
+      579
+    ]
+  },
+  {
+    "pose": "BegTokens",
+    "image": "whale-emotions.png",
+    "rect": [
+      631,
+      176,
+      538,
+      585
+    ]
+  },
+  {
+    "pose": "TokenDazed",
+    "image": "whale-emotions.png",
+    "rect": [
+      1203,
+      212,
+      557,
+      541
+    ]
+  }
+]

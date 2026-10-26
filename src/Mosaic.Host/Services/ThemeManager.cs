@@ -28,7 +28,7 @@ public static class ThemeManager
     public static void Apply(AppearanceSettings settings)
     {
         settings.Validate(); Current = settings;
-        UiEffects.Enabled = settings.AnimationsEnabled && SystemParameters.ClientAreaAnimation;
+        UiEffects.Enabled = settings.AnimationsEnabled;
         var palette = settings.Theme switch
         {
             "Light" => new[] { "#F3F6FA", "#FFFFFF", "#E8EEF6", "#D2DCE8", "#172A40", "#52677F", "#EAF0F7", "#FFFFFF" },

@@ -13,10 +13,18 @@
 
 V0.8.1 起按新的交互要求更新占位行为：顶部菜单只要展开（包括边缘临时唤出）就注册 AppBar，预留 32 DIP 工作区；最大化窗口同步适配到菜单下方，已有普通窗口的标题栏保持可达。收起和关闭时注销并释放空间。每块屏幕分别记录菜单可见状态，定时工作区维护不会覆盖这一状态。Dock 仍保留原有呼出行为。
 
+V0.8.2 将菜单滑动和占位高度同步缓动（展开约 280ms、收起约 220ms），中途唤回会从当前位置反向。外观动画关闭时立即切换；过渡期间退出仍完整释放占位。
+
 在 Mosaic 桌面覆盖模式内，专用线程安装临时 `WH_KEYBOARD_LL`：单按左/右 Win 时使用无功能菜单屏蔽键并正确释放 Win，保留 Win+D、Win+E、Win+方向键等组合；Ctrl+Esc 也被拦截，Ctrl+Shift+Esc 和普通 Esc 不受影响。切回 Windows 或退出时卸载钩子，不写系统键位注册表。主进程被结束后，系统会清理进程的钩子。
 
 验证包括桌面/有无最大化应用的策略组合、真实窗口最大化/最小化/隐藏判断、Dock/顶部栏的展开与延迟收起、取消旧隐藏计时、菜单展开保护、最大化应用场景下的原生顶部栏隐藏、Win 按键序列与组合键保留，以及钩子安装、卸载、重新安装。自动检查不发送真实 Win 按键，也不把这些检查描述为物理键盘的端到端验收。
 
-V0.7 当时的验证为 Release 构建 0 警告、0 错误，完整检查 29/29 通过；对应历史运行包为 `artifacts/Mosaic-v0.7.0-win-x64`。当前 V0.8.1 的完整验证记录为 33/33，新增功能与范围见 [V0.8／V0.8.1 指南](EXPERIENCE_V0.8.md)。
+V0.7 当时的验证为 Release 构建 0 警告、0 错误，完整检查 29/29 通过；对应历史运行包为 `artifacts/Mosaic-v0.7.0-win-x64`。当前 V0.8.3 的完整验证记录为 34/34，新增功能与范围见 [V0.8 系列指南](EXPERIENCE_V0.8.md)。
 
 参考：[Microsoft 键盘钩子回调](https://learn.microsoft.com/en-us/windows/win32/winmsg/lowlevelkeyboardproc)、[DWM cloaked 窗口](https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/ne-dwmapi-dwmwindowattribute)、[AutoHotkey 菜单屏蔽键说明](https://raw.githubusercontent.com/AutoHotkey/AutoHotkeyDocs/v2/docs/lib/A_MenuMaskKey.htm)。
+
+## V0.8.14 Win 显示开关
+
+Mosaic 桌面模式下，单按左／右 Win 同时展开 Dock 和所有屏幕的顶部菜单，并保持显示，鼠标移开不会自动隐藏；再次单按 Win 收起，之后仍可从屏幕边缘唤出。长按只在松开时切换一次。Win+D、Win+E 等组合键保留，Ctrl+Esc 继续拦截开始菜单。切回 Windows 或退出后解除拦截；该显示状态不写入配置。
+
+Win 手动保持显示优先于场景自动隐藏策略；再次收起后进入可从边缘唤出的状态。退出桌面覆盖时重置手动状态。

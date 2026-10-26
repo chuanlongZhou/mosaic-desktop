@@ -1,0 +1,32 @@
+[
+  {
+    "pose": "Tired",
+    "image": "DeepSeekStandard/emotions.png",
+    "rect": [
+      115,
+      170,
+      450,
+      617
+    ]
+  },
+  {
+    "pose": "BegTokens",
+    "image": "DeepSeekStandard/emotions.png",
+    "rect": [
+      705,
+      175,
+      450,
+      614
+    ]
+  },
+  {
+    "pose": "TokenDazed",
+    "image": "DeepSeekStandard/emotions.png",
+    "rect": [
+      1222,
+      313,
+      450,
+      461
+    ]
+  }
+]

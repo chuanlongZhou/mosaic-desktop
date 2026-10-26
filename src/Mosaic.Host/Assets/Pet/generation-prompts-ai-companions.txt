@@ -1,0 +1,197 @@
+Built-in image_gen; transparent_background=true. Right-side chibi from each reference.
+Gpt/idle.png
+Reference: References/openai-reference.png
+Use case: stylized-concept. Production transparent desktop-pet sprite sheet, not an identity reference sheet. Input image is ONLY identity, costume and art-style reference. Preserve ONLY the RIGHT CHIBI character. GPT WHITE DRAGON girl, use only the RIGHT CHIBI identity from the reference. Long silver-white hair with very pale lavender shading, lavender eyes, two white curved dragon horns with gold/silver knot ornament, white dragon wings and white scaled dragon tail, modest fully closed high-collar flowing WHITE gown with silver geometric knots and light gold tassel details, white shoes. Calm, clever, gently confident and considerate personality. Never green hair, glasses, maid apron or cat ears.
+Exactly NINE separate full-body 2.5-head CHIBI figures arranged in a precise THREE-COLUMN by THREE-ROW layout, row-major order. Requested canvas 2048x2048 square, TRUE TRANSPARENT ALPHA background. Each FULL figure and all hair, horns, wings, tails, feet, fan, gown and props occupies at most 62% of its cell width and 72% of cell height. VERY WIDE completely transparent gutters between every row and column and exterior padding. No cropped tips, no neighbors touching, no connecting objects. Same head size, costume, proportions, frontal orientation, face identity and standing foot baseline across cells except explicitly seated poses. No frames, no labels, no scene background, floor, cast shadows, caption text or watermarks. Clear polished anime linework and soft cel shading, readable at small desktop size. No unnecessary floating effects. A tiny simple T emblem is allowed only where specified.
+The 9 cells in order:
+1. neutral idle: one hand near chest, poised friendly small smile, wings folded
+2. same neutral standing position, face and eyes glance LEFT
+3. same neutral standing position, face and eyes glance RIGHT
+4. same neutral standing position, lift gaze UP
+5. same neutral standing position, lower gaze DOWN
+6. same neutral standing position, eyes fully CLOSED in a friendly brief blink
+7. sleeping peacefully, curled sitting or reclining safely with full costume and feet visible; no Z text
+8. waking up with small stretch, eyes open, soft relieved smile
+9. fatigue preparation: one hand covering a small open-mouth YAWN, sleepy half-closed eyes, standing fully upright
+Do NOT draw any adult version from the reference. Do NOT copy the reference title or background. Every pose must be complete and visibly separate.
+
+Gpt/social.png
+Reference: References/openai-reference.png
+Use case: stylized-concept. Production transparent desktop-pet sprite sheet, not an identity reference sheet. Input image is ONLY identity, costume and art-style reference. Preserve ONLY the RIGHT CHIBI character. GPT WHITE DRAGON girl, use only the RIGHT CHIBI identity from the reference. Long silver-white hair with very pale lavender shading, lavender eyes, two white curved dragon horns with gold/silver knot ornament, white dragon wings and white scaled dragon tail, modest fully closed high-collar flowing WHITE gown with silver geometric knots and light gold tassel details, white shoes. Calm, clever, gently confident and considerate personality. Never green hair, glasses, maid apron or cat ears.
+Exactly NINE separate full-body 2.5-head CHIBI figures arranged in a precise THREE-COLUMN by THREE-ROW layout, row-major order. Requested canvas 2048x2048 square, TRUE TRANSPARENT ALPHA background. Each FULL figure and all hair, horns, wings, tails, feet, fan, gown and props occupies at most 62% of its cell width and 72% of cell height. VERY WIDE completely transparent gutters between every row and column and exterior padding. No cropped tips, no neighbors touching, no connecting objects. Same head size, costume, proportions, frontal orientation, face identity and standing foot baseline across cells except explicitly seated poses. No frames, no labels, no scene background, floor, cast shadows, caption text or watermarks. Clear polished anime linework and soft cel shading, readable at small desktop size. No unnecessary floating effects. A tiny simple T emblem is allowed only where specified.
+The 9 cells in order:
+1. reacting to a head pat: slight blush, shy smile, eyes partly closed, hands near cheek
+2. gentle encouraging celebration, one hand raised and a bright smile, full body
+3. small friendly wave with right hand near face, kind smile
+4. goodbye wave with left hand, a gentle smiling wink
+5. holding a small teacup and a round tea biscuit, a serene appreciative smile
+6. being lifted by an unseen hand: feet dangling, hands up, harmless surprised expression; NO extra person or hand drawn
+7. landing surprise: standing on both feet, eyes wide, both hands slightly raised
+8. cute mild pout with small puffed cheeks, entirely friendly and harmless
+9. token request PREPARATION: both EMPTY palms extended to viewer, a hopeful questioning face, no bag and no token yet
+Do NOT draw any adult version from the reference. Do NOT copy the reference title or background. Every pose must be complete and visibly separate.
+
+Gpt/actions.png
+Reference: References/openai-reference.png
+Use case: stylized-concept. Production transparent desktop-pet sprite sheet, not an identity reference sheet. Input image is ONLY identity, costume and art-style reference. Preserve ONLY the RIGHT CHIBI character. GPT WHITE DRAGON girl, use only the RIGHT CHIBI identity from the reference. Long silver-white hair with very pale lavender shading, lavender eyes, two white curved dragon horns with gold/silver knot ornament, white dragon wings and white scaled dragon tail, modest fully closed high-collar flowing WHITE gown with silver geometric knots and light gold tassel details, white shoes. Calm, clever, gently confident and considerate personality. Never green hair, glasses, maid apron or cat ears.
+Exactly NINE separate full-body 2.5-head CHIBI figures arranged in a precise THREE-COLUMN by THREE-ROW layout, row-major order. Requested canvas 2048x2048 square, TRUE TRANSPARENT ALPHA background. Each FULL figure and all hair, horns, wings, tails, feet, fan, gown and props occupies at most 62% of its cell width and 72% of cell height. VERY WIDE completely transparent gutters between every row and column and exterior padding. No cropped tips, no neighbors touching, no connecting objects. Same head size, costume, proportions, frontal orientation, face identity and standing foot baseline across cells except explicitly seated poses. No frames, no labels, no scene background, floor, cast shadows, caption text or watermarks. Clear polished anime linework and soft cel shading, readable at small desktop size. No unnecessary floating effects. A tiny simple T emblem is allowed only where specified.
+The 9 cells in order:
+1. typing keyframe A: tiny white/pale-purple keyboard held or placed immediately in front of waist, LEFT hand pressing down, RIGHT hand lifted
+2. typing keyframe B: SAME keyboard, pose, face and body scale as previous cell, RIGHT hand pressing down, LEFT hand lifted
+3. personal signature gesture keyframe A: quietly spread her small white dragon wings: left wing slightly folded in frame A, both wings gently spread in frame B; same seated/standing position
+4. personal signature gesture keyframe B: quietly spread her small white dragon wings: left wing slightly folded in frame A, both wings gently spread in frame B; same seated/standing position
+5. greeting keyframe A: right hand waving at face height, palm facing viewer, warm smile, consistent upright body
+6. greeting keyframe B: same body and face and hand height as previous cell, right waving hand noticeably tilted inward with fingers slightly curled
+7. final fatigue: weary half-lidded eyes and drooping shoulders, one hand gently rubbing an eye, no extra effects
+8. final begging for AI tokens: glossy hopeful eyes, holding an OPEN EMPTY pale-gold small pouch with a capital T emblem, held towards viewer
+9. final token-dazed: sitting gently with harmless spiral dizzy eyes and surprised mouth, ONE large light-gold hexagonal T chip resting on head, tiny close star orbit drawn above, full costume and feet visible, no wounds or bruises
+Do NOT draw any adult version from the reference. Do NOT copy the reference title or background. Every pose must be complete and visibly separate.
+
+Gemini/idle.png
+Reference: References/gemini-reference.png
+Use case: stylized-concept. Production transparent desktop-pet sprite sheet, not an identity reference sheet. Input image is ONLY identity, costume and art-style reference. Preserve ONLY the RIGHT CHIBI character. GEMINI CAT STAR SORCERESS girl, use only the RIGHT CHIBI identity from reference. Long blue-to-purple/lavender hair, two blue-purple cat ears with pink insides, fluffy purple-blue cat tail, heterochromatic eyes ONE rose pink and ONE golden yellow, purple layered fantasy astrologer outfit with white frills and GOLD trims, four-point star ornaments, white boots with purple toe and golden trim. Modest fully clothed chibi outfit. Playful, lively, curious and clever. No whale tail, dragon wings, maid apron.
+Exactly NINE separate full-body 2.5-head CHIBI figures arranged in a precise THREE-COLUMN by THREE-ROW layout, row-major order. Requested canvas 2048x2048 square, TRUE TRANSPARENT ALPHA background. Each FULL figure and all hair, horns, wings, tails, feet, fan, gown and props occupies at most 62% of its cell width and 72% of cell height. VERY WIDE completely transparent gutters between every row and column and exterior padding. No cropped tips, no neighbors touching, no connecting objects. Same head size, costume, proportions, frontal orientation, face identity and standing foot baseline across cells except explicitly seated poses. No frames, no labels, no scene background, floor, cast shadows, caption text or watermarks. Clear polished anime linework and soft cel shading, readable at small desktop size. No unnecessary floating effects. A tiny simple T emblem is allowed only where specified.
+The 9 cells in order:
+1. neutral idle: one hand loosely raised as a small cat paw, playful smile
+2. same neutral standing position, face and eyes glance LEFT
+3. same neutral standing position, face and eyes glance RIGHT
+4. same neutral standing position, lift gaze UP
+5. same neutral standing position, lower gaze DOWN
+6. same neutral standing position, eyes fully CLOSED in a friendly brief blink
+7. sleeping peacefully, curled sitting or reclining safely with full costume and feet visible; no Z text
+8. waking up with small stretch, eyes open, soft relieved smile
+9. fatigue preparation: one hand covering a small open-mouth YAWN, sleepy half-closed eyes, standing fully upright
+Do NOT draw any adult version from the reference. Do NOT copy the reference title or background. Every pose must be complete and visibly separate.
+
+Gemini/social.png
+Reference: References/gemini-reference.png
+Use case: stylized-concept. Production transparent desktop-pet sprite sheet, not an identity reference sheet. Input image is ONLY identity, costume and art-style reference. Preserve ONLY the RIGHT CHIBI character. GEMINI CAT STAR SORCERESS girl, use only the RIGHT CHIBI identity from reference. Long blue-to-purple/lavender hair, two blue-purple cat ears with pink insides, fluffy purple-blue cat tail, heterochromatic eyes ONE rose pink and ONE golden yellow, purple layered fantasy astrologer outfit with white frills and GOLD trims, four-point star ornaments, white boots with purple toe and golden trim. Modest fully clothed chibi outfit. Playful, lively, curious and clever. No whale tail, dragon wings, maid apron.
+Exactly NINE separate full-body 2.5-head CHIBI figures arranged in a precise THREE-COLUMN by THREE-ROW layout, row-major order. Requested canvas 2048x2048 square, TRUE TRANSPARENT ALPHA background. Each FULL figure and all hair, horns, wings, tails, feet, fan, gown and props occupies at most 62% of its cell width and 72% of cell height. VERY WIDE completely transparent gutters between every row and column and exterior padding. No cropped tips, no neighbors touching, no connecting objects. Same head size, costume, proportions, frontal orientation, face identity and standing foot baseline across cells except explicitly seated poses. No frames, no labels, no scene background, floor, cast shadows, caption text or watermarks. Clear polished anime linework and soft cel shading, readable at small desktop size. No unnecessary floating effects. A tiny simple T emblem is allowed only where specified.
+The 9 cells in order:
+1. reacting to a head pat: slight blush, shy smile, eyes partly closed, hands near cheek
+2. cheering with both cat-paw hands raised, one foot lifted excitedly
+3. small friendly wave with right hand near face, kind smile
+4. goodbye wave with left hand, a gentle smiling wink
+5. nibbling one tiny fish-SHAPED BISCUIT held between hands with happy cat ears
+6. being lifted by an unseen hand: feet dangling, hands up, harmless surprised expression; NO extra person or hand drawn
+7. landing surprise: standing on both feet, eyes wide, both hands slightly raised
+8. cute mild pout with small puffed cheeks, entirely friendly and harmless
+9. token request PREPARATION: both EMPTY palms extended to viewer, a hopeful questioning face, no bag and no token yet
+Do NOT draw any adult version from the reference. Do NOT copy the reference title or background. Every pose must be complete and visibly separate.
+
+Gemini/actions.png
+Reference: References/gemini-reference.png
+Use case: stylized-concept. Production transparent desktop-pet sprite sheet, not an identity reference sheet. Input image is ONLY identity, costume and art-style reference. Preserve ONLY the RIGHT CHIBI character. GEMINI CAT STAR SORCERESS girl, use only the RIGHT CHIBI identity from reference. Long blue-to-purple/lavender hair, two blue-purple cat ears with pink insides, fluffy purple-blue cat tail, heterochromatic eyes ONE rose pink and ONE golden yellow, purple layered fantasy astrologer outfit with white frills and GOLD trims, four-point star ornaments, white boots with purple toe and golden trim. Modest fully clothed chibi outfit. Playful, lively, curious and clever. No whale tail, dragon wings, maid apron.
+Exactly NINE separate full-body 2.5-head CHIBI figures arranged in a precise THREE-COLUMN by THREE-ROW layout, row-major order. Requested canvas 2048x2048 square, TRUE TRANSPARENT ALPHA background. Each FULL figure and all hair, horns, wings, tails, feet, fan, gown and props occupies at most 62% of its cell width and 72% of cell height. VERY WIDE completely transparent gutters between every row and column and exterior padding. No cropped tips, no neighbors touching, no connecting objects. Same head size, costume, proportions, frontal orientation, face identity and standing foot baseline across cells except explicitly seated poses. No frames, no labels, no scene background, floor, cast shadows, caption text or watermarks. Clear polished anime linework and soft cel shading, readable at small desktop size. No unnecessary floating effects. A tiny simple T emblem is allowed only where specified.
+The 9 cells in order:
+1. typing keyframe A: tiny white/pale-purple keyboard held or placed immediately in front of waist, LEFT hand pressing down, RIGHT hand lifted
+2. typing keyframe B: SAME keyboard, pose, face and body scale as previous cell, RIGHT hand pressing down, LEFT hand lifted
+3. personal signature gesture keyframe A: both hands make tiny cat paws in frame A, then bring the paws together into a playful little heart in frame B; tail curls upward
+4. personal signature gesture keyframe B: both hands make tiny cat paws in frame A, then bring the paws together into a playful little heart in frame B; tail curls upward
+5. greeting keyframe A: right hand waving at face height, palm facing viewer, warm smile, consistent upright body
+6. greeting keyframe B: same body and face and hand height as previous cell, right waving hand noticeably tilted inward with fingers slightly curled
+7. final fatigue: weary half-lidded eyes and drooping shoulders, one hand gently rubbing an eye, no extra effects
+8. final begging for AI tokens: glossy hopeful eyes, holding an OPEN EMPTY pale-gold small pouch with a capital T emblem, held towards viewer
+9. final token-dazed: sitting gently with harmless spiral dizzy eyes and surprised mouth, ONE large light-gold hexagonal T chip resting on head, tiny close star orbit drawn above, full costume and feet visible, no wounds or bruises
+Do NOT draw any adult version from the reference. Do NOT copy the reference title or background. Every pose must be complete and visibly separate.
+
+Claude/idle.png
+Reference: References/claude-reference.png
+Use case: stylized-concept. Production transparent desktop-pet sprite sheet, not an identity reference sheet. Input image is ONLY identity, costume and art-style reference. Preserve ONLY the RIGHT CHIBI character. CLAUDE SCHOLAR girl, use only the RIGHT CHIBI identity from reference. Very long straight copper-orange hair, amber eyes, burnt-orange sunburst flower hair ornament with black ribbon and pale tassels, modest IVORY long pleated gown with black corset belt and orange hanging panels with bronze sun embroidery, white sleeves and ivory boots, holding a small BROWN book with golden sun motif when indicated. No animal ears/tail or wings. Quiet, thoughtful, gentle, bookish and composed personality. No glasses required.
+Exactly NINE separate full-body 2.5-head CHIBI figures arranged in a precise THREE-COLUMN by THREE-ROW layout, row-major order. Requested canvas 2048x2048 square, TRUE TRANSPARENT ALPHA background. Each FULL figure and all hair, horns, wings, tails, feet, fan, gown and props occupies at most 62% of its cell width and 72% of cell height. VERY WIDE completely transparent gutters between every row and column and exterior padding. No cropped tips, no neighbors touching, no connecting objects. Same head size, costume, proportions, frontal orientation, face identity and standing foot baseline across cells except explicitly seated poses. No frames, no labels, no scene background, floor, cast shadows, caption text or watermarks. Clear polished anime linework and soft cel shading, readable at small desktop size. No unnecessary floating effects. A tiny simple T emblem is allowed only where specified.
+The 9 cells in order:
+1. neutral idle: holding her closed brown book at chest, gentle composed smile
+2. same neutral standing position, face and eyes glance LEFT
+3. same neutral standing position, face and eyes glance RIGHT
+4. same neutral standing position, lift gaze UP
+5. same neutral standing position, lower gaze DOWN
+6. same neutral standing position, eyes fully CLOSED in a friendly brief blink
+7. sleeping peacefully, curled sitting or reclining safely with full costume and feet visible; no Z text
+8. waking up with small stretch, eyes open, soft relieved smile
+9. fatigue preparation: one hand covering a small open-mouth YAWN, sleepy half-closed eyes, standing fully upright
+Do NOT draw any adult version from the reference. Do NOT copy the reference title or background. Every pose must be complete and visibly separate.
+
+Claude/social.png
+Reference: References/claude-reference.png
+Use case: stylized-concept. Production transparent desktop-pet sprite sheet, not an identity reference sheet. Input image is ONLY identity, costume and art-style reference. Preserve ONLY the RIGHT CHIBI character. CLAUDE SCHOLAR girl, use only the RIGHT CHIBI identity from reference. Very long straight copper-orange hair, amber eyes, burnt-orange sunburst flower hair ornament with black ribbon and pale tassels, modest IVORY long pleated gown with black corset belt and orange hanging panels with bronze sun embroidery, white sleeves and ivory boots, holding a small BROWN book with golden sun motif when indicated. No animal ears/tail or wings. Quiet, thoughtful, gentle, bookish and composed personality. No glasses required.
+Exactly NINE separate full-body 2.5-head CHIBI figures arranged in a precise THREE-COLUMN by THREE-ROW layout, row-major order. Requested canvas 2048x2048 square, TRUE TRANSPARENT ALPHA background. Each FULL figure and all hair, horns, wings, tails, feet, fan, gown and props occupies at most 62% of its cell width and 72% of cell height. VERY WIDE completely transparent gutters between every row and column and exterior padding. No cropped tips, no neighbors touching, no connecting objects. Same head size, costume, proportions, frontal orientation, face identity and standing foot baseline across cells except explicitly seated poses. No frames, no labels, no scene background, floor, cast shadows, caption text or watermarks. Clear polished anime linework and soft cel shading, readable at small desktop size. No unnecessary floating effects. A tiny simple T emblem is allowed only where specified.
+The 9 cells in order:
+1. reacting to a head pat: slight blush, shy smile, eyes partly closed, hands near cheek
+2. gentle encouraging celebration, one hand raised and a bright smile, full body
+3. small friendly wave with right hand near face, kind smile
+4. goodbye wave with left hand, a gentle smiling wink
+5. holding a warm teacup and keeping the closed brown book beside her, a soft grateful smile
+6. being lifted by an unseen hand: feet dangling, hands up, harmless surprised expression; NO extra person or hand drawn
+7. landing surprise: standing on both feet, eyes wide, both hands slightly raised
+8. cute mild pout with small puffed cheeks, entirely friendly and harmless
+9. token request PREPARATION: both EMPTY palms extended to viewer, a hopeful questioning face, no bag and no token yet
+Do NOT draw any adult version from the reference. Do NOT copy the reference title or background. Every pose must be complete and visibly separate.
+
+Claude/actions.png
+Reference: References/claude-reference.png
+Use case: stylized-concept. Production transparent desktop-pet sprite sheet, not an identity reference sheet. Input image is ONLY identity, costume and art-style reference. Preserve ONLY the RIGHT CHIBI character. CLAUDE SCHOLAR girl, use only the RIGHT CHIBI identity from reference. Very long straight copper-orange hair, amber eyes, burnt-orange sunburst flower hair ornament with black ribbon and pale tassels, modest IVORY long pleated gown with black corset belt and orange hanging panels with bronze sun embroidery, white sleeves and ivory boots, holding a small BROWN book with golden sun motif when indicated. No animal ears/tail or wings. Quiet, thoughtful, gentle, bookish and composed personality. No glasses required.
+Exactly NINE separate full-body 2.5-head CHIBI figures arranged in a precise THREE-COLUMN by THREE-ROW layout, row-major order. Requested canvas 2048x2048 square, TRUE TRANSPARENT ALPHA background. Each FULL figure and all hair, horns, wings, tails, feet, fan, gown and props occupies at most 62% of its cell width and 72% of cell height. VERY WIDE completely transparent gutters between every row and column and exterior padding. No cropped tips, no neighbors touching, no connecting objects. Same head size, costume, proportions, frontal orientation, face identity and standing foot baseline across cells except explicitly seated poses. No frames, no labels, no scene background, floor, cast shadows, caption text or watermarks. Clear polished anime linework and soft cel shading, readable at small desktop size. No unnecessary floating effects. A tiny simple T emblem is allowed only where specified.
+The 9 cells in order:
+1. typing keyframe A: tiny white/pale-purple keyboard held or placed immediately in front of waist, LEFT hand pressing down, RIGHT hand lifted
+2. typing keyframe B: SAME keyboard, pose, face and body scale as previous cell, RIGHT hand pressing down, LEFT hand lifted
+3. personal signature gesture keyframe A: open the small brown sun-motif book in frame A, then clearly turn one page with her right hand in frame B; attentive reading eyes
+4. personal signature gesture keyframe B: open the small brown sun-motif book in frame A, then clearly turn one page with her right hand in frame B; attentive reading eyes
+5. greeting keyframe A: right hand waving at face height, palm facing viewer, warm smile, consistent upright body
+6. greeting keyframe B: same body and face and hand height as previous cell, right waving hand noticeably tilted inward with fingers slightly curled
+7. final fatigue: weary half-lidded eyes and drooping shoulders, one hand gently rubbing an eye, no extra effects
+8. final begging for AI tokens: glossy hopeful eyes, holding an OPEN EMPTY pale-gold small pouch with a capital T emblem, held towards viewer
+9. final token-dazed: sitting gently with harmless spiral dizzy eyes and surprised mouth, ONE large light-gold hexagonal T chip resting on head, tiny close star orbit drawn above, full costume and feet visible, no wounds or bruises
+Do NOT draw any adult version from the reference. Do NOT copy the reference title or background. Every pose must be complete and visibly separate.
+
+Qwen/idle.png
+Reference: References/qwen-reference.png
+Use case: stylized-concept. Production transparent desktop-pet sprite sheet, not an identity reference sheet. Input image is ONLY identity, costume and art-style reference. Preserve ONLY the RIGHT CHIBI character. QWEN Chinese scholar girl, use only the RIGHT CHIBI identity from reference. Long wavy periwinkle-blue hair with loose SIDE BRAID, blue eyes, small tilted round blue Chinese headwear with white geometric star-knot and tassels, modest WHITE-and-blue-violet flowing Chinese-inspired long gown and matching long draped cape sleeves, GOLD embroidered patterns and navy blue shoes, small tasseled bag and BLUE FOLDING FAN when indicated. Bright, poised, confident and witty personality. No animal ears/tail/wings, no maid apron.
+Exactly NINE separate full-body 2.5-head CHIBI figures arranged in a precise THREE-COLUMN by THREE-ROW layout, row-major order. Requested canvas 2048x2048 square, TRUE TRANSPARENT ALPHA background. Each FULL figure and all hair, horns, wings, tails, feet, fan, gown and props occupies at most 62% of its cell width and 72% of cell height. VERY WIDE completely transparent gutters between every row and column and exterior padding. No cropped tips, no neighbors touching, no connecting objects. Same head size, costume, proportions, frontal orientation, face identity and standing foot baseline across cells except explicitly seated poses. No frames, no labels, no scene background, floor, cast shadows, caption text or watermarks. Clear polished anime linework and soft cel shading, readable at small desktop size. No unnecessary floating effects. A tiny simple T emblem is allowed only where specified.
+The 9 cells in order:
+1. neutral idle: holding closed blue fan across chest, bright composed smile
+2. same neutral standing position, face and eyes glance LEFT
+3. same neutral standing position, face and eyes glance RIGHT
+4. same neutral standing position, lift gaze UP
+5. same neutral standing position, lower gaze DOWN
+6. same neutral standing position, eyes fully CLOSED in a friendly brief blink
+7. sleeping peacefully, curled sitting or reclining safely with full costume and feet visible; no Z text
+8. waking up with small stretch, eyes open, soft relieved smile
+9. fatigue preparation: one hand covering a small open-mouth YAWN, sleepy half-closed eyes, standing fully upright
+Do NOT draw any adult version from the reference. Do NOT copy the reference title or background. Every pose must be complete and visibly separate.
+
+Qwen/social.png
+Reference: References/qwen-reference.png
+Use case: stylized-concept. Production transparent desktop-pet sprite sheet, not an identity reference sheet. Input image is ONLY identity, costume and art-style reference. Preserve ONLY the RIGHT CHIBI character. QWEN Chinese scholar girl, use only the RIGHT CHIBI identity from reference. Long wavy periwinkle-blue hair with loose SIDE BRAID, blue eyes, small tilted round blue Chinese headwear with white geometric star-knot and tassels, modest WHITE-and-blue-violet flowing Chinese-inspired long gown and matching long draped cape sleeves, GOLD embroidered patterns and navy blue shoes, small tasseled bag and BLUE FOLDING FAN when indicated. Bright, poised, confident and witty personality. No animal ears/tail/wings, no maid apron.
+Exactly NINE separate full-body 2.5-head CHIBI figures arranged in a precise THREE-COLUMN by THREE-ROW layout, row-major order. Requested canvas 2048x2048 square, TRUE TRANSPARENT ALPHA background. Each FULL figure and all hair, horns, wings, tails, feet, fan, gown and props occupies at most 62% of its cell width and 72% of cell height. VERY WIDE completely transparent gutters between every row and column and exterior padding. No cropped tips, no neighbors touching, no connecting objects. Same head size, costume, proportions, frontal orientation, face identity and standing foot baseline across cells except explicitly seated poses. No frames, no labels, no scene background, floor, cast shadows, caption text or watermarks. Clear polished anime linework and soft cel shading, readable at small desktop size. No unnecessary floating effects. A tiny simple T emblem is allowed only where specified.
+The 9 cells in order:
+1. reacting to a head pat: slight blush, shy smile, eyes partly closed, hands near cheek
+2. gentle encouraging celebration, one hand raised and a bright smile, full body
+3. small friendly wave with right hand near face, kind smile
+4. goodbye wave with left hand, a gentle smiling wink
+5. holding a tiny plate with ONE white osmanthus cake, pleased elegant smile
+6. being lifted by an unseen hand: feet dangling, hands up, harmless surprised expression; NO extra person or hand drawn
+7. landing surprise: standing on both feet, eyes wide, both hands slightly raised
+8. cute mild pout with small puffed cheeks, entirely friendly and harmless
+9. token request PREPARATION: both EMPTY palms extended to viewer, a hopeful questioning face, no bag and no token yet
+Do NOT draw any adult version from the reference. Do NOT copy the reference title or background. Every pose must be complete and visibly separate.
+
+Qwen/actions.png
+Reference: References/qwen-reference.png
+Use case: stylized-concept. Production transparent desktop-pet sprite sheet, not an identity reference sheet. Input image is ONLY identity, costume and art-style reference. Preserve ONLY the RIGHT CHIBI character. QWEN Chinese scholar girl, use only the RIGHT CHIBI identity from reference. Long wavy periwinkle-blue hair with loose SIDE BRAID, blue eyes, small tilted round blue Chinese headwear with white geometric star-knot and tassels, modest WHITE-and-blue-violet flowing Chinese-inspired long gown and matching long draped cape sleeves, GOLD embroidered patterns and navy blue shoes, small tasseled bag and BLUE FOLDING FAN when indicated. Bright, poised, confident and witty personality. No animal ears/tail/wings, no maid apron.
+Exactly NINE separate full-body 2.5-head CHIBI figures arranged in a precise THREE-COLUMN by THREE-ROW layout, row-major order. Requested canvas 2048x2048 square, TRUE TRANSPARENT ALPHA background. Each FULL figure and all hair, horns, wings, tails, feet, fan, gown and props occupies at most 62% of its cell width and 72% of cell height. VERY WIDE completely transparent gutters between every row and column and exterior padding. No cropped tips, no neighbors touching, no connecting objects. Same head size, costume, proportions, frontal orientation, face identity and standing foot baseline across cells except explicitly seated poses. No frames, no labels, no scene background, floor, cast shadows, caption text or watermarks. Clear polished anime linework and soft cel shading, readable at small desktop size. No unnecessary floating effects. A tiny simple T emblem is allowed only where specified.
+The 9 cells in order:
+1. typing keyframe A: tiny white/pale-purple keyboard held or placed immediately in front of waist, LEFT hand pressing down, RIGHT hand lifted
+2. typing keyframe B: SAME keyboard, pose, face and body scale as previous cell, RIGHT hand pressing down, LEFT hand lifted
+3. personal signature gesture keyframe A: hold her blue folding fan CLOSED at chest in frame A, then open the fan fully and raise it gracefully near her cheek in frame B, charming eyes
+4. personal signature gesture keyframe B: hold her blue folding fan CLOSED at chest in frame A, then open the fan fully and raise it gracefully near her cheek in frame B, charming eyes
+5. greeting keyframe A: right hand waving at face height, palm facing viewer, warm smile, consistent upright body
+6. greeting keyframe B: same body and face and hand height as previous cell, right waving hand noticeably tilted inward with fingers slightly curled
+7. final fatigue: weary half-lidded eyes and drooping shoulders, one hand gently rubbing an eye, no extra effects
+8. final begging for AI tokens: glossy hopeful eyes, holding an OPEN EMPTY pale-gold small pouch with a capital T emblem, held towards viewer
+9. final token-dazed: sitting gently with harmless spiral dizzy eyes and surprised mouth, ONE large light-gold hexagonal T chip resting on head, tiny close star orbit drawn above, full costume and feet visible, no wounds or bruises
+Do NOT draw any adult version from the reference. Do NOT copy the reference title or background. Every pose must be complete and visibly separate.
+
+Layout revision Gpt-social.png
+Edit this nine-pose sprite sheet for clean production cropping. Preserve EXACTLY the same nine poses, their expressions, identity, hands, costume, colors, order and chibi proportions. ONLY repair layout and alpha cleanup: make each entire character 25% SMALLER and center it in its original one of the 3x3 cells, with HUGE perfectly transparent gutters all around. Every horn, wing, hair curl, fan, cape and foot must be fully visible, no clipping. Remove all stray background speckles, haze and low-opacity colored noise, leaving true clear alpha between figures. No neighboring silhouette or fragment may enter another figure's rectangular bounding box. 3 columns by 3 rows, square 2048x2048 transparent PNG. No captions or added effects. Preserve the character and pose artwork as closely as possible.
+Layout revision Qwen-idle.png
+Edit this nine-pose sprite sheet for clean production cropping. Preserve EXACTLY the same nine poses, their expressions, identity, hands, costume, colors, order and chibi proportions. ONLY repair layout and alpha cleanup: make each entire character 25% SMALLER and center it in its original one of the 3x3 cells, with HUGE perfectly transparent gutters all around. Every horn, wing, hair curl, fan, cape and foot must be fully visible, no clipping. Remove all stray background speckles, haze and low-opacity colored noise, leaving true clear alpha between figures. No neighboring silhouette or fragment may enter another figure's rectangular bounding box. 3 columns by 3 rows, square 2048x2048 transparent PNG. No captions or added effects. Preserve the character and pose artwork as closely as possible.

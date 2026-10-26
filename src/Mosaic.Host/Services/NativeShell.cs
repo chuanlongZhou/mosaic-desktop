@@ -22,6 +22,7 @@ public sealed class NativeShell : Forms.NativeWindow, IDisposable
     public event Action? LibraryRequested;
     public event Action? WorkspacesRequested;
     public event Action? EditLayoutRequested;
+    public event Action? MenuBarPinRequested;
     public event Action? PaletteRequested;
     public Func<nint, bool>? CopyDataReceiver { get; set; }
     public event Action<bool>? FullscreenChanged;
@@ -66,6 +67,7 @@ public sealed class NativeShell : Forms.NativeWindow, IDisposable
                 case "library": LibraryRequested?.Invoke(); break;
                 case "workspaces": WorkspacesRequested?.Invoke(); break;
                 case "edit": EditLayoutRequested?.Invoke(); break;
+                case "menu-pin": MenuBarPinRequested?.Invoke(); break;
             }
         }
         if (message.Msg == 0x4A && CopyDataReceiver?.Invoke(message.LParam) == true) { message.Result = 1; return; }
@@ -152,26 +154,24 @@ public sealed class NativeShell : Forms.NativeWindow, IDisposable
         var foreground = GetForegroundWindow();
         if (eventId == 0x800B && (window != foreground || objectId != 0)) return;
         ShellLayoutChanged?.Invoke();
-        var full = false;
-        if (foreground != 0 && IsWindowVisible(foreground) && !IsIconic(foreground))
-        {
-            var className = new StringBuilder(128);
-            GetClassName(foreground, className, className.Capacity);
-            // Explorer's desktop also fills the monitor; it must not hide the desktop modules.
-            if (className.ToString() is "Progman" or "WorkerW" or "Shell_TrayWnd" or "Shell_SecondaryTrayWnd")
-            {
-                PublishFullscreen(false);
-                return;
-            }
-            GetWindowThreadProcessId(foreground, out var processId);
-            if (processId != Environment.ProcessId && GetWindowRect(foreground, out var rect))
-            {
-                var info = new MonitorInfo { Size = Marshal.SizeOf<MonitorInfo>() };
-                if (GetMonitorInfo(MonitorFromWindow(foreground, 2), ref info))
-                    full = rect.Left <= info.Monitor.Left && rect.Top <= info.Monitor.Top && rect.Right >= info.Monitor.Right && rect.Bottom >= info.Monitor.Bottom;
-            }
-        }
-        PublishFullscreen(full);
+        GetWindowThreadProcessId(foreground, out var processId);
+        PublishFullscreen(processId != Environment.ProcessId && IsFullscreenApplication(foreground));
+    }
+
+    public static bool IsFullscreenApplication(nint window)
+    {
+        if (window == 0 || !IsWindowVisible(window) || IsIconic(window)) return false;
+        var className = new StringBuilder(128);
+        GetClassName(window, className, className.Capacity);
+        if (className.ToString() is "Progman" or "WorkerW" or "SHELLDLL_DefView" or "Shell_TrayWnd" or "Shell_SecondaryTrayWnd") return false;
+        // Maximized applications can cover the monitor when the taskbar is hidden.
+        // A retained caption/resize frame distinguishes them from borderless fullscreen.
+        var style = GetWindowLongPtr(window, -16).ToInt64();
+        if (IsZoomed(window) && (style & 0x00C40000) != 0) return false;
+        if (DwmGetWindowAttribute(window, 9, out var rect, Marshal.SizeOf<Rect>()) < 0 && !GetWindowRect(window, out rect)) return false;
+        var info = new MonitorInfo { Size = Marshal.SizeOf<MonitorInfo>() };
+        return GetMonitorInfo(MonitorFromWindow(window, 2), ref info) &&
+            rect.Left <= info.Monitor.Left && rect.Top <= info.Monitor.Top && rect.Right >= info.Monitor.Right && rect.Bottom >= info.Monitor.Bottom;
     }
 
     private void PublishFullscreen(bool full)
@@ -188,7 +188,7 @@ public sealed class NativeShell : Forms.NativeWindow, IDisposable
         SetWindowPos(window, new nint(-1), bounds.Left, bounds.Top, bounds.Width, (int)Math.Ceiling(ShellWorkArea.BarHeight * scale), 0x50);
     }
 
-    public static void StyleWindow(nint window, bool toolWindow, bool noActivate)
+    public static void StyleWindow(nint window, bool toolWindow, bool noActivate, bool transparent = false)
     {
         var style = GetWindowLongPtr(window, -20).ToInt64();
         if (toolWindow) style |= 0x80;
@@ -196,8 +196,17 @@ public sealed class NativeShell : Forms.NativeWindow, IDisposable
         SetWindowLongPtr(window, -20, new nint(style));
         var dark = 1;
         DwmSetWindowAttribute(window, 20, ref dark, sizeof(int));
-        var corners = 2;
+        // Per-pixel transparent windows must not opt into a rectangular DWM frame.
+        var corners = transparent ? 1 : 2; // DWMWCP_DONOTROUND / DWMWCP_ROUND
         DwmSetWindowAttribute(window, 33, ref corners, sizeof(int));
+        if (transparent)
+        {
+            var disabled = 1; // DWMNCRP_DISABLED; DWMSBT_NONE
+            var noBorder = unchecked((int)0xFFFFFFFE); // DWMWA_COLOR_NONE
+            DwmSetWindowAttribute(window, 2, ref disabled, sizeof(int));
+            DwmSetWindowAttribute(window, 34, ref noBorder, sizeof(int));
+            DwmSetWindowAttribute(window, 38, ref disabled, sizeof(int));
+        }
     }
 
     public void Dispose()
@@ -229,4 +238,6 @@ public sealed class NativeShell : Forms.NativeWindow, IDisposable
     [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW")] private static extern nint GetWindowLongPtr(nint window, int index);
     [DllImport("user32.dll", EntryPoint = "SetWindowLongPtrW")] private static extern nint SetWindowLongPtr(nint window, int index, nint value);
     [DllImport("dwmapi.dll")] private static extern int DwmSetWindowAttribute(nint window, int attribute, ref int value, int size);
+    [DllImport("dwmapi.dll")] private static extern int DwmGetWindowAttribute(nint window, int attribute, out Rect rect, int size);
+    [DllImport("user32.dll")] private static extern bool IsZoomed(nint window);
 }
