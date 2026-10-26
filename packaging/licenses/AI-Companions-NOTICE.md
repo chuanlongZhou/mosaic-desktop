@@ -7,6 +7,8 @@
 
 Mosaic 于 2026-10-25 使用内置 image_gen 参考右侧 Q 版身份，重新生成四套各三张透明动作图集，每套 27 幅绘制姿态。正常图用于两个 token 下落复用帧，因此每款有 29 个缓存姿态。原参考 PNG 保留在源码 References 目录中，不打包为运行时素材。没有裁用作者原立绘作为动作帧，没有用脚本修改生成 PNG 像素；取图区域仅由透明轮廓分析获得。
 
+2026-10-26 追加四套正常比例版本，分别参考同一原参考图左侧成年动漫比例身份，使用内置 image_gen 重新生成每套三张透明动作图集。Q 版素材全部保留，正常比例各 27 幅绘制姿态及两幅 token 下落复用帧；提示词与排版修订见 generation-prompts-standard-companions.txt。原来源和使用条件保持，不新增或扩张授权声明。
+
 参考文件及 SHA-256：
 - openai-reference.png：37bf617c72092f73a8f56d3db6d95456679fea9c5ecf1a38fc1d64c2704e6d6a
 - gemini-reference.png：f280188303731d17205de926795a8fd0463dc8995b7342cddf4b93a5dbf50e85

@@ -73,7 +73,7 @@ internal static class DesktopPetChecks
             Complete(services.UpdatePetAsync(p => p.Character = character));
             window.UpdateLayout();
             Assert(ReferenceEquals(window, pet.Window) && window.Sprite.Character == character && window.Title.Contains(DesktopPetCharacters.Get(character).Name), "Character change failed or recreated the desktop window.");
-            var expectedSize = services.Settings.Pet.Size * (character == PetCharacter.DeepSeekStandard ? 2 : 1);
+            var expectedSize = services.Settings.Pet.Size * (character is PetCharacter.DeepSeekStandard or PetCharacter.GptStandard or PetCharacter.GeminiStandard or PetCharacter.ClaudeStandard or PetCharacter.QwenStandard ? 2 : 1);
             Assert(window.Width == expectedSize + 32 && window.Height == expectedSize + 96 && window.Sprite.ActualWidth == expectedSize && window.Sprite.ActualHeight == expectedSize, "Normal-proportion pet did not double its canvas size or another character changed size.");
             foreach (var pose in Enum.GetValues<PetPose>())
             {
@@ -121,12 +121,13 @@ internal static class DesktopPetChecks
         host.Show(); host.UpdateLayout();
         CheckEmotionPreview(preview, host);
         CheckMultiplePets(pet, services, preview);
+        CheckMultiplePets(pet, services, preview, standard: true);
         var bitmap = new RenderTargetBitmap(530, 820, 96, 96, PixelFormats.Pbgra32); bitmap.Render(host);
         var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap));
         var directory = Path.GetFullPath(".artifacts/pet-check"); Directory.CreateDirectory(directory);
         using (var stream = File.Create(Path.Combine(directory, "pet-settings.png"))) encoder.Save(stream);
         host.Close();
-        Console.WriteLine("  Pet: 203 cached poses; three keyframe sequences from neutral, preview/menu, retired walking, alpha hit tests, input, topmost and fullscreen verified.");
+        Console.WriteLine("  Pet: 319 cached poses; eleven identities, keyframe sequences from neutral, preview/menu, retired walking, alpha hit tests, input, topmost and fullscreen verified.");
     }
     private static void CheckHoverInput(DesktopPetService service, DesktopPetWindow window)
     {
@@ -160,7 +161,7 @@ internal static class DesktopPetChecks
         Assert(NativeShell.CaptureForeground() == foreground, "Hover or clicking the passive pet stole focus.");
         Console.WriteLine("  Hover UI: alpha-only dwell, one entry/one reaction, silhouette-gap grace, re-entry, press suppression, actual click/menu speech and focus verified.");
     }
-    private static void CheckMultiplePets(DesktopPetService service, AppServices services, DesktopPetSettingsPanel panel)
+    private static void CheckMultiplePets(DesktopPetService service, AppServices services, DesktopPetSettingsPanel panel, bool standard = false)
     {
         var original = services.Settings.Pet.Copy();
         try
@@ -168,13 +169,15 @@ internal static class DesktopPetChecks
             panel.Load(original);
             var add = (Button)panel.FindName("AddPetButton"); var remove = (Button)panel.FindName("RemovePetButton");
             var picker = (ComboBox)panel.FindName("CharacterPicker"); var instances = (ComboBox)panel.FindName("InstancePicker");
-            foreach (var character in new[] { PetCharacter.Gpt, PetCharacter.Gemini, PetCharacter.Claude, PetCharacter.Qwen })
+            if (standard) picker.SelectedValue = PetCharacter.DeepSeekStandard;
+            var characters = standard ? new[] { PetCharacter.GptStandard, PetCharacter.GeminiStandard, PetCharacter.ClaudeStandard, PetCharacter.QwenStandard } : new[] { PetCharacter.Gpt, PetCharacter.Gemini, PetCharacter.Claude, PetCharacter.Qwen };
+            foreach (var character in characters)
             {
                 add.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); picker.SelectedValue = character;
                 ((Slider)panel.FindName("SizeSlider")).Value = 160;
             }
             var draft = original.Copy(); panel.ApplyTo(draft);
-            Assert(draft.Companions.Count == 4 && draft.Character == original.Character && services.Settings.Pet.Companions.Count == 0, "Roster draft leaked to live pets or changed the primary character.");
+            Assert(draft.Companions.Count == 4 && draft.Character == (standard ? PetCharacter.DeepSeekStandard : original.Character) && services.Settings.Pet.Companions.Count == 0 && services.Settings.Pet.Character == original.Character, "Roster draft leaked to live pets or changed the primary character.");
             Assert(!add.IsEnabled, "Five-pet cap did not disable adding.");
             add.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); panel.ApplyTo(draft);
             Assert(draft.Companions.Count == 4, "An extra UI action exceeded the five-pet cap.");
@@ -186,15 +189,16 @@ internal static class DesktopPetChecks
             Complete(services.UpdatePetAsync(pet => draft.CopyAllTo(pet)));
             Assert(service.Pets.Count == 5 && service.Pets.Select(pet => pet.Window).Distinct().Count() == 5 && service.Pets.Select(pet => pet.Behavior).Distinct().Count() == 5 && service.Pets.All(pet => pet.Window.IsVisible), "Five independent visible pets were not created.");
             Assert(service.Pets.Select(pet => new Point(pet.Window.Left, pet.Window.Top)).Distinct().Count() == 5, "New pets all spawned at one position.");
-            var claudeId = draft.Companions.Single(pet => pet.Character == PetCharacter.Claude).Id;
-            var qwenId = draft.Companions.Single(pet => pet.Character == PetCharacter.Qwen).Id;
+            var claudeCharacter = standard ? PetCharacter.ClaudeStandard : PetCharacter.Claude;
+            var claudeId = draft.Companions.Single(pet => pet.Character == claudeCharacter).Id;
+            var qwenId = draft.Companions.Single(pet => pet.Character == (standard ? PetCharacter.QwenStandard : PetCharacter.Qwen)).Id;
             var actor = service.Pets.Single(pet => pet.Id == claudeId);
             foreach (var pet in service.Pets) pet.Behavior.Tick(Environment.TickCount64 + 10000, 0, false, 90, false, 0, 0);
             var interact = (Action<PetTrigger>)typeof(DesktopPetWindow).GetField("Interacted", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(actor.Window)!;
             interact(PetTrigger.Hover);
             var hoverStarted = actor.Behavior.StartedAt;
             interact(PetTrigger.Click);
-            Assert(actor.Behavior.StartedAt == hoverStarted && DesktopPetDialogue.ClickLines(PetCharacter.Claude).Contains(actor.Behavior.Bubble) && service.Pets.Where(pet => pet.Id != claudeId).All(pet => pet.Behavior.Bubble.Length == 0), "Hover/click dialogue leaked to another companion or reset the gesture.");
+            Assert(actor.Behavior.StartedAt == hoverStarted && DesktopPetDialogue.ClickLines(claudeCharacter).Contains(actor.Behavior.Bubble) && service.Pets.Where(pet => pet.Id != claudeId).All(pet => pet.Behavior.Bubble.Length == 0), "Hover/click dialogue leaked to another companion or reset the gesture.");
             var signature = actor.Window.Sprite.ContextMenu!.Items.OfType<MenuItem>().Single(item => Equals(item.Header, "翻一页书"));
             signature.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
             Assert(actor.Behavior.Pose == PetPose.RiceHat && actor.Behavior.Bubble.Contains("一起读") && service.Pets.Where(pet => pet.Id != claudeId).All(pet => pet.Behavior.Pose != PetPose.RiceHat), "A personal gesture affected other pets or lost its persona.");
@@ -229,7 +233,7 @@ internal static class DesktopPetChecks
             Complete(services.UpdatePetAsync(pet => pet.Enable())); Assert(service.Pets.Count == 4, "Global re-enable did not restore the roster.");
         }
         finally { Complete(services.UpdatePetAsync(pet => original.CopyAllTo(pet))); panel.Load(original); }
-        Console.WriteLine("  Multi-pet: five windows/states, sixth-pet cap, independent drag/restart/menu/fullscreen/settings, shared input and global off/on verified.");
+        Console.WriteLine($"  Multi-pet ({(standard ? "normal proportions" : "chibi")}): five windows/states, sixth-pet cap, independent drag/restart/menu/fullscreen/settings, shared input and global off/on verified.");
     }
     private static void CheckEmotionPreview(DesktopPetSettingsPanel panel, Window host)
     {
@@ -416,10 +420,11 @@ internal static class DesktopPetChecks
     }
     private static void SaveCharacterOverview(IReadOnlyList<BitmapSource> idles)
     {
+        var height = (int)Math.Ceiling(idles.Count / 4d) * 360;
         var drawing = new DrawingVisual();
         using (var context = drawing.RenderOpen())
         {
-            context.DrawRectangle(new SolidColorBrush(Color.FromRgb(236, 242, 250)), null, new Rect(0, 0, 1200, 720));
+            context.DrawRectangle(new SolidColorBrush(Color.FromRgb(236, 242, 250)), null, new Rect(0, 0, 1200, height));
             for (var i = 0; i < idles.Count; i++)
             {
                 context.DrawImage(idles[i], new Rect(i % 4 * 300 + 12, i / 4 * 360 + 10, 276, 276));
@@ -427,10 +432,25 @@ internal static class DesktopPetChecks
                 context.DrawText(caption, new Point(i % 4 * 300 + (300 - caption.Width) / 2, i / 4 * 360 + 310));
             }
         }
-        var bitmap = new RenderTargetBitmap(1200, 720, 96, 96, PixelFormats.Pbgra32); bitmap.Render(drawing);
+        var bitmap = new RenderTargetBitmap(1200, height, 96, 96, PixelFormats.Pbgra32); bitmap.Render(drawing);
         var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap));
         var directory = Path.GetFullPath(".artifacts/pet-check"); Directory.CreateDirectory(directory);
         using var stream = File.Create(Path.Combine(directory, "pet-characters.png")); encoder.Save(stream);
+        var normal = new DrawingVisual();
+        using (var context = normal.RenderOpen())
+        {
+            context.DrawRectangle(new SolidColorBrush(Color.FromRgb(241, 245, 252)), null, new Rect(0, 0, 1440, 600));
+            var characters = new[] { PetCharacter.GptStandard, PetCharacter.GeminiStandard, PetCharacter.ClaudeStandard, PetCharacter.QwenStandard };
+            for (var i = 0; i < characters.Length; i++)
+            {
+                context.DrawImage(idles[(int)characters[i]], new Rect(i * 360 - 36, 35, 432, 432));
+                var caption = new FormattedText(DesktopPetCharacters.Get(characters[i]).Name, System.Globalization.CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface("Microsoft YaHei"), 18, Brushes.MidnightBlue, 1);
+                context.DrawText(caption, new Point(i * 360 + (360 - caption.Width) / 2, 550));
+            }
+        }
+        var normalBitmap = new RenderTargetBitmap(1440, 600, 96, 96, PixelFormats.Pbgra32); normalBitmap.Render(normal);
+        var normalEncoder = new PngBitmapEncoder(); normalEncoder.Frames.Add(BitmapFrame.Create(normalBitmap));
+        using var normalStream = File.Create(Path.Combine(directory, "pet-standard-characters.png")); normalEncoder.Save(normalStream);
     }
     private static void SavePoseSheet(WhalePetSprite sprite, PetCharacter character)
     {

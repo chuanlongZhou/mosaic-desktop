@@ -83,7 +83,7 @@ public sealed class WhalePetSprite : Image
             PetCharacter.DeepSeekStandard => "DeepSeekStandard/keyframes.json",
             _ => "whale-keyframes.json"
         } };
-        if (character is PetCharacter.Gpt or PetCharacter.Gemini or PetCharacter.Claude or PetCharacter.Qwen) manifestPaths = [character + "/frames.json"];
+        if (DesktopPetCharacters.Personality(character) is PetCharacter.Gpt or PetCharacter.Gemini or PetCharacter.Claude or PetCharacter.Qwen) manifestPaths = [character + "/frames.json"];
         foreach (var path in manifestPaths)
         {
           using var stream = Application.GetResourceStream(new Uri(root + path)).Stream;

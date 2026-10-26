@@ -1,0 +1,272 @@
+[
+  {
+    "pose": "Idle",
+    "image": "QwenStandard/idle.png",
+    "rect": [
+      81,
+      4,
+      328,
+      421
+    ]
+  },
+  {
+    "pose": "LookLeft",
+    "image": "QwenStandard/idle.png",
+    "rect": [
+      478,
+      3,
+      327,
+      422
+    ]
+  },
+  {
+    "pose": "LookRight",
+    "image": "QwenStandard/idle.png",
+    "rect": [
+      878,
+      5,
+      324,
+      420
+    ]
+  },
+  {
+    "pose": "LookUp",
+    "image": "QwenStandard/idle.png",
+    "rect": [
+      76,
+      423,
+      340,
+      418
+    ]
+  },
+  {
+    "pose": "LookDown",
+    "image": "QwenStandard/idle.png",
+    "rect": [
+      479,
+      423,
+      333,
+      420
+    ]
+  },
+  {
+    "pose": "Blink",
+    "image": "QwenStandard/idle.png",
+    "rect": [
+      886,
+      422,
+      331,
+      420
+    ]
+  },
+  {
+    "pose": "Sleep",
+    "image": "QwenStandard/idle.png",
+    "rect": [
+      10,
+      932,
+      455,
+      290
+    ]
+  },
+  {
+    "pose": "Wake",
+    "image": "QwenStandard/idle.png",
+    "rect": [
+      470,
+      846,
+      435,
+      385
+    ]
+  },
+  {
+    "pose": "TiredYawn",
+    "image": "QwenStandard/idle.png",
+    "rect": [
+      909,
+      839,
+      309,
+      409
+    ]
+  },
+  {
+    "pose": "Pat",
+    "image": "QwenStandard/social.png",
+    "rect": [
+      75,
+      15,
+      342,
+      408
+    ]
+  },
+  {
+    "pose": "Cheer",
+    "image": "QwenStandard/social.png",
+    "rect": [
+      464,
+      3,
+      374,
+      421
+    ]
+  },
+  {
+    "pose": "Wave",
+    "image": "QwenStandard/social.png",
+    "rect": [
+      888,
+      17,
+      316,
+      406
+    ]
+  },
+  {
+    "pose": "Goodbye",
+    "image": "QwenStandard/social.png",
+    "rect": [
+      76,
+      427,
+      349,
+      409
+    ]
+  },
+  {
+    "pose": "Eat",
+    "image": "QwenStandard/social.png",
+    "rect": [
+      480,
+      426,
+      331,
+      409
+    ]
+  },
+  {
+    "pose": "Drag",
+    "image": "QwenStandard/social.png",
+    "rect": [
+      853,
+      421,
+      374,
+      380
+    ]
+  },
+  {
+    "pose": "Surprise",
+    "image": "QwenStandard/social.png",
+    "rect": [
+      72,
+      836,
+      344,
+      406
+    ]
+  },
+  {
+    "pose": "Pout",
+    "image": "QwenStandard/social.png",
+    "rect": [
+      492,
+      832,
+      308,
+      414
+    ]
+  },
+  {
+    "pose": "BegReach",
+    "image": "QwenStandard/social.png",
+    "rect": [
+      865,
+      826,
+      359,
+      420
+    ]
+  },
+  {
+    "pose": "TypingLeft",
+    "image": "QwenStandard/actions.png",
+    "rect": [
+      79,
+      3,
+      324,
+      420
+    ]
+  },
+  {
+    "pose": "TypingRight",
+    "image": "QwenStandard/actions.png",
+    "rect": [
+      471,
+      3,
+      323,
+      419
+    ]
+  },
+  {
+    "pose": "RiceHat",
+    "image": "QwenStandard/actions.png",
+    "rect": [
+      884,
+      4,
+      326,
+      419
+    ]
+  },
+  {
+    "pose": "RiceHatTilt",
+    "image": "QwenStandard/actions.png",
+    "rect": [
+      60,
+      421,
+      354,
+      423
+    ]
+  },
+  {
+    "pose": "GreetA",
+    "image": "QwenStandard/actions.png",
+    "rect": [
+      465,
+      421,
+      342,
+      421
+    ]
+  },
+  {
+    "pose": "GreetB",
+    "image": "QwenStandard/actions.png",
+    "rect": [
+      870,
+      422,
+      345,
+      421
+    ]
+  },
+  {
+    "pose": "Tired",
+    "image": "QwenStandard/actions.png",
+    "rect": [
+      66,
+      842,
+      345,
+      404
+    ]
+  },
+  {
+    "pose": "BegTokens",
+    "image": "QwenStandard/actions.png",
+    "rect": [
+      468,
+      841,
+      335,
+      403
+    ]
+  },
+  {
+    "pose": "TokenDazed",
+    "image": "QwenStandard/actions.png",
+    "rect": [
+      827,
+      903,
+      420,
+      325
+    ]
+  }
+]

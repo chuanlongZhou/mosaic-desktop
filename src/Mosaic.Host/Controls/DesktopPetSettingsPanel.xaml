@@ -14,7 +14,7 @@
   <TextBlock Text="最多 5 位，可重复选择同一角色；各自保存位置、大小和反应。主位可收起，其他伙伴可移除。保存后一起应用。" Foreground="{DynamicResource MutedBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,4,0,16"/>
   <TextBlock Text="选择桌宠" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8"/>
   <ComboBox x:Name="CharacterPicker" DisplayMemberPath="Name" SelectedValuePath="Id" SelectionChanged="OnCharacterChanged" AutomationProperties.Name="桌宠角色" Margin="0,0,0,8"/>
-  <TextBlock Text="保留三款鲸鱼娘，新增 GPT、Gemini、Claude、Qwen。先选择上方伙伴，再选择她的角色。" Foreground="{DynamicResource MutedBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,16"/>
+  <TextBlock Text="共 11 款：原版鲸鱼娘，以及 DeepSeek、GPT、Gemini、Claude、Qwen 的 Q 版与正常比例版。正常比例显示高度加倍。先选择伙伴，再选择她的角色。" Foreground="{DynamicResource MutedBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,16"/>
   <Border Background="{DynamicResource HeroBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="14" Padding="12" Margin="0,0,0,18">
    <Grid x:Name="PreviewStage" ClipToBounds="True"><Grid.ColumnDefinitions><ColumnDefinition Width="160"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
     <local:WhalePetSprite x:Name="PreviewSprite" Width="152" Height="170" RenderTransformOrigin=".5,.85" AutomationProperties.Name="鲸鱼娘动作预览"/>

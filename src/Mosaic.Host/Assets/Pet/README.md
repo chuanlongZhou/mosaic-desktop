@@ -1,6 +1,14 @@
 # AI 娘桌宠素材
 
-## 当前：四位新伙伴（V0.8.12）
+## 当前：四位正常比例伙伴（V0.8.15）
+
+新增 [GptStandard](GptStandard/idle.png)、[GeminiStandard](GeminiStandard/idle.png)、[ClaudeStandard](ClaudeStandard/idle.png)、[QwenStandard](QwenStandard/idle.png)。每套包含 idle.png、social.png、actions.png 与 frames.json，覆盖 27 幅独立绘制的成年动漫比例关键帧，再复用本角色待机图与单枚 token 组成两帧下落。各角色共有 29 个缓存姿态，十一款共 319 个；所有正常比例版默认显示高度为 Q 版两倍。
+
+使用内置 image_gen，根据各参考图左侧正常比例身份生成；完整提示词、排版修订见 [generation-prompts-standard-companions.txt](generation-prompts-standard-companions.txt)。分析脚本只记录透明轮廓的矩形区域，没有修改 PNG 像素。Q 版与所有旧 PNG 保留。同一角色两个比例共用性格台词、投喂与专属动作；最多五开可混合比例。
+
+正常版姿态与说明见 [完整列表](../../../../../docs/NORMAL_PET_VARIANTS.md)，来源继续见 [署名记录](../../../../../packaging/licenses/AI-Companions-NOTICE.md)。
+
+## Q 版素材（V0.8.12，原图保留）
 
 保留全部鲸鱼娘素材，新增 [Gpt](Gpt/idle.png)、[Gemini](Gemini/idle.png)、[Claude](Claude/idle.png)、[Qwen](Qwen/idle.png) 四个目录。每个目录包含 idle.png、social.png、actions.png 和 frames.json，分别覆盖九个独立姿态，共 27 幅绘制关键帧；另外两帧 token 下落直接复用各自的 Idle 与同一枚 token。四套身份来自 References 中的完整 v5 参考图右侧 Q 版。
 
@@ -8,7 +16,7 @@
 
 来源、参考图哈希与署名条件见 [新角色来源记录](../../../../../packaging/licenses/AI-Companions-NOTICE.md)；四款不套用 DeepSeek 的 CC 协议。性格与全部台词见 [设计说明](../../../../../docs/AI_PET_PERSONALITIES.md)。
 
-## 当前：关键帧（V0.8.11）
+## 关键帧记录（V0.8.11）
 
 移除上一版的变形、粒子与 GIF 效果。新增每款两幅准备姿态：打哈欠 `TiredYawn`、伸手 `BegReach`。素材使用内置 image_gen 参考各自已有 idle 图集的左上角色生成；完整提示词见 [generation-prompts-keyframes.txt](generation-prompts-keyframes.txt)。
 

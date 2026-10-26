@@ -2,7 +2,7 @@
 
 ## 当前交付 · V0.8.3
 
-2026-10-25。当前版本以 `src/Mosaic.Host/Mosaic.Host.csproj` 的 `0.8.14` 为准；运行包输出到 `artifacts/Mosaic-v0.8.14-win-x64`。下面的 V0.1／V0.2 记录保留当时的范围与数据，不能作为当前依赖、功能或验收状态。
+2026-10-26。当前版本以 `src/Mosaic.Host/Mosaic.Host.csproj` 的 `0.8.15` 为准；运行包输出到 `artifacts/Mosaic-v0.8.15-win-x64`。下面的 V0.1／V0.2 记录保留当时的范围与数据，不能作为当前依赖、功能或验收状态。
 
 | 更新 | 当前实现 |
 | --- | --- |
@@ -117,3 +117,7 @@ Release 构建将警告视为错误。Windows 界面在隔离的 `--data-dir` �
 运行 `scripts/publish.ps1` 生成最新版程序目录与 ZIP；版本号读取 Host 项目文件，成功打包后仅清理 artifacts 下符合 Mosaic 版本命名的旧发行包。源码素材、用户配置和开发检查记录保留。
 
 Mosaic 桌面模式下，单按左／右 Win 同时展开 Dock 和所有屏幕的顶部菜单，并保持显示，鼠标移开不会自动隐藏；再次单按 Win 收起，之后仍可从屏幕边缘唤出。长按只在松开时切换一次。Win+D、Win+E 等组合键保留，Ctrl+Esc 继续拦截开始菜单。切回 Windows 或退出后解除拦截；该显示状态不写入配置。
+
+## 图书馆茶室独立演示
+
+项目 `src/Mosaic.PetWorldDemo` 引用主应用的生产素材，通过 `scripts/run-pet-world-demo.ps1` 单独构建运行，不改变正常桌宠或桌面接管配置。验证入口和边界见 [场景演示说明](PET_WORLD_DEMO.md)。`output/` 保存本地程序与报告，不随 Git 提交。

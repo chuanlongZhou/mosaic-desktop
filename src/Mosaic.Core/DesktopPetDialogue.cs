@@ -6,7 +6,7 @@ namespace Mosaic.Core;
 // original companion writing, not quotations or official model statements.
 public static class DesktopPetDialogue
 {
-    public static IReadOnlyList<string> ClickLines(PetCharacter character) => character switch
+    public static IReadOnlyList<string> ClickLines(PetCharacter character) => DesktopPetCharacters.Personality(character) switch
     {
         PetCharacter.Gpt => GptClicks,
         PetCharacter.Gemini => GeminiClicks,
@@ -133,7 +133,7 @@ public static class DesktopPetDialogue
 
     public static string Line(PetCharacter character, PetTrigger trigger, string fallback)
     {
-        var lines = character switch
+        var lines = DesktopPetCharacters.Personality(character) switch
         {
             PetCharacter.Gpt => Gpt,
             PetCharacter.Gemini => Gemini,
@@ -143,7 +143,7 @@ public static class DesktopPetDialogue
         };
         return lines?.GetValueOrDefault(trigger) ?? fallback;
     }
-    public static string Sleep(PetCharacter character) => character switch
+    public static string Sleep(PetCharacter character) => DesktopPetCharacters.Personality(character) switch
     {
         PetCharacter.Gpt => "先收好龙翼，等你回来再继续。",
         PetCharacter.Gemini => "猫猫先充一会儿电…呼噜…",
@@ -151,7 +151,7 @@ public static class DesktopPetDialogue
         PetCharacter.Qwen => "折扇轻合，且歇片刻。",
         _ => "Zzz… 鱼片回来记得叫我…"
     };
-    public static string Wake(PetCharacter character) => character switch
+    public static string Wake(PetCharacter character) => DesktopPetCharacters.Personality(character) switch
     {
         PetCharacter.Gpt => "欢迎回来，我们接着理清思路。",
         PetCharacter.Gemini => "喵！新灵感是不是来了？",
@@ -159,7 +159,7 @@ public static class DesktopPetDialogue
         PetCharacter.Qwen => "精神养足，折扇再开。说吧，想问什么？",
         _ => "你回来啦！刚刚只是在闭目养神～"
     };
-    public static string Preparation(PetCharacter character, PetPose pose, string fallback) => (character, pose) switch
+    public static string Preparation(PetCharacter character, PetPose pose, string fallback) => (DesktopPetCharacters.Personality(character), pose) switch
     {
         (PetCharacter.Gpt, PetPose.Idle) => "让我想一想。",
         (PetCharacter.Gemini, PetPose.Idle) => "喵？",

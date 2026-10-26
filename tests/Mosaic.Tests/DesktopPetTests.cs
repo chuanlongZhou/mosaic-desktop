@@ -41,6 +41,7 @@ internal static class DesktopPetTests
     {
         CheckExpressionsAndGreetings();
         CheckPersonalities();
+        CheckStandardCharacters();
         CheckHoverAndClick();
         var pet = new DesktopPetBehavior();
         Assert(pet.Trigger(PetTrigger.Enter, 10000) && pet.Pose == PetPose.Cheer, "Enter did not cheer.");
@@ -173,6 +174,33 @@ internal static class DesktopPetTests
         idle.Tick(14000, 1000, false, 90, false, 0, 0);
         Assert(!idle.IsSleeping, "Disabled idle sleep still triggered.");
         Assert(!Enum.GetNames<PetTrigger>().Contains("Walk") && !Enum.GetNames<PetPose>().Any(name => name.StartsWith("Walk")), "Walking remains a runtime action.");
+    }
+
+    private static void CheckStandardCharacters()
+    {
+        Assert(DesktopPetCharacters.All.Count == 11 && DesktopPetCharacters.All.Select(character => character.Id).Distinct().Count() == 11, "Standard variants replaced an existing character.");
+        Assert((int)PetCharacter.WhaleGirl == 0 && (int)PetCharacter.DeepSeekStandard == 2 && (int)PetCharacter.Gpt == 3 && (int)PetCharacter.Qwen == 6, "Existing persisted character IDs changed.");
+        foreach (var (chibi, standard) in new[]
+        {
+            (PetCharacter.Gpt, PetCharacter.GptStandard), (PetCharacter.Gemini, PetCharacter.GeminiStandard),
+            (PetCharacter.Claude, PetCharacter.ClaudeStandard), (PetCharacter.Qwen, PetCharacter.QwenStandard)
+        })
+        {
+            var small = DesktopPetCharacters.Get(chibi); var normal = DesktopPetCharacters.Get(standard);
+            Assert(small.SizeMultiplier == 1 && normal.SizeMultiplier == 2 && normal.Name.Contains("正常比例"), "Standard variant did not double its display size.");
+            Assert(small.FeedLabel == normal.FeedLabel && small.SignatureLabel == normal.SignatureLabel && small.TeaseLabel == normal.TeaseLabel, "A new body type lost its character's interactions.");
+            Assert(ReferenceEquals(DesktopPetDialogue.ClickLines(chibi), DesktopPetDialogue.ClickLines(standard)), "Standard dialogue did not reuse the same personality pool.");
+            Assert(DesktopPetDialogue.Sleep(chibi) == DesktopPetDialogue.Sleep(standard) && DesktopPetDialogue.Wake(chibi) == DesktopPetDialogue.Wake(standard), "Standard sleep/wake used whale dialogue.");
+            foreach (var pose in Enum.GetValues<PetPose>())
+                Assert(DesktopPetDialogue.Preparation(chibi, pose, "fallback") == DesktopPetDialogue.Preparation(standard, pose, "fallback"), "Standard keyframe caption lost its personality.");
+            foreach (var trigger in Enum.GetValues<PetTrigger>())
+            {
+                var a = new DesktopPetBehavior(_ => 0, chibi); var b = new DesktopPetBehavior(_ => 0, standard);
+                a.Trigger(trigger, 10000); b.Trigger(trigger, 10000);
+                Assert(a.Pose == b.Pose && a.Bubble == b.Bubble && a.StillBubble == b.StillBubble, "Standard body changed an action or its dialogue.");
+            }
+        }
+        Console.WriteLine("  Standard: four independent adult identities; 2x size, legacy IDs, all actions/keyframe captions and shared personality dialogue verified.");
     }
 
     private static void CheckHoverAndClick()

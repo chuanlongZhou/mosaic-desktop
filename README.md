@@ -2,7 +2,7 @@
   <img src="src/Mosaic.Host/Assets/Mosaic.svg" width="72" alt="Mosaic Desktop" />
   <h1>Mosaic Desktop</h1>
   <p>让控件留在桌面，让应用各就其位。</p>
-  <p>Windows 11 · C# / .NET 10 · WPF · 开发预览 v0.8.14</p>
+  <p>Windows 11 · C# / .NET 10 · WPF · 开发预览 v0.8.15</p>
 </div>
 
 Mosaic Desktop 是一款可切换的 Windows 桌面覆盖软件。它保留你的壁纸，把时钟、笔记、待办和系统监控固定在桌面层，用应用 Dock 和顶部菜单栏承接日常操作。主界面负责设置、插件管理、资源和工作空间。
@@ -11,7 +11,7 @@ Mosaic Desktop 是一款可切换的 Windows 桌面覆盖软件。它保留你�
 
 ## 当前功能
 
-- **七款 AI 娘桌宠，最多五开**：保留原版与两款 DeepSeek，新增 GPT 白龙娘、Gemini 星猫娘、Claude 书卷娘、Qwen 折扇娘。每款 29 个缓存姿态，动作和台词根据各自性格设计；支持龙翼舒展、猫爪比心、翻书与开合折扇。设置中的同伴名册可添加、切换、收起与移除，每位独立保存位置、大小和反应。悬停与点击都有互动动作；点击随机聊天，五套性格共 100 句，连续不重复，含轻松互相吐槽。继续使用正常→过渡→最终表情的关键帧，走路保持移除。详见 [桌宠说明](docs/DESKTOP_PET.md)、[性格与动作台词](docs/AI_PET_PERSONALITIES.md)、[100 句随机聊天](docs/PET_CHAT_LINES.md) 和 [表情列表](docs/PET_EXPRESSIONS.md)。
+- **十一款 AI 娘桌宠，最多五开**：保留原版，DeepSeek、GPT、Gemini、Claude、Qwen 均提供 Q 版和正常比例版。正常比例版各有独立绘制的动作图，显示高度加倍。每款 29 个缓存姿态，动作和台词根据各自性格设计；支持龙翼舒展、猫爪比心、翻书与开合折扇。设置中的同伴名册可添加、切换、收起与移除，每位独立保存位置、大小和反应。悬停与点击都有互动动作；点击随机聊天，五套性格共 100 句，连续不重复，含轻松互相吐槽。继续使用正常→过渡→最终表情的关键帧，走路保持移除。详见 [桌宠说明](docs/DESKTOP_PET.md)、[四位正常比例版](docs/NORMAL_PET_VARIANTS.md)、[性格与动作台词](docs/AI_PET_PERSONALITIES.md)、[100 句随机聊天](docs/PET_CHAT_LINES.md) 和 [表情列表](docs/PET_EXPRESSIONS.md)。
 - **固定桌面控件**：时钟、随手记、待办、CPU、内存、GPU、显存、温度、风扇 RPM、网络、存储和快捷访问。平时锁定；进入「编辑桌面布局」后移动或缩放，支持完成保存、取消和 Escape 恢复。
 - **应用 Dock**：读取 Windows 任务栏固定应用，合并运行窗口，展示新打开的应用；支持窗口切换、24–80 图标大小、横向滚动和原始应用图标。
 - **按场景显示的菜单栏**：桌面或没有最大化应用时，Dock 与顶部菜单保持展开；有最大化或全屏应用且当前不在桌面时，按各自设置自动隐藏。顶部菜单展开时预留工作区，窗口从其下方开始，收起后释放空间；边缘唤出与菜单使用期间同样占位。
@@ -58,7 +58,7 @@ cd mosaic-desktop
 .\scripts\publish.ps1
 ```
 
-输出位于 `artifacts/Mosaic-v0.8.14-win-x64/`，同级生成 ZIP；发布成功后只保留当前版本的目录与 ZIP，旧版本发行包自动清理。运行包需要 **.NET 10 Desktop Runtime**，不包含运行时或 SDK。
+输出位于 `artifacts/Mosaic-v0.8.15-win-x64/`，同级生成 ZIP；发布成功后只保留当前版本的目录与 ZIP，旧版本发行包自动清理，正在运行的旧版暂时保留。运行包需要 **.NET 10 Desktop Runtime**，不包含运行时或 SDK。
 
 源码仓库不跟踪本机 SDK、编译输出和运行包。
 
@@ -127,6 +127,10 @@ scripts/                   SDK 准备、构建、运行、测试与打包
 docs/                      设计、实现复核与开发历史
 ```
 
+## 独立场景演示
+
+[图书馆茶室](docs/PET_WORLD_DEMO.md)复用五位正常比例角色，提供六章、48 幕的 2.5D 场景、导航和互动。运行 `scripts/run-pet-world-demo.ps1`；这是独立窗口演示，尚未挂载到壁纸层。程序输出与验证报告位于本地 `output/`，不纳入源码仓库。
+
 ## 当前边界
 
 - 当前为开发预览；桌面控件画布与 Dock 主要覆盖主屏，顶部菜单栏支持各屏幕。
@@ -136,6 +140,9 @@ docs/                      设计、实现复核与开发历史
 - 尚未提供签名安装包、自动更新和完整主题编辑器。
 
 ## 文档
+
+- [正常比例角色与素材说明](docs/NORMAL_PET_VARIANTS.md)
+- [图书馆茶室场景演示与验证](docs/PET_WORLD_DEMO.md)
 
 - [V0.8 系列外观、快捷键、监控与托盘指南](docs/EXPERIENCE_V0.8.md)
 - [桌面栏与开始菜单行为](docs/SHELL_BEHAVIOR_V0.7.md)

@@ -1,0 +1,272 @@
+[
+  {
+    "pose": "Idle",
+    "image": "ClaudeStandard/idle.png",
+    "rect": [
+      83,
+      42,
+      275,
+      391
+    ]
+  },
+  {
+    "pose": "LookLeft",
+    "image": "ClaudeStandard/idle.png",
+    "rect": [
+      502,
+      44,
+      267,
+      388
+    ]
+  },
+  {
+    "pose": "LookRight",
+    "image": "ClaudeStandard/idle.png",
+    "rect": [
+      915,
+      45,
+      282,
+      389
+    ]
+  },
+  {
+    "pose": "LookUp",
+    "image": "ClaudeStandard/idle.png",
+    "rect": [
+      76,
+      463,
+      286,
+      395
+    ]
+  },
+  {
+    "pose": "LookDown",
+    "image": "ClaudeStandard/idle.png",
+    "rect": [
+      501,
+      463,
+      278,
+      395
+    ]
+  },
+  {
+    "pose": "Blink",
+    "image": "ClaudeStandard/idle.png",
+    "rect": [
+      924,
+      464,
+      280,
+      359
+    ]
+  },
+  {
+    "pose": "Sleep",
+    "image": "ClaudeStandard/idle.png",
+    "rect": [
+      24,
+      938,
+      397,
+      277
+    ]
+  },
+  {
+    "pose": "Wake",
+    "image": "ClaudeStandard/idle.png",
+    "rect": [
+      451,
+      869,
+      401,
+      357
+    ]
+  },
+  {
+    "pose": "TiredYawn",
+    "image": "ClaudeStandard/idle.png",
+    "rect": [
+      941,
+      846,
+      260,
+      379
+    ]
+  },
+  {
+    "pose": "Pat",
+    "image": "ClaudeStandard/social.png",
+    "rect": [
+      89,
+      11,
+      286,
+      409
+    ]
+  },
+  {
+    "pose": "Cheer",
+    "image": "ClaudeStandard/social.png",
+    "rect": [
+      492,
+      0,
+      292,
+      430
+    ]
+  },
+  {
+    "pose": "Wave",
+    "image": "ClaudeStandard/social.png",
+    "rect": [
+      906,
+      14,
+      282,
+      416
+    ]
+  },
+  {
+    "pose": "Goodbye",
+    "image": "ClaudeStandard/social.png",
+    "rect": [
+      95,
+      420,
+      298,
+      399
+    ]
+  },
+  {
+    "pose": "Eat",
+    "image": "ClaudeStandard/social.png",
+    "rect": [
+      490,
+      435,
+      291,
+      395
+    ]
+  },
+  {
+    "pose": "Drag",
+    "image": "ClaudeStandard/social.png",
+    "rect": [
+      872,
+      429,
+      346,
+      364
+    ]
+  },
+  {
+    "pose": "Surprise",
+    "image": "ClaudeStandard/social.png",
+    "rect": [
+      81,
+      831,
+      322,
+      416
+    ]
+  },
+  {
+    "pose": "Pout",
+    "image": "ClaudeStandard/social.png",
+    "rect": [
+      493,
+      834,
+      294,
+      414
+    ]
+  },
+  {
+    "pose": "BegReach",
+    "image": "ClaudeStandard/social.png",
+    "rect": [
+      906,
+      827,
+      302,
+      426
+    ]
+  },
+  {
+    "pose": "TypingLeft",
+    "image": "ClaudeStandard/actions.png",
+    "rect": [
+      81,
+      16,
+      291,
+      410
+    ]
+  },
+  {
+    "pose": "TypingRight",
+    "image": "ClaudeStandard/actions.png",
+    "rect": [
+      484,
+      14,
+      296,
+      412
+    ]
+  },
+  {
+    "pose": "RiceHat",
+    "image": "ClaudeStandard/actions.png",
+    "rect": [
+      893,
+      14,
+      299,
+      412
+    ]
+  },
+  {
+    "pose": "RiceHatTilt",
+    "image": "ClaudeStandard/actions.png",
+    "rect": [
+      77,
+      431,
+      312,
+      422
+    ]
+  },
+  {
+    "pose": "GreetA",
+    "image": "ClaudeStandard/actions.png",
+    "rect": [
+      475,
+      431,
+      315,
+      425
+    ]
+  },
+  {
+    "pose": "GreetB",
+    "image": "ClaudeStandard/actions.png",
+    "rect": [
+      893,
+      431,
+      312,
+      431
+    ]
+  },
+  {
+    "pose": "Tired",
+    "image": "ClaudeStandard/actions.png",
+    "rect": [
+      78,
+      853,
+      303,
+      398
+    ]
+  },
+  {
+    "pose": "BegTokens",
+    "image": "ClaudeStandard/actions.png",
+    "rect": [
+      475,
+      861,
+      306,
+      388
+    ]
+  },
+  {
+    "pose": "TokenDazed",
+    "image": "ClaudeStandard/actions.png",
+    "rect": [
+      859,
+      905,
+      371,
+      323
+    ]
+  }
+]

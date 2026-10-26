@@ -1,0 +1,272 @@
+[
+  {
+    "pose": "Idle",
+    "image": "GptStandard/idle.png",
+    "rect": [
+      51,
+      7,
+      370,
+      417
+    ]
+  },
+  {
+    "pose": "LookLeft",
+    "image": "GptStandard/idle.png",
+    "rect": [
+      456,
+      9,
+      373,
+      413
+    ]
+  },
+  {
+    "pose": "LookRight",
+    "image": "GptStandard/idle.png",
+    "rect": [
+      867,
+      6,
+      365,
+      418
+    ]
+  },
+  {
+    "pose": "LookUp",
+    "image": "GptStandard/idle.png",
+    "rect": [
+      50,
+      423,
+      375,
+      411
+    ]
+  },
+  {
+    "pose": "LookDown",
+    "image": "GptStandard/idle.png",
+    "rect": [
+      457,
+      421,
+      377,
+      411
+    ]
+  },
+  {
+    "pose": "Blink",
+    "image": "GptStandard/idle.png",
+    "rect": [
+      874,
+      423,
+      367,
+      410
+    ]
+  },
+  {
+    "pose": "Sleep",
+    "image": "GptStandard/idle.png",
+    "rect": [
+      6,
+      905,
+      443,
+      299
+    ]
+  },
+  {
+    "pose": "Wake",
+    "image": "GptStandard/idle.png",
+    "rect": [
+      453,
+      831,
+      399,
+      413
+    ]
+  },
+  {
+    "pose": "TiredYawn",
+    "image": "GptStandard/idle.png",
+    "rect": [
+      893,
+      832,
+      355,
+      406
+    ]
+  },
+  {
+    "pose": "Pat",
+    "image": "GptStandard/social.png",
+    "rect": [
+      93,
+      50,
+      300,
+      355
+    ]
+  },
+  {
+    "pose": "Cheer",
+    "image": "GptStandard/social.png",
+    "rect": [
+      479,
+      40,
+      322,
+      364
+    ]
+  },
+  {
+    "pose": "Wave",
+    "image": "GptStandard/social.png",
+    "rect": [
+      889,
+      49,
+      300,
+      353
+    ]
+  },
+  {
+    "pose": "Goodbye",
+    "image": "GptStandard/social.png",
+    "rect": [
+      82,
+      452,
+      322,
+      362
+    ]
+  },
+  {
+    "pose": "Eat",
+    "image": "GptStandard/social.png",
+    "rect": [
+      489,
+      458,
+      302,
+      357
+    ]
+  },
+  {
+    "pose": "Drag",
+    "image": "GptStandard/social.png",
+    "rect": [
+      887,
+      452,
+      304,
+      368
+    ]
+  },
+  {
+    "pose": "Surprise",
+    "image": "GptStandard/social.png",
+    "rect": [
+      92,
+      853,
+      314,
+      348
+    ]
+  },
+  {
+    "pose": "Pout",
+    "image": "GptStandard/social.png",
+    "rect": [
+      493,
+      858,
+      300,
+      348
+    ]
+  },
+  {
+    "pose": "BegReach",
+    "image": "GptStandard/social.png",
+    "rect": [
+      908,
+      852,
+      291,
+      348
+    ]
+  },
+  {
+    "pose": "TypingLeft",
+    "image": "GptStandard/actions.png",
+    "rect": [
+      73,
+      56,
+      306,
+      346
+    ]
+  },
+  {
+    "pose": "TypingRight",
+    "image": "GptStandard/actions.png",
+    "rect": [
+      494,
+      57,
+      295,
+      345
+    ]
+  },
+  {
+    "pose": "RiceHat",
+    "image": "GptStandard/actions.png",
+    "rect": [
+      888,
+      55,
+      321,
+      347
+    ]
+  },
+  {
+    "pose": "RiceHatTilt",
+    "image": "GptStandard/actions.png",
+    "rect": [
+      60,
+      462,
+      355,
+      348
+    ]
+  },
+  {
+    "pose": "GreetA",
+    "image": "GptStandard/actions.png",
+    "rect": [
+      488,
+      459,
+      310,
+      351
+    ]
+  },
+  {
+    "pose": "GreetB",
+    "image": "GptStandard/actions.png",
+    "rect": [
+      897,
+      462,
+      314,
+      348
+    ]
+  },
+  {
+    "pose": "Tired",
+    "image": "GptStandard/actions.png",
+    "rect": [
+      73,
+      857,
+      331,
+      332
+    ]
+  },
+  {
+    "pose": "BegTokens",
+    "image": "GptStandard/actions.png",
+    "rect": [
+      501,
+      859,
+      291,
+      330
+    ]
+  },
+  {
+    "pose": "TokenDazed",
+    "image": "GptStandard/actions.png",
+    "rect": [
+      873,
+      900,
+      346,
+      303
+    ]
+  }
+]

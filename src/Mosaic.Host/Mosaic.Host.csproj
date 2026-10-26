@@ -9,7 +9,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <AssemblyName>Mosaic</AssemblyName>
     <RootNamespace>Mosaic.Host</RootNamespace>
-    <Version>0.8.14</Version>
+    <Version>0.8.15</Version>
     <Description>Mosaic Desktop — lightweight native Windows desktop</Description>
   </PropertyGroup>
   <ItemGroup>
@@ -41,6 +41,14 @@
     <Resource Include="Assets/Pet/Claude/frames.json" />
     <Resource Include="Assets/Pet/Qwen/*.png" />
     <Resource Include="Assets/Pet/Qwen/frames.json" />
+    <Resource Include="Assets/Pet/GptStandard/*.png" />
+    <Resource Include="Assets/Pet/GptStandard/frames.json" />
+    <Resource Include="Assets/Pet/GeminiStandard/*.png" />
+    <Resource Include="Assets/Pet/GeminiStandard/frames.json" />
+    <Resource Include="Assets/Pet/ClaudeStandard/*.png" />
+    <Resource Include="Assets/Pet/ClaudeStandard/frames.json" />
+    <Resource Include="Assets/Pet/QwenStandard/*.png" />
+    <Resource Include="Assets/Pet/QwenStandard/frames.json" />
     <PackageReference Include="ManagedShell" Version="0.0.374" />
     <Content Include="../../packaging/licenses/ManagedShell-LICENSE.txt" Link="licenses/ManagedShell-LICENSE.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="../../packaging/licenses/DeepSeek-Pets-NOTICE.md" Link="licenses/DeepSeek-Pets-NOTICE.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />

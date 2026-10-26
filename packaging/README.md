@@ -1,6 +1,8 @@
-# Mosaic Desktop · V0.8.14
+# Mosaic Desktop · V0.8.15
 
 Windows 11 x64 + .NET 10 Desktop Runtime；双击 Mosaic.exe。
+
+V0.8.15 新增 GPT、Gemini、Claude、Qwen 的正常比例版本，保留所有 Q 版和 DeepSeek 正常版。设置 → 桌宠 → 选择角色中选带「正常比例」的名字后保存；默认高度为 Q 版的两倍，可独立调节。新增四位均配齐 29 个缓存姿态，保留专属动作、悬停和随机聊天，以及最多五开。共 11 款角色、319 姿态，详情和图片见 NORMAL_PET_VARIANTS.md。发行清理遇到仍在运行的旧版时，保留其目录和 ZIP，退出后下次发布再清理。
 
 V0.8.14：单按 Win 同时显示并保持 Dock 与顶部菜单，再按一次收起。发布目录只保留最新版。
 
