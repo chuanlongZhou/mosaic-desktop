@@ -18,6 +18,7 @@ public sealed class DesktopPetBehavior
     private int _lastClickLine = -1;
     public DesktopPetBehavior(Func<int, int>? choose = null, PetCharacter character = PetCharacter.WhaleGirl)
         => (_choose, _character) = (choose ?? Random.Shared.Next, character);
+    public PetPose ActionPose => _pose;
     public PetPose Pose { get; private set; }
     public string Bubble { get; private set; } = "";
     public long StartedAt { get; private set; }

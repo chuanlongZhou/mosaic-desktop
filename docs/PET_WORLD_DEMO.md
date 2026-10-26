@@ -1,6 +1,6 @@
 # 图书馆茶室：五位 AI 娘的 2.5D 场景演示
 
-独立 WPF 演示项目：`src/Mosaic.PetWorldDemo/`。复用当前五位正常比例角色和生产版 `WhalePetSprite` 的全部素材，不修改原来的置顶桌宠、设置和桌面接管逻辑。
+独立 WPF 演示项目：`src/Mosaic.PetWorldDemo/`。复用当前五位 Q 版角色和生产版 `WhalePetSprite` 的全部素材，不修改原来的置顶桌宠、设置和桌面接管逻辑。
 
 ## 启动
 

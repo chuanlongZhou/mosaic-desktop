@@ -146,11 +146,11 @@ public sealed class WorldDirector
 {
     public WorldActor[] Actors { get; } =
     [
-        new(0, "DeepSeek", PetCharacter.DeepSeekStandard, "#80BFC8", new(4.5, 7)),
-        new(1, "GPT", PetCharacter.GptStandard, "#C8C3DC", new(6.0, 1.5)),
-        new(2, "Gemini", PetCharacter.GeminiStandard, "#A396DB", new(10, 4.5)),
-        new(3, "Claude", PetCharacter.ClaudeStandard, "#DFAB7C", new(2, 3.5)),
-        new(4, "Qwen", PetCharacter.QwenStandard, "#8EABD4", new(8.5, 6.5))
+        new(0, "DeepSeek", PetCharacter.DeepSeekChibi, "#80BFC8", new(4.5, 7)),
+        new(1, "GPT", PetCharacter.Gpt, "#C8C3DC", new(6.0, 1.5)),
+        new(2, "Gemini", PetCharacter.Gemini, "#A396DB", new(10, 4.5)),
+        new(3, "Claude", PetCharacter.Claude, "#DFAB7C", new(2, 3.5)),
+        new(4, "Qwen", PetCharacter.Qwen, "#8EABD4", new(8.5, 6.5))
     ];
     public static readonly string[] Chapters = ["开馆 · 五个座位", "共写 · 一页就好", "茶点 · 饭碗验收", "书签 · 风从哪里来", "Token · 预算小事故", "午后 · 休息也算计划"];
     public IReadOnlyList<StoryBeat> Story { get; }

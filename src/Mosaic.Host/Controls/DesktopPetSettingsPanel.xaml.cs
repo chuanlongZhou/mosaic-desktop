@@ -15,16 +15,17 @@ public partial class DesktopPetSettingsPanel : UserControl
     private DesktopPetSettings _draft = new();
     private string _selectedId = DesktopPetSettings.PrimaryId;
     private readonly TranslateTransform _bob = new();
+    private readonly ScaleTransform _facing = new();
     private bool _loading, _sleepPreview;
-    private long _typingPreviewUntil;
+    private long _typingPreviewUntil, _chimePreviewUntil;
     public event Action? Changed;
     public DesktopPetSettingsPanel()
     {
-        InitializeComponent(); PreviewSprite.RenderTransform = _bob;
+        InitializeComponent(); PreviewSprite.RenderTransform = new TransformGroup { Children = { _facing, _bob } };
         CharacterPicker.ItemsSource = DesktopPetCharacters.All;
         _timer.Tick += (_, _) => PreviewTick();
-        IsVisibleChanged += (_, _) => { if (IsVisible) _timer.Start(); else _timer.Stop(); };
-        Unloaded += (_, _) => _timer.Stop();
+        IsVisibleChanged += (_, _) => { if (IsVisible) _timer.Start(); else { _timer.Stop(); Services.PetChimeAudio.Shared.StopPreview(); PreviewSprite.StopAnimation(); } };
+        Unloaded += (_, _) => { _timer.Stop(); Services.PetChimeAudio.Shared.StopPreview(); PreviewSprite.StopAnimation(); };
     }
     public void Load(DesktopPetSettings settings)
     {
@@ -53,6 +54,8 @@ public partial class DesktopPetSettingsPanel : UserControl
         CursorCheck.IsChecked = settings.FollowCursor; EnterCheck.IsChecked = settings.ReactToEnter;
         DesktopCheck.IsChecked = settings.ReactToDesktop; TypingCheck.IsChecked = settings.ReactToTyping;
         CloseCheck.IsChecked = settings.ReactToAppClose; IdleCheck.IsChecked = settings.SleepWhenIdle;
+        HourlyChimeCheck.IsChecked = settings.HourlyChimeEnabled; ChimeVolumeSlider.Value = settings.HourlyChimeVolume;
+        ChimeVolumeLabel.Text = $"报时音量 · {settings.HourlyChimeVolume}%";
         BubbleCheck.IsChecked = settings.ShowBubbles; FullscreenCheck.IsChecked = settings.HideInFullscreen;
         IdleSlider.Maximum = Math.Max(600, settings.IdleSeconds); IdleSlider.Value = settings.IdleSeconds; SizeSlider.Value = settings.Size;
         PositionLabel.Text = "这位伙伴的拖动位置会独立保存在本机。";
@@ -67,6 +70,7 @@ public partial class DesktopPetSettingsPanel : UserControl
         settings.FollowCursor = CursorCheck.IsChecked == true; settings.ReactToEnter = EnterCheck.IsChecked == true;
         settings.ReactToDesktop = DesktopCheck.IsChecked == true; settings.ReactToTyping = TypingCheck.IsChecked == true;
         settings.ReactToAppClose = CloseCheck.IsChecked == true; settings.SleepWhenIdle = IdleCheck.IsChecked == true;
+        settings.HourlyChimeEnabled = HourlyChimeCheck.IsChecked == true; settings.HourlyChimeVolume = (int)ChimeVolumeSlider.Value;
         settings.ShowBubbles = BubbleCheck.IsChecked == true; settings.HideInFullscreen = FullscreenCheck.IsChecked == true;
         settings.IdleSeconds = (int)IdleSlider.Value; settings.Size = (int)SizeSlider.Value;
     }
@@ -103,11 +107,42 @@ public partial class DesktopPetSettingsPanel : UserControl
     private void UpdateCharacter()
     {
         if (CharacterPicker.SelectedValue is not PetCharacter character) return;
+        HourlyChimePanel.Visibility = PetHourlyChime.Supports(character) ? Visibility.Visible : Visibility.Collapsed;
+        Services.PetChimeAudio.Shared.StopPreview(); _chimePreviewUntil = 0;
+        var animated = DesktopPetCharacters.IsAnimated(character);
+        Mk2AnimationPanel.Visibility = animated ? Visibility.Visible : Visibility.Collapsed;
+        PreviewStage.ColumnDefinitions[0].Width = new GridLength(animated ? 260 : 160);
+        PreviewSprite.Width = animated ? 252 : 152;
+        if (animated) { Mk2AnimationPicker.ItemsSource = Mk2AnimationCatalog.All.Select(c => c.Name); Mk2AnimationPicker.SelectedIndex = 0; }
         var info = DesktopPetCharacters.Get(character); PreviewSprite.SetCharacter(character);
         CharacterName.Text = info.Name; CharacterDescription.Text = info.Description; CharacterTagline.Text = info.Tagline;
         FeedPreviewButton.Content = info.FeedLabel; SignaturePreviewButton.Content = info.SignatureLabel; TeasePreviewButton.Content = info.TeaseLabel;
         System.Windows.Automation.AutomationProperties.SetName(PreviewSprite, info.Name + "动作预览");
         _preview = new(character: character); _sleepPreview = false; _typingPreviewUntil = 0; PreviewTick();
+    }
+    private void OnMk2Preview(object sender, RoutedEventArgs e)
+    {
+        if (!PreviewSprite.HasNativeAnimation || Mk2AnimationPicker.SelectedItem is not string name) return;
+        PreviewSprite.PlayAnimation(name); PreviewTick();
+    }
+    private void OnChimeChanged(object sender, RoutedEventArgs e) { if (!_loading) Changed?.Invoke(); }
+    private void OnChimeVolumeChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (ChimeVolumeLabel is not null) ChimeVolumeLabel.Text = $"报时音量 · {e.NewValue:0}%";
+        if (!_loading) Changed?.Invoke();
+    }
+    private void OnChimePreview(object sender, RoutedEventArgs e)
+    {
+        if (CharacterPicker.SelectedValue is not PetCharacter character || !PetHourlyChime.Supports(character)) return;
+        var hour = DateTimeOffset.Now.Hour; var audio = Services.PetChimeAudio.Shared;
+        if (audio.Play(hour, (int)ChimeVolumeSlider.Value, true, error =>
+            { ChimeStatus.Text = error ?? "试听结束。开启整点报时并保存后，每到整点会自动播放。"; _chimePreviewUntil = 0; }))
+        {
+            _preview = new(character: character); _preview.Trigger(PetTrigger.Wave, Environment.TickCount64);
+            _sleepPreview = false; _typingPreviewUntil = 0; _chimePreviewUntil = Environment.TickCount64 + 20000;
+            ChimeStatus.Text = "正在试听：" + PetHourlyChime.GetLine(hour); PreviewTick();
+        }
+        else ChimeStatus.Text = audio.LastError ?? "语音暂不可用。";
     }
     private void OnSliderChanged(object sender, RoutedPropertyChangedEventArgs<double> e) { UpdateLabels(); if (!_loading) Changed?.Invoke(); }
     private void UpdateLabels()
@@ -140,10 +175,13 @@ public partial class DesktopPetSettingsPanel : UserControl
         if (now < _typingPreviewUntil) _preview.Trigger(PetTrigger.Typing, now);
         _preview.Tick(now, _sleepPreview ? 1000 : 0, _sleepPreview, 90, false, 0, 0);
         var motion = Services.ThemeManager.Current.AnimationsEnabled;
-        PreviewSprite.SetPose(!motion && _preview.IsExpression ? _preview.StillPose : !motion && _preview.IsTyping ? PetPose.TypingLeft : !motion && _preview.IsGreeting ? PetPose.GreetA : !motion && _preview.Pose == PetPose.RiceHatTilt ? PetPose.RiceHat : _preview.Pose);
-        _bob.Y = motion && !_preview.IsTyping && !_preview.IsExpression ? _preview.Pose == PetPose.Cheer ? -10 * Math.Abs(Math.Sin(now / 100d)) : Math.Sin(now / 900d) * 2 : 0;
-        _timer.Interval = TimeSpan.FromMilliseconds(!motion ? 200 : _preview.IsTyping ? 130 : 100);
+        if (!PreviewSprite.RenderAnimation(_preview.ActionPose, _preview.StartedAt, now, motion, _preview.Pose)) PreviewSprite.SetPose(!motion && _preview.IsExpression ? _preview.StillPose : !motion && _preview.IsTyping ? PetPose.TypingLeft : !motion && _preview.IsGreeting ? PetPose.GreetA : !motion && _preview.Pose == PetPose.RiceHatTilt ? PetPose.RiceHat : _preview.Pose);
+        _facing.ScaleX = PreviewSprite.IsAnimationMirrored ? -1 : 1;
+        _bob.Y = motion && !PreviewSprite.HasNativeAnimation && !_preview.IsTyping && !_preview.IsExpression ? _preview.Pose == PetPose.Cheer ? -10 * Math.Abs(Math.Sin(now / 100d)) : Math.Sin(now / 900d) * 2 : 0;
+        _timer.Interval = TimeSpan.FromMilliseconds(motion && PreviewSprite.HasNativeAnimation ? 40 : !motion ? 200 : _preview.IsTyping ? 130 : 100);
         var bubble = !motion ? _preview.StillBubble : _preview.Bubble;
+        if (now < _chimePreviewUntil) bubble = PetHourlyChime.GetLine(DateTimeOffset.Now.Hour);
+        if (bubble.Length == 0 && PreviewSprite.HasNativeAnimation) bubble = "原版动画：" + PreviewSprite.CurrentAnimationName;
         PreviewCaption.Text = bubble.Length > 0 ? bubble : "动作预览，不会改变桌宠开关。";
     }
 }
